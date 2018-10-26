@@ -13,7 +13,7 @@ LARGE_FONT = ("Verdana", 12)
 class PageThree(tk.Frame):
 
     def __init__(self, parent, controller):
-        from gui.startPage import StartPage
+        from front.gui.startPage import StartPage
 
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Graph Page!", font=LARGE_FONT)

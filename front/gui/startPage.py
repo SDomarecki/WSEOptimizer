@@ -8,9 +8,9 @@ LARGE_FONT = ("Verdana", 12)
 class StartPage(tk.Frame):
 
     def __init__(self, parent, controller):
-        from gui.pageOne import PageOne
-        from gui.pageTwo import PageTwo
-        from gui.pageThree import PageThree
+        from front.gui.pageOne import PageOne
+        from front.gui.pageTwo import PageTwo
+        from front.gui.pageThree import PageThree
 
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)

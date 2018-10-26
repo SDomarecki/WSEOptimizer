@@ -1,4 +1,10 @@
-from gui.main_window import SeaofBTCapp
+from front.gui.main_window import WSEOapp
+import configparser
 
-app = SeaofBTCapp()
-app.mainloop()
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+appName = config['ROOT']['APP_NAME']
+version = config['ROOT']['VERSION']
+
+
