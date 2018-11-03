@@ -112,5 +112,5 @@ dmypy.json
 
 .idea
 
-database/technical
-database/fundamental
+*.csv
+*.json

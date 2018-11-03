@@ -42,7 +42,9 @@ class Gene:
                 return self.result_false
 
     def get_fundamental_strength(self, fundamentals, day):
-        financial_statement = fundamentals.getClosestStatement(day)
+        from shared.model.company import date_to_quarter
+        quarter = date_to_quarter(day)
+        financial_statement = fundamentals[quarter]
         return financial_statement[self.indicator]
 
     def get_technical_strength(self, technicals, day):

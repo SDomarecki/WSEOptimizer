@@ -5,6 +5,7 @@ class Agent:
 
     def __init__(self, length):
         self.genes = [create_random_gene() for _ in range(1, length)]
+        self.fitness = -1
 
     def calculate_strength(self, stock, day):
         strength = 0

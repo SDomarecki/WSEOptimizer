@@ -5,7 +5,7 @@ import matplotlib
 
 from shared.model.company import Company
 from shared.model.config import read_config, Config
-from shared.model.technical import StockDay
+
 
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
