@@ -321,7 +321,7 @@ def ease_of_movement(data, period=14, high_col='<HIGH>', low_col='<LOW>', vol_co
         vol = row[vol_col]
         if vol == 0:
             vol = 1
-        box_ratio = (vol / 100000000) / (diff)
+        box_ratio = (vol / 100000000) / diff
         emv = midpoint_move / box_ratio
 
         data.set_value(index, 'emv', emv)
@@ -427,10 +427,10 @@ Returns:
 """
 
 
-def money_flow_index(data, periods=14, vol_col='<VOL>'):
+def money_flow_index(data, periods=14, high_col='<HIGH>', low_col='<LOW>', close_col='<CLOSE>', vol_col='<VOL>'):
     remove_tp_col = False
     if not 'typical_price' in data.columns:
-        data = typical_price(data)
+        data = typical_price(data, high_col=high_col, low_col=low_col, close_col=close_col)
         remove_tp_col = True
 
     data['money_flow'] = data['typical_price'] * data[vol_col]
@@ -685,9 +685,11 @@ def williams_r(data, periods=14, high_col='<HIGH>', low_col='<LOW>', close_col='
 
     for index, row in data.iterrows():
         if index > periods:
+            price_range = max(data[high_col][index - periods:index]) - min(data[low_col][index - periods:index])
+            if price_range == 0:
+                continue
             data.set_value(index, 'williams_r', ((max(data[high_col][index - periods:index]) - row[close_col]) /
-                                                 (max(data[high_col][index - periods:index]) - min(
-                                                     data[low_col][index - periods:index]))))
+                                                 price_range) * (-100))
 
     return data
 

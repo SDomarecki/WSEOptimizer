@@ -10,5 +10,8 @@ class Agent:
     def calculate_strength(self, stock, day):
         strength = 0
         for gene in self.genes:
-            strength += gene.getSubstrength(stock, day)
+            try:
+                strength += gene.get_substrength(stock, day)
+            except KeyError:
+                continue
         return strength

@@ -21,9 +21,9 @@ class Wallet:
 
     def trade(self, stock_strengths, day, current_total):
         # 1. realizuj sprzedaż
-        for i in range(stock_strengths.length()-1, 10, -1):
+        for i in range(len(stock_strengths)-1, 10, -1):
             loc = self.stocksHold.get(stock_strengths[i].ticker)
-            if loc is None:
+            if loc is not None:
                 self.sell(stock_strengths[i], day)
 
         # 2. realizuj kupno
@@ -36,7 +36,10 @@ class Wallet:
         direction = 'SELL'
         ticker = stock.ticker
         amount = self.stocksHold[stock.ticker].amount
-        price = stock.technicals[day]['Close']
+        try:
+            price = stock.technicals.at[day, 'Close']
+        except KeyError:
+            return
 
         del self.stocksHold[ticker]
         # TODO jeszcze dowalic opłaty maklera
@@ -49,7 +52,11 @@ class Wallet:
         order_value = min(self.cash, total_value/5)
         direction = 'BUY'
         ticker = stock.ticker
-        price = stock.technicals[day]['Close']
+        try:
+            price = stock.technicals.at[day, 'Close']
+        except KeyError:
+            return
+
         amount = int(math.floor(order_value/price))
         if amount < 1:
             return
@@ -57,14 +64,30 @@ class Wallet:
         # TODO jeszcze dowalic opłaty maklera
         stock_order = StockOrder(day, direction, ticker, amount, price)
         self.ordersLog.append(stock_order)
-        self[ticker] = stock_order
+        self.stocksHold[ticker] = stock_order
         self.cash -= order_value
 
     def get_total_value(self, database, end_date):
         sum = self.cash
-        for stock in self.stocksHold:
-            sum += database[stock.ticker].technicals[end_date]['Close'] * stock.amount
+        for stock in self.stocksHold.values():
+            company = database[stock.ticker]
+            today_price = self.get_closest_day_price(company.technicals, end_date)
+            sum += today_price * stock.amount
         return sum
+
+    def get_closest_day_price(self, technicals, day):
+        import datetime
+
+        price = -1
+        delta = datetime.timedelta(days=1)
+        while price == -1:
+            try:
+                price = technicals.at[day, 'Close']
+            except KeyError:
+                day -= delta
+                continue
+
+        return price
 
     # TODO
     def get_current_sharpe(self, database):

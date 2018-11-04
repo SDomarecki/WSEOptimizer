@@ -9,7 +9,7 @@ from shared.model.config import read_config
 
 
 def ga():
-    database = read_database()
+    database = read_database(path_to_database= '../../database')
 
     agents = init_agents(Config.initial_population, 10)
     generations = Config.iterations
@@ -19,6 +19,7 @@ def ga():
         print('Generation: ' + str(generation))
 
         for agent in agents:
+            print("Agent testing <3")
             agent.fitness = fitness(agent, database)
 
         agents = selection(agents)
@@ -50,12 +51,23 @@ def fitness(tested_agent: Agent, database, validation=False) -> float:
     day = start_date
     delta = datetime.timedelta(days=1)
     while day < end_date:
+        if day.weekday() == 5:
+            day += delta
+        if day.weekday() == 6:
+            day += delta
+
         stock_strengths = {}
-        for stock in database:
-            stock_strengths[tested_agent.calculate_strength(stock, day)].append(stock)
-        ordered_stock_strengths = collections.OrderedDict(sorted(stock_strengths.items()))
-        current_total = wallet.get_total_value(database, day)
-        wallet.trade(ordered_stock_strengths, current_total)
+        for stock in database.values():
+            strength = tested_agent.calculate_strength(stock, day)
+            stock_strengths[stock] = strength
+
+        ordered_stocks = []
+        ordered_tuples = sorted(stock_strengths.items(), key=lambda kv: kv[1], reverse=True)
+        for key, value in ordered_tuples:
+            ordered_stocks.append(key)
+
+        current_total = wallet.get_total_value(database, end_date=day)
+        wallet.trade(ordered_stocks, day, current_total)
         day += delta
 
     if Config.return_method == "cash":

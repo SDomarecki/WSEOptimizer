@@ -15,39 +15,44 @@ class Company:
             'utf8').decode("utf-8")
 
     def convert_columns(self):
-        self.technicals = self.technicals.rename(columns={'Data': 'Date',
-                                                          'Otwarcie': 'Open',
-                                                          'Najwyzszy': 'High',
-                                                          'Najnizszy': 'Low',
-                                                          'Zamkniecie': 'Close',
-                                                          'Wolumen': 'Volume'})
+        self.technicals.rename(columns={'Data': 'Date',
+                                        'Otwarcie': 'Open',
+                                        'Najwyzszy': 'High',
+                                        'Najnizszy': 'Low',
+                                        'Zamkniecie': 'Close',
+                                        'Wolumen': 'Volume'},
+                               inplace=True)
 
     def convert_date_as_index(self):
-        self.technicals.set_index('Data', inplace=True)
+        self.technicals.set_index('Date', inplace=True)
 
-    # TODO Uzupełnić
     def calculate_all_technicals(self):
         self.calculate_circulation()
         self.calculate_sma15()
         self.calculate_sma40()
 
         self.technicals = ema(self.technicals, period=200, close_col='Close')
-        self.technicals = typical_price(self.technicals, 'High', 'Low', 'Close')
         self.technicals = rsi(self.technicals, periods=14, close_col='Close')
         self.technicals = macd(self.technicals, period_long=26, period_short=12, period_signal=9, close_col='Close')
         self.technicals = trix(self.technicals, periods=14, signal_periods=9, close_col='Close')
         self.technicals = williams_r(self.technicals, periods=10, high_col='High', low_col='Low', close_col='Close')
-
-        self.technicals = money_flow_index(self.technicals, vol_col='Volume')
+        self.technicals = money_flow_index(self.technicals,
+                                           periods=14,
+                                           high_col='High',
+                                           low_col='Low',
+                                           close_col='Close',
+                                           vol_col='Volume')
+        self.technicals = momentum(self.technicals, periods=14, close_col='Close')
+        self.technicals = ease_of_movement(self.technicals, period=14, high_col='High', low_col='Low', vol_col='Volume')
 
     def calculate_circulation(self):
         self.technicals['Circulation'] = self.technicals['Close'] * self.technicals['Volume']
 
     def calculate_sma15(self):
-        self.technicals['sma15'] = self.technicals['Zamkniecie'].rolling(window=15).mean()
+        self.technicals['sma15'] = self.technicals['Close'].rolling(window=15).mean()
 
     def calculate_sma40(self):
-        self.technicals['sma40'] = self.technicals['Zamkniecie'].rolling(window=40).mean()
+        self.technicals['sma40'] = self.technicals['Close'].rolling(window=40).mean()
 
     # P/E = current_price * stocks_amount / last_statements_earnings*4
     def get_price_to_earnings(self, date) -> float:
@@ -71,5 +76,6 @@ class Company:
     def calculate_all_fundamentals(self):
         pass
 
+
 def date_to_quarter(date):
-    return date.year + "Q" + pd.Timestamp(date).quarter
+    return str(date.year) + "/Q" + str(pd.Timestamp(date).quarter)

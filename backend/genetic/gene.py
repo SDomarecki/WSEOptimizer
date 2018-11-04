@@ -4,63 +4,35 @@
 #     return result_false
 #
 # W uogólnieniu value i indicator mogłyby być zamienne oraz result_true/false byłyby kolejnymi genami
+import random
+
 
 class Gene:
-    indicator = None  #string?
-    comparator = None #string - less than, more than, equals?
-    value = 0
-    result_true = 0
-    result_false = 0
-
-    def __init__(self, indicator, comparator, value, result_true, result_false):
-        self.indicator = indicator
-        self.comparator = comparator
-        self.value = value
-        self.result_true = result_true
-        self.result_false = result_false
 
     def get_substrength(self, company, day):
-        if self.indicator.type == 'fundamental':
-            indicator_value = self.get_fundamental_strength(company.fundamentals, day)
-        else:
-            indicator_value = self.get_technical_strength(company.technicals, day)
-
-        if self.comparator == 'more_than':
-            if indicator_value > self.value:
-                return self.result_true
-            else:
-                return self.result_false
-        elif self.comparator == 'less_than':
-            if indicator_value < self.value:
-                return self.result_true
-            else:
-                return self.result_false
-        else:
-            if indicator_value == self.value:
-                return self.result_true
-            else:
-                return self.result_false
-
-    def get_fundamental_strength(self, fundamentals, day):
-        from shared.model.company import date_to_quarter
-        quarter = date_to_quarter(day)
-        financial_statement = fundamentals[quarter]
-        return financial_statement[self.indicator]
-
-    def get_technical_strength(self, technicals, day):
-        stock_day = technicals[day]
-        return stock_day[self.indicator]
+        pass
 
 
 def create_random_gene():
-    possible_indicators = ['SMA_15_NORM', 'SMA_40_NORM', 'SMA_200_NORM', 'RSI', 'MFI']
+    from backend.genetic.genes.pe_gene import PEGene
+    from backend.genetic.genes.pbv_gene import PBVGene
+    from backend.genetic.genes.ps_gene import PSGene
+    from backend.genetic.genes.roe_gene import ROEGene
+    from backend.genetic.genes.roa_gene import ROAGene
+    from backend.genetic.genes.sma15_gene import SMA15Gene
+    from backend.genetic.genes.sma40_gene import SMA40Gene
+    from backend.genetic.genes.ema200_gene import EMA200Gene
+    from backend.genetic.genes.macd_gene import MACDGene
+    from backend.genetic.genes.rsi_gene import RSIGene
+    from backend.genetic.genes.trix_gene import TrixGene
+    from backend.genetic.genes.williams_gene import WilliamsGene
+    from backend.genetic.genes.mfi_gene import MFIGene
+    from backend.genetic.genes.momentum_gene import MomentumGene
+    from backend.genetic.genes.emv_gene import EMVGene
 
-    import random
-    indicator = random.choice(possible_indicators)
-    #TODO More randomic!!
-    comparator = 'more_than'
-    value = 0.5
-    result_true = 50
-    result_false = -50
+    possible_indicators = [PEGene, PBVGene, PSGene, ROEGene, ROAGene,
+                           SMA15Gene, SMA40Gene, EMA200Gene,
+                           RSIGene, MACDGene, TrixGene, WilliamsGene,
+                           MFIGene, MomentumGene, EMVGene]
 
-    return Gene(indicator, comparator, value, result_true, result_false)
+    return random.choice(possible_indicators)()

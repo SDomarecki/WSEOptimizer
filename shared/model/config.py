@@ -17,6 +17,8 @@ class Config:
     start_cash = 0
     start_date = None
     end_date = None
+    validation_start_date = None
+    validation_end_date = None
     return_method = ""
     benchmark = ""
     risk_free_return = 0.0
@@ -43,6 +45,8 @@ def read_config():
     Config.start_cash = float(config['WALLET']['START_CASH'])
     Config.start_date = datetime.datetime.strptime(config['WALLET']['START_DATE'], '%Y-%m-%d')
     Config.end_date = datetime.datetime.strptime(config['WALLET']['END_DATE'], '%Y-%m-%d')
+    Config.validation_start_date = datetime.datetime.strptime(config['WALLET']['VALID_START_DATE'], '%Y-%m-%d')
+    Config.validation_end_date = datetime.datetime.strptime(config['WALLET']['VALID_END_DATE'], '%Y-%m-%d')
     Config.return_method = config['WALLET']['RETURN_METHOD']
     Config.benchmark = config['WALLET']['BENCHMARK']
     Config.risk_free_return = float(config['WALLET']['RISK_FREE_RETURN'])
@@ -50,6 +54,8 @@ def read_config():
     Config.fee_rate = float(config['WALLET']['FEE_RATE'])
     Config.fee_added = float(config['WALLET']['FEE_ADDED'])
     Config.fee_max = float(config['WALLET']['FEE_MAX'])
+
+
 
 
 # TODO update 2018-10-24
