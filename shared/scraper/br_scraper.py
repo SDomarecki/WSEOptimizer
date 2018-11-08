@@ -21,6 +21,17 @@ class BRscraper:
         return companies
 
     @staticmethod
+    def get_sector(link: str):
+
+        sector = ""
+        url = 'https://www.biznesradar.pl/notowania' + link
+        page = get_page(url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+        sector = soup.find(text='Sektor:').parent.parent.findNext('td').contents[1].contents[0]
+        return sector
+
+
+    @staticmethod
     def get_fundamentals(link: str):
         df1 = BRscraper.get_raw_fundamentals(link)
 

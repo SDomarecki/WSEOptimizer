@@ -6,6 +6,10 @@ class StockOrder:
         self.amount = amount
         self.price = price
 
-    def print(self):
-        print(self.date + " " + self.direction + " " + self.ticker + " " + self.amount + " x " + self.price)
+    def to_string(self):
+        return self.date.strftime('%Y-%m-%d') + " " \
+               + self.direction + " " \
+               + self.ticker + " " \
+               + str(self.amount) + " x " \
+               + str(self.price)
 

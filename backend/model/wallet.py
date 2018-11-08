@@ -21,13 +21,13 @@ class Wallet:
 
     def trade(self, stock_strengths, day, current_total):
         # 1. realizuj sprzedaż
-        for i in range(len(stock_strengths)-1, 10, -1):
+        for i in range(len(stock_strengths)-1, Config.stocks_to_hold, -1):
             loc = self.stocksHold.get(stock_strengths[i].ticker)
             if loc is not None:
                 self.sell(stock_strengths[i], day)
 
         # 2. realizuj kupno
-        for i in range(0, 4):
+        for i in range(0, Config.stocks_to_buy-1):
             loc = self.stocksHold.get(stock_strengths[i].ticker)
             if loc is None:
                 self.buy(stock_strengths[i], day, current_total)
@@ -42,8 +42,10 @@ class Wallet:
             return
 
         del self.stocksHold[ticker]
-        # TODO jeszcze dowalic opłaty maklera
-        self.cash += amount*price
+        charge = amount*price
+        fee = self.get_fee_from_charge(charge)
+        self.cash += charge
+        self.cash -= fee
         self.ordersLog.append(StockOrder(day, direction, ticker, amount, price))
 
     def buy(self, stock: Company, day, total_value: float):
@@ -61,11 +63,20 @@ class Wallet:
         if amount < 1:
             return
         order_value = price * amount
-        # TODO jeszcze dowalic opłaty maklera
+        fee = self.get_fee_from_charge(order_value)
         stock_order = StockOrder(day, direction, ticker, amount, price)
         self.ordersLog.append(stock_order)
         self.stocksHold[ticker] = stock_order
         self.cash -= order_value
+        self.cash -= fee
+
+    def get_fee_from_charge(self, charge):
+        fee = charge * Config.fee_rate/100 + Config.fee_added
+        if fee < Config.fee_min:
+            fee = Config.fee_min
+        if Config.fee_max != -1 and fee > Config.fee_max:
+            fee = Config.fee_max
+        return fee
 
     def get_total_value(self, database, end_date):
         sum = self.cash

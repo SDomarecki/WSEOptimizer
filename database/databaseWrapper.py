@@ -18,6 +18,7 @@ def create_database():
     pool = ThreadPool(4)
 
     companies = pool.map(collect_company_info, companies.values())
+
     return companies
 
 
@@ -37,25 +38,40 @@ def read_database(path_to_database: str):
         company.fundamentals = get_fundamentals(path_to_database, ticker)
         company.technicals = get_technicals(path_to_database, ticker)
         companies[ticker] = company
+
+    sectors = []
+    for company in companies.values():
+        if company.sector not in sectors:
+            sectors.append(company.sector)
+    print(sectors)
+
     return companies
 
 
 def company_decoder(json) -> Company:
-    return Company(json['name'], json['ticker'], json['link'])
+    company = Company(json['name'], json['ticker'], json['link'])
+    company.sector = json['sector']
+    return company
 
 
 def collect_company_info(company) -> Company:
     global fetched
 
-    company.fundamentals = BRscraper.get_fundamentals(company.link)
-    company.calculate_all_fundamentals()
-    company.technicals = get_raw_technicals(company.ticker)
-    company.convert_columns()
-    company.calculate_all_technicals()
-    company.convert_date_as_index()
 
-    company.fundamentals.to_csv('fundamental2/' + company.ticker + '.csv')
-    company.technicals.to_csv('technical2/' + company.ticker + '.csv')
+    try:
+        company.sector = BRscraper.get_sector(company.link)
+    except AttributeError:
+        return
+
+    # company.fundamentals = BRscraper.get_fundamentals(company.link)
+    # company.calculate_all_fundamentals()
+    # company.technicals = get_raw_technicals(company.ticker)
+    # company.convert_columns()
+    # company.calculate_all_technicals()
+    # company.convert_date_as_index()
+    #
+    # company.fundamentals.to_csv('fundamental2/' + company.ticker + '.csv')
+    # company.technicals.to_csv('technical2/' + company.ticker + '.csv')
     with io.open('basic_info/' + company.ticker + '.json', 'w') as f:
         f.write(company.toJSON())
     fetched += 1
@@ -87,4 +103,5 @@ def get_technicals(path: str, ticker: str):
 
 
 if __name__ == "__main__":
-    read_database('basic_info')
+    read_database('.')
+    # create_database()

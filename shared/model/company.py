@@ -6,6 +6,7 @@ class Company:
         self.name = name
         self.ticker = ticker
         self.link = link
+        self.sector = ""
         self.fundamentals = None  # Pandas DataFrame object!
         self.technicals = None  # Pandas DataFrame object!
 

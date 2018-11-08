@@ -19,9 +19,7 @@ def create_random_gene():
     from backend.genetic.genes.ps_gene import PSGene
     from backend.genetic.genes.roe_gene import ROEGene
     from backend.genetic.genes.roa_gene import ROAGene
-    from backend.genetic.genes.sma15_gene import SMA15Gene
-    from backend.genetic.genes.sma40_gene import SMA40Gene
-    from backend.genetic.genes.ema200_gene import EMA200Gene
+
     from backend.genetic.genes.macd_gene import MACDGene
     from backend.genetic.genes.rsi_gene import RSIGene
     from backend.genetic.genes.trix_gene import TrixGene
@@ -30,9 +28,18 @@ def create_random_gene():
     from backend.genetic.genes.momentum_gene import MomentumGene
     from backend.genetic.genes.emv_gene import EMVGene
 
+    from backend.genetic.genes.sma15_vs_price_gene import SMA15VsPriceGene
+    from backend.genetic.genes.sma40_vs_price_gene import SMA40VsPriceGene
+    from backend.genetic.genes.ema200_vs_price_gene import EMA200VsPriceGene
+    from backend.genetic.genes.sma15_normalized_gene import SMA15NormalizedGene
+    from backend.genetic.genes.sma40_normalized_gene import SMA40NormalizedGene
+    from backend.genetic.genes.ema200_normalized_gene import EMA200NormalizedGene
+
+    from backend.genetic.genes.sector_gene import SectorGene
     possible_indicators = [PEGene, PBVGene, PSGene, ROEGene, ROAGene,
-                           SMA15Gene, SMA40Gene, EMA200Gene,
+                           SMA15VsPriceGene, SMA40VsPriceGene, EMA200VsPriceGene,
+                           SMA15NormalizedGene, SMA40NormalizedGene, EMA200NormalizedGene,
                            RSIGene, MACDGene, TrixGene, WilliamsGene,
-                           MFIGene, MomentumGene, EMVGene]
+                           MFIGene, MomentumGene, EMVGene, SectorGene]
 
     return random.choice(possible_indicators)()

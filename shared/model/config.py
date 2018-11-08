@@ -1,5 +1,6 @@
 import configparser
 import datetime
+import json
 
 
 class Config:
@@ -10,7 +11,10 @@ class Config:
 
     last_used_ticker = ""
 
+    timedelta = 0
     initial_population = 0
+    initial_length = 0
+    agents_to_drop = 0
     max_genes = 0
     iterations = 0
 
@@ -27,6 +31,13 @@ class Config:
     fee_added = 0
     fee_max = 0
 
+    stocks_to_buy = 0
+    stocks_to_hold = 0
+
+    min_circulation = 0
+    max_circulation = 0
+    sectors = []
+    companies = []
 
 def read_config():
     config = configparser.ConfigParser()
@@ -38,7 +49,10 @@ def read_config():
 
     Config.last_used_ticker = config['LAST_USED']['TICKER']
 
+    Config.timedelta = int(config['GA']['TIMEDELTA'])
     Config.initial_population = int(config['GA']['INITIAL_POPULATION'])
+    Config.initial_length = int(config['GA']['INITIAL_LENGTH'])
+    Config.agents_to_drop = float(config['GA']['AGENTS_TO_DROP'])
     Config.max_genes = int(config['GA']['MAX_GENES'])
     Config.iterations = int(config['GA']['ITERATIONS'])
 
@@ -55,8 +69,14 @@ def read_config():
     Config.fee_added = float(config['WALLET']['FEE_ADDED'])
     Config.fee_max = float(config['WALLET']['FEE_MAX'])
 
+    Config.stocks_to_buy = int(config['WALLET']['STOCKS_TO_BUY'])
+    Config.stocks_to_hold = int(config['WALLET']['STOCKS_TO_HOLD'])
 
+    Config.min_circulation = int(config['FILTER']['MIN_CIRCULATION'])
+    Config.max_circulation = int(config['FILTER']['MAX_CIRCULATION'])
 
+    Config.sectors = config['FILTER']['SECTORS'].split(', ')
+    Config.companies = config['FILTER']['COMPANIES'].split(', ')
 
 # TODO update 2018-10-24
 def reset():
