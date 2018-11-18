@@ -1,4 +1,4 @@
-from front.gui.main_window import WSEOapp
+# inactve - see backend/genetic/GA_main.py
 import configparser
 
 config = configparser.ConfigParser()

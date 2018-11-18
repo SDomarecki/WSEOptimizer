@@ -1,10 +1,42 @@
-"""
-Copyright, Rinat Maksutov, 2017.
-License: GNU General Public License
-"""
-
 import numpy as np
 import pandas as pd
+
+
+"""
+Circulation
+Source: ===
+Params: 
+    data: pandas DataFrame
+    period: smoothing period
+    close_col: the name of the CLOSE values column
+
+Returns:
+    copy of 'data' DataFrame with 'ema[period]' column added
+"""
+
+
+def circulation(data, close_col='<CLOSE>', vol_col='<VOL>'):
+    data['Circulation'] = data[close_col] * data[vol_col]
+    return data
+
+
+"""
+Simple moving average
+Source: ===
+Params: 
+    data: pandas DataFrame
+    period: smoothing period
+    close_col: the name of the CLOSE values column
+
+Returns:
+    copy of 'data' DataFrame with 'ema[period]' column added
+"""
+
+
+def sma(data, period=0, close_col='<CLOSE>'):
+    data['sma' + str(period)] = data[close_col].rolling(window=period).mean()
+    return data
+
 
 """
 Exponential moving average
@@ -21,7 +53,6 @@ Returns:
 
 def ema(data, period=0, close_col='<CLOSE>'):
     data['ema' + str(period)] = data[close_col].ewm(ignore_na=False, min_periods=period, com=period, adjust=True).mean()
-
     return data
 
 
