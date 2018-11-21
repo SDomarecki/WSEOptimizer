@@ -1,4 +1,4 @@
-from genetic.gene import Gene
+from genetic.genes.gene import Gene
 import random
 
 
@@ -21,14 +21,21 @@ class SectorGene(Gene):
                         'NewConnect: Informatyka', 'NewConnect: Inwestycje']
 
     def __init__(self):
-        self.result_true = random.uniform(-10, 10)
-        self.result_false = random.uniform(-10, 10)
+        super().__init__()
         self.sector = random.choice(self.possible_sectors)
 
-    def get_substrength(self, company, day):
+    def condition(self, company, day):
         company_sector = company.sector
 
         if company_sector == self.sector:
-            return self.result_true
+            return True
         else:
-            return self.result_false
+            return False
+
+    def to_string(self):
+        return "If(Sector == " \
+               + self.sector \
+               + ") then " \
+               + str(self.result_true) \
+               + " else " \
+               + str(self.result_false)

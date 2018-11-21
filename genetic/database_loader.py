@@ -1,6 +1,7 @@
 import pandas as pd
 
 from shared.company import Company
+from shared.config import Config
 
 
 def read_database(path_to_database: str):
@@ -26,6 +27,8 @@ def read_database(path_to_database: str):
             sectors.append(company.sector)
     print(sectors)
 
+    companies = filter_database(companies)
+
     return companies
 
 
@@ -46,3 +49,49 @@ def get_technicals(path: str, ticker: str):
     df = pd.read_csv(path + '/technical/' + ticker + '.csv', delimiter=',', index_col='Date')
     df.index = pd.to_datetime(df.index)
     return df
+
+
+def filter_database(database):
+    # TODO
+    min_circulation = Config.min_circulation
+    max_circulation = Config.max_circulation
+
+    to_delete = []
+
+    import pandas as pd
+    for company in database.values():
+        company.technicals = pd.concat([company.technicals.loc[Config.start_date:Config.end_date],
+                                        company.technicals.loc[
+                                        Config.validation_start_date:Config.validation_end_date]])
+
+        circulation_mean = float(company.technicals['Circulation'].mean())
+        if min_circulation != -1 and circulation_mean < Config.min_circulation:
+            to_delete.append(company.ticker)
+        if max_circulation != -1 and circulation_mean > Config.max_circulation:
+            to_delete.append(company.ticker)
+
+    for ticker in to_delete:
+        del database[ticker]
+    database = filter_by_company_name(database)
+    database = filter_by_sector(database)
+    return database
+
+
+def filter_by_company_name(database):
+    return database
+
+
+def filter_by_sector(database):
+    sectors = Config.sectors
+    to_delete = []
+
+    if sectors[0] == 'All':
+        return database
+
+    for company in database.values():
+        if company.sector not in sectors:
+            to_delete.append(company.ticker)
+
+    for ticker in to_delete:
+        del database[ticker]
+    return database
