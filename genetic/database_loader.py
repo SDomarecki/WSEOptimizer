@@ -95,3 +95,26 @@ def filter_by_sector(database):
     for ticker in to_delete:
         del database[ticker]
     return database
+
+
+def get_target_ratio(ticker: str, start_date, end_date, path_to_database):
+    ticker = ticker.lower()
+    df = pd.read_csv(path_to_database + '/benchmarks/' + ticker + '.csv', delimiter=';', index_col=0)
+    df.index = pd.to_datetime(df.index)
+
+    start_value = get_closest_value(df, start_date)
+    end_value = get_closest_value(df, end_date)
+
+    return end_value / start_value
+
+
+def get_closest_value(df, date):
+    import datetime
+    delta = datetime.timedelta(days=1)
+
+    while True:
+        try:
+            return df.at[date, 'Zamkniecie']
+        except KeyError:
+            date -= delta
+            continue

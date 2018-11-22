@@ -11,14 +11,15 @@ import pandas as pd
 class Gene:
 
     def __init__(self):
-        self.result_true = random.uniform(-10, 10)
-        self.result_false = random.uniform(-10, 10)
 
-    def get_substrength(self, company, day) -> float:
+        self.result_true = random.randint(1, 10) * random.choice([-1,1])
+        self.result_false = 0
+
+    def get_substrength(self, company, day) -> int:
         if self.condition(company, day):
             return self.result_true
         else:
-            return self.result_false
+            return 0
 
     def condition(self, company, day) -> bool:
         raise NotImplementedError("Please Implement this method")

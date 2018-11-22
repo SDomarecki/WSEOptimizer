@@ -62,7 +62,7 @@ class Agent:
         if Config.return_method == "total_value":
             return self.wallet.get_total_value(database, end_date)
         elif Config.return_method == "sharpe":
-            return self.wallet.get_current_sharpe(database)
+            return self.wallet.get_current_sharpe()
         else:
             return self.wallet.get_current_information_ratio()
 
@@ -79,9 +79,12 @@ class Agent:
         return {
             "id": self.id,
             "strategy": self.to_string(),
-            "fitness": self.fitness,
-            "validation": self.validation
+            "fitness": "{0:.2f}".format(self.fitness),
+            "validation": "{0:.2f}".format(self.validation)
         }
 
     def to_string(self) -> [str]:
-        return list(map(lambda g: g.to_string(), self.genes))
+        weighted_gene_str = []
+        for i in range(len(self.genes)):
+            weighted_gene_str.append("{0:.2f}".format(self.weights[i]) + " x " + self.genes[i].to_string())
+        return weighted_gene_str

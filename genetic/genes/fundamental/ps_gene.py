@@ -33,7 +33,7 @@ class PSGene(Gene):
         return "If(P/S " \
                + c \
                + " " \
-               + str(self.compared_value) \
+               + "{0:.2f}".format(self.compared_value) \
                + ") then " \
                + str(self.result_true) \
                + " else " \
