@@ -67,7 +67,7 @@ class Agent:
             return self.wallet.get_current_information_ratio()
 
     def calculate_strength(self, stock, day) -> float:
-        strength = 0
+        strength = 0.
         for i in range(len(self.genes)):
             try:
                 strength += self.genes[i].get_substrength(stock, day) * self.weights[i]

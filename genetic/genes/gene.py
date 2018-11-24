@@ -12,7 +12,7 @@ class Gene:
 
     def __init__(self):
 
-        self.result_true = random.randint(1, 10) * random.choice([-1,1])
+        self.result_true = random.randint(1, 10) * random.choice([-1, 1])
         self.result_false = 0
 
     def get_substrength(self, company, day) -> int:
@@ -29,4 +29,7 @@ class Gene:
 
     @staticmethod
     def date_to_quarter(date) -> str:
-        return str(date.year) + "/Q" + str(pd.Timestamp(date).quarter)
+        import datetime
+        fin_statement_lag = datetime.timedelta(days=135)
+        lag_date = date - fin_statement_lag
+        return str(lag_date.year) + "/Q" + str(pd.Timestamp(lag_date).quarter)

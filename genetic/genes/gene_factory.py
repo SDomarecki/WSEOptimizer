@@ -7,7 +7,7 @@ class GeneFactory:
 
     @staticmethod
     def create_random_gene() -> Gene:
-        if random.uniform(0.0, 1.0) <= 0.7:
+        if random.uniform(0.0, 1.0) <= 0.5:
             return GeneFactory.create_fundamental_gene()
         else:
             return GeneFactory.create_technical_gene()

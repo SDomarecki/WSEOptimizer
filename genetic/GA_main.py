@@ -23,7 +23,7 @@ class GA:
     def perform_ga(self):
         print("Database size: " + str(len(self.database)) + " companies")
 
-        chunks = 3
+        chunks = 4
         database_chunks = self.split_database_equally(chunks=chunks)
 
         for generation in range(1, self.generations+1):
@@ -34,7 +34,7 @@ class GA:
             for agent in self.agents:
                 agent.calculate_fitness(current_database)
 
-            if generation < self.generations - 1:
+            if generation < self.generations:
                 self.selection()
                 to_create = int((Config.initial_population - len(self.agents)) / 2)
                 self.crossover(to_create)
@@ -121,7 +121,6 @@ class GA:
         file.write(result)
         file.close()
 
-        self.agents[0].wallet.print_order_log()
 
     class JSONPack:
         def __init__(self, agents, target):
@@ -137,7 +136,7 @@ class GA:
 
     def toJSON(self):
         import json
-        return json.dumps(self.JSONPack(self.agents[:5], self.target).__dict__, default=str, indent=4)
+        return json.dumps(self.JSONPack(self.agents[:5], self.target).__dict__, default=str, indent=2)
 
 
 if __name__ == "__main__":
