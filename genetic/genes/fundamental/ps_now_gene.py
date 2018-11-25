@@ -3,7 +3,7 @@ import random
 from genetic.genes.gene import Gene
 
 
-class PEGene(Gene):
+class PSNowGene(Gene):
 
     def __init__(self):
         super().__init__()
@@ -12,9 +12,8 @@ class PEGene(Gene):
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
-        indicator_value = company.fundamentals.at[quarter, 'P/E']
-        if indicator_value is None:
-            return False
+        indicator_value = company.technicals.at[day, 'Close'] / \
+                          company.fundamentals.at[quarter, 'SPS']
 
         if self.comparator == 'more_than':
             if indicator_value > self.compared_value:
@@ -32,7 +31,7 @@ class PEGene(Gene):
             c = ">"
         else:
             c = "<"
-        return "If(P/E " \
+        return "If(P/S Now " \
                + c \
                + " " \
                + "{0:.2f}".format(self.compared_value) \

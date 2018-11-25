@@ -1,7 +1,6 @@
 import configparser
 import datetime
 
-
 class Config:
 
     appName = ""
@@ -12,8 +11,9 @@ class Config:
 
     timedelta = 0
     initial_population = 0
+    agents_to_save = 0
+    constant_length = True
     initial_length = 0
-    agents_to_drop = 0
     max_genes = 0
     iterations = 0
 
@@ -51,8 +51,10 @@ def read_config():
 
     Config.timedelta = int(config['GA']['TIMEDELTA'])
     Config.initial_population = int(config['GA']['INITIAL_POPULATION'])
+
+    Config.agents_to_save = float(config['GA']['AGENTS_TO_SAVE'])
+    Config.constant_length = (config['GA']['CONSTANT_LENGTH'] == 'True')
     Config.initial_length = int(config['GA']['INITIAL_LENGTH'])
-    Config.agents_to_drop = float(config['GA']['AGENTS_TO_DROP'])
     Config.max_genes = int(config['GA']['MAX_GENES'])
     Config.iterations = int(config['GA']['ITERATIONS'])
 

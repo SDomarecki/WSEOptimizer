@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pandas as pd
 
 from shared.company import Company
@@ -99,7 +101,9 @@ def filter_by_sector(database):
 
 def get_target_ratio(ticker: str, start_date, end_date, path_to_database):
     ticker = ticker.lower()
-    df = pd.read_csv(path_to_database + '/benchmarks/' + ticker + '.csv', delimiter=';', index_col=0)
+    df = pd.read_csv(path_to_database + '/benchmarks/' + ticker + '.csv',
+                     delimiter=';',
+                     index_col=0)
     df.index = pd.to_datetime(df.index)
 
     start_value = get_closest_value(df, start_date)

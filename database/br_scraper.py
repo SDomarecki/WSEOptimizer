@@ -30,12 +30,12 @@ class BRscraper:
 
     @staticmethod
     def get_fundamentals(link: str):
-        df1 = BRscraper.get_raw_fundamentals(link)
-        df2 = BRscraper.get_balance(link)
+        # df1 = BRscraper.get_raw_fundamentals(link)
+        # df2 = BRscraper.get_balance(link)
         df3 = BRscraper.get_value_indicators(link)
         df4 = BRscraper.get_profitability_indicators(link)
 
-        fundamentals = pd.concat([df1, df2, df3, df4], axis=1, sort=False).sort_index(inplace=False)
+        fundamentals = pd.concat([df3, df4], axis=1, sort=False).sort_index(inplace=False)
 
         return fundamentals
 
@@ -105,7 +105,7 @@ class BRscraper:
 
     @staticmethod
     def get_value_indicators(link: str):
-        columns = ['P/E', 'P/BV', 'P/S']
+        columns = ['P/E', 'P/BV', 'P/S', 'EPS', 'BVPS', 'SPS']
         indicators = pd.DataFrame(columns=columns)
 
         url = 'https://www.biznesradar.pl/wskazniki-wartosci-rynkowej' + link + ',Q'
@@ -123,6 +123,9 @@ class BRscraper:
         p_es = tr[10].findAll("td")[1:-1]
         p_bvs = tr[4].findAll("td")[1:-1]
         p_ss = tr[8].findAll("td")[1:-1]
+        epss = tr[9].findAll("td")[1:-1]
+        bvpss = tr[3].findAll("td")[1:-1]
+        spss = tr[7].findAll("td")[1:-1]
 
         for i in range(0, len(dates) - 1):
             date = dates[i]
@@ -132,12 +135,21 @@ class BRscraper:
                 continue
             if p_ss[i].contents == [] or p_ss[i].contents[0].name == 'div':
                 continue
+            if epss[i].contents == [] or epss[i].contents[0].name == 'div':
+                continue
+            if bvpss[i].contents == [] or bvpss[i].contents[0].name == 'div':
+                continue
+            if spss[i].contents == [] or spss[i].contents[0].name == 'div':
+                continue
 
             p_e = p_es[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
             p_bv = p_bvs[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
             p_s = p_ss[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
+            eps = epss[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
+            bvps = bvpss[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
+            sps = spss[i].contents[0].contents[0].contents[0].contents[0].strip().replace(" ", "")
 
-            indicators.loc[date] = [float(p_e), float(p_bv), float(p_s)]
+            indicators.loc[date] = [float(p_e), float(p_bv), float(p_s), float(eps), float(bvps), float(sps)]
 
         return indicators
 

@@ -3,18 +3,17 @@ import random
 from genetic.genes.gene import Gene
 
 
-class PEGene(Gene):
+class PBVNowGene(Gene):
 
     def __init__(self):
         super().__init__()
         self.comparator = random.choice(['more_than', 'less_than'])
-        self.compared_value = random.uniform(2, 40)
+        self.compared_value = random.uniform(0.25, 4)
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
-        indicator_value = company.fundamentals.at[quarter, 'P/E']
-        if indicator_value is None:
-            return False
+        indicator_value = company.technicals.at[day, 'Close'] / \
+                          company.fundamentals.at[quarter, 'BVPS']
 
         if self.comparator == 'more_than':
             if indicator_value > self.compared_value:
@@ -32,7 +31,7 @@ class PEGene(Gene):
             c = ">"
         else:
             c = "<"
-        return "If(P/E " \
+        return "If(P/BV Now " \
                + c \
                + " " \
                + "{0:.2f}".format(self.compared_value) \

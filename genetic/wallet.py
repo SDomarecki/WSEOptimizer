@@ -5,14 +5,16 @@ from shared.config import Config
 
 class Wallet:
     def __init__(self):
-        self.cash = Config.start_cash
+        self.cash = Config.start_cash # float
         self.stocksHold = {} # {ticker:StockOrder}
         self.ordersLog = [] # [StockOrder]
-        self.valueHistory = []
+        self.valueHistory = [] # [float]
+        self.valueTimestamps = [] #[Datetime]
 
     def trade(self, stock_strengths, day, database):
         current_total = self.get_total_value(database, end_date=day)
         self.valueHistory.append(current_total)
+        self.valueTimestamps.append(day)
 
         # 1. realizuj sprzedaż
         for i in range(len(stock_strengths)-1, Config.stocks_to_hold, -1):
@@ -27,7 +29,7 @@ class Wallet:
                 if loc is None:
                     self.buy(stock_strengths[i], day, current_total)
 
-    def sell(self, stock, day):
+    def sell(self, stock: Company, day):
         direction = 'SELL'
         ticker = stock.ticker
         try:
@@ -40,6 +42,7 @@ class Wallet:
         fee = self.get_fee_from_charge(order_value)
         self.cash += order_value
         self.cash -= fee
+        self.cash = round(self.cash, 2)
         stock_order = StockOrder(day, direction, ticker, amount, price, fee, self.cash)
         del self.stocksHold[ticker]
         self.ordersLog.append(stock_order)
@@ -63,23 +66,24 @@ class Wallet:
         fee = self.get_fee_from_charge(order_value)
         self.cash -= order_value
         self.cash -= fee
+        self.cash = round(self.cash, 2)
         stock_order = StockOrder(day, direction, ticker, amount, price, fee, self.cash)
         self.stocksHold[ticker] = stock_order
         self.ordersLog.append(stock_order)
 
-    def get_fee_from_charge(self, charge):
+    def get_fee_from_charge(self, charge: float) -> float:
         import statistics as s
-        return s.median([Config.fee_min, round(charge * Config.fee_rate/100 + Config.fee_added, 2), Config.fee_max])
+        return round(s.median([Config.fee_min, round(charge * Config.fee_rate/100 + Config.fee_added, 2), Config.fee_max]), 2)
 
-    def get_total_value(self, database, end_date):
+    def get_total_value(self, database, end_date) -> float:
         total = self.cash
         for stock in self.stocksHold.values():
             company = database[stock.ticker]
             today_price = self.get_closest_day_price(company.technicals, end_date)
             total += today_price * stock.amount
-        return total
+        return round(total, 2)
 
-    def get_closest_day_price(self, technicals, day):
+    def get_closest_day_price(self, technicals, day) -> float:
         import datetime
 
         price = -1

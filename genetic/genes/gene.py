@@ -13,13 +13,13 @@ class Gene:
     def __init__(self):
 
         self.result_true = random.randint(1, 10) * random.choice([-1, 1])
-        self.result_false = 0
+        self.result_false = random.randint(1, 10) * random.choice([-1, 1])
 
     def get_substrength(self, company, day) -> int:
         if self.condition(company, day):
             return self.result_true
         else:
-            return 0
+            return self.result_false
 
     def condition(self, company, day) -> bool:
         raise NotImplementedError("Please Implement this method")

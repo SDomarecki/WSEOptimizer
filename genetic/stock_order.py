@@ -1,5 +1,7 @@
 class StockOrder:
-    def __init__(self, date, direction, ticker, amount, price, fee, cash_remaining):
+    def __init__(self, date, direction: str,
+                 ticker: str, amount: int, price: float,
+                 fee: float, cash_remaining: float):
         self.date = date
         self.direction = direction
         self.ticker = ticker
