@@ -1,5 +1,6 @@
 import random
 
+from config import Config
 from genetic.genes.gene import Gene
 
 
@@ -7,7 +8,7 @@ class GeneFactory:
 
     @staticmethod
     def create_random_gene() -> Gene:
-        if random.uniform(0.0, 1.0) <= 0.7:
+        if random.uniform(0.0, 1.0) <= Config.fundamental_to_all:
             return GeneFactory.create_fundamental_gene()
         else:
             return GeneFactory.create_technical_gene()

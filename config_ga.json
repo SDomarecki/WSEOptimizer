@@ -1,0 +1,47 @@
+{
+  "database": {
+    "min_circulation": 500000,
+    "max_circulation": -1,
+    "sectors": [],
+    "companies": []
+  },
+  "simulation": {
+    "timedelta": 7,
+    "iterations": 100,
+    "initial_population": 100,
+    "learning": {
+      "start_date": "2014-01-01",
+      "end_date": "2015-12-31"
+    },
+    "testing": [
+      {"start_date": "2016-01-01", "end_date": "2017-12-31"}
+    ]
+  },
+  "selection": {
+    "agents_to_save": 0.75
+  },
+  "crossover": {
+    "constant_length": true,
+    "initial_genes": 5,
+    "max_genes": 10,
+    "mutation_rate": 0.1
+  },
+  "wallet": {
+    "start_cash": 100000,
+    "return_method": "total_value",
+    "benchmark": "wig",
+    "risk_free_return": 0.025,
+    "fees": {
+      "min": 0,
+      "rate": 0.098,
+      "added": 1,
+      "max": 125
+    },
+    "stocks_to_buy": 5,
+    "stocks_to_hold": 10
+  },
+  "genes": {
+    "fin_statement_lag": 135,
+    "fundamental_to_all": 0.7
+  }
+}

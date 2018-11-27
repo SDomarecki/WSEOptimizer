@@ -1,4 +1,4 @@
-# WSEOptimizer v0.5
+# WSEOptimizer v0.5.1
 Project created as base for engineering thesis _"Optimization of stock exchange investment strategy with a genetic algorithm"_ written @ AGH UST 2018.
 
 As a whole it computes winning strategy on WSE stocks basing on fundamental & technical analysis indicators optimized by genetic algorithm.
@@ -19,7 +19,7 @@ Another approach is to open project in IDE such as PyCharm and let it manage dep
 Current version includes 3 separate modules:
 * Database - fetches fundamental analysis data from BiznesRadar.pl & computes technical analysis over prepared data from Stooq.pl\
 Returned data is used then by Genetic.\
-Hit `python database/database_wrapper.py` to run.
+Hit `python database/database_operator.py` to run.
 * Genetic - implements main algorithm to optimize investing strategy.\
 More info below.\
 Hit `python genetic/GA_main.py` to run.

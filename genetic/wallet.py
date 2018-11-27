@@ -9,10 +9,10 @@ class Wallet:
         self.stocksHold = {} # {ticker:StockOrder}
         self.ordersLog = [] # [StockOrder]
         self.valueHistory = [] # [float]
-        self.valueTimestamps = [] #[Datetime]
+        self.valueTimestamps = [] # [Datetime]
 
     def trade(self, stock_strengths, day, database):
-        current_total = self.get_total_value(database, end_date=day)
+        current_total = self.get_total_value(database, date=day)
         self.valueHistory.append(current_total)
         self.valueTimestamps.append(day)
 
@@ -75,11 +75,11 @@ class Wallet:
         import statistics as s
         return round(s.median([Config.fee_min, round(charge * Config.fee_rate/100 + Config.fee_added, 2), Config.fee_max]), 2)
 
-    def get_total_value(self, database, end_date) -> float:
+    def get_total_value(self, database, date) -> float:
         total = self.cash
         for stock in self.stocksHold.values():
             company = database[stock.ticker]
-            today_price = self.get_closest_day_price(company.technicals, end_date)
+            today_price = self.get_closest_day_price(company.technicals, date)
             total += today_price * stock.amount
         return round(total, 2)
 
@@ -97,15 +97,15 @@ class Wallet:
 
         return price
 
-    def get_current_sharpe(self) -> float:
+    def get_current_sharpe(self, database, date) -> float:
         import statistics
 
         risk_free = Config.start_cash * (Config.risk_free_return + 1)
-        mean_return = statistics.mean(self.valueHistory)
+        current_return = self.get_total_value(database, date)
         stdev = statistics.stdev(self.valueHistory)
         if stdev == 0:
             return 0
-        return (mean_return - risk_free) / stdev
+        return (current_return - risk_free) / stdev
 
     # TODO
     def get_current_information_ratio(self):

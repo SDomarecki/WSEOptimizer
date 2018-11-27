@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 import pandas as pd
 
 from shared.company import Company
@@ -29,9 +27,9 @@ def read_database(path_to_database: str):
             sectors.append(company.sector)
     print(sectors)
 
-    companies = filter_database(companies)
+    databases = filter_database(companies)
 
-    return companies
+    return databases
 
 
 def company_decoder(json) -> Company:
@@ -53,30 +51,35 @@ def get_technicals(path: str, ticker: str):
     return df
 
 
-def filter_database(database):
-    # TODO
-    min_circulation = Config.min_circulation
-    max_circulation = Config.max_circulation
+def filter_database(database) -> []:
+    database = filter_by_company_name(database)
+    database = filter_by_sector(database)
+
+    databases = []
+    databases.append(filter_database_with_dates(database, Config.start_date, Config.end_date))
+    for validation in Config.validations:
+        databases.append(filter_database_with_dates(database, validation[0], validation[1]))
+    return databases
+
+
+def filter_database_with_dates(database, start_date, end_date):
+    from copy import deepcopy
 
     to_delete = []
-
-    import pandas as pd
-    for company in database.values():
-        company.technicals = pd.concat([company.technicals.loc[Config.start_date:Config.end_date],
-                                        company.technicals.loc[
-                                        Config.validation_start_date:Config.validation_end_date]])
+    new_database = deepcopy(database)
+    for company in new_database.values():
+        company.technicals = company.technicals.loc[start_date:end_date]
 
         circulation_mean = float(company.technicals['Circulation'].mean())
-        if min_circulation != -1 and circulation_mean < Config.min_circulation:
+        if Config.min_circulation != -1 and circulation_mean < Config.min_circulation:
             to_delete.append(company.ticker)
-        if max_circulation != -1 and circulation_mean > Config.max_circulation:
+        if Config.max_circulation != -1 and circulation_mean > Config.max_circulation:
             to_delete.append(company.ticker)
 
     for ticker in to_delete:
-        del database[ticker]
-    database = filter_by_company_name(database)
-    database = filter_by_sector(database)
-    return database
+        del new_database[ticker]
+
+    return new_database
 
 
 def filter_by_company_name(database):
@@ -87,7 +90,7 @@ def filter_by_sector(database):
     sectors = Config.sectors
     to_delete = []
 
-    if sectors[0] == 'All':
+    if not sectors or sectors[0] == 'All':
         return database
 
     for company in database.values():
@@ -99,15 +102,18 @@ def filter_by_sector(database):
     return database
 
 
-def get_target_ratio(ticker: str, start_date, end_date, path_to_database):
+def get_benchmark(ticker: str, path_to_database):
     ticker = ticker.lower()
     df = pd.read_csv(path_to_database + '/benchmarks/' + ticker + '.csv',
                      delimiter=';',
                      index_col=0)
     df.index = pd.to_datetime(df.index)
+    return df
 
-    start_value = get_closest_value(df, start_date)
-    end_value = get_closest_value(df, end_date)
+
+def get_target_ratio(benchmark, start_date, end_date) -> float:
+    start_value = get_closest_value(benchmark, start_date)
+    end_value = get_closest_value(benchmark, end_date)
 
     return end_value / start_value
 

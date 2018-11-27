@@ -1,27 +1,34 @@
-import configparser
 import datetime
+import json
+
 
 class Config:
 
-    appName = ""
-    version = ""
-    geometry = ""
+    # database
+    min_circulation = 0
+    max_circulation = 0
+    sectors = []
+    companies = []
 
-    last_used_ticker = ""
-
+    # simulation
     timedelta = 0
+    iterations = 0
     initial_population = 0
+    start_date = None
+    end_date = None
+    validations = []
+
+    # selection
     agents_to_save = 0
+
+    # crossover
     constant_length = True
     initial_length = 0
     max_genes = 0
-    iterations = 0
+    mutation_rate = 0.0
 
+    # wallet
     start_cash = 0
-    start_date = None
-    end_date = None
-    validation_start_date = None
-    validation_end_date = None
     return_method = ""
     benchmark = ""
     risk_free_return = 0.0
@@ -29,64 +36,59 @@ class Config:
     fee_rate = 0
     fee_added = 0
     fee_max = 0
-
     stocks_to_buy = 0
     stocks_to_hold = 0
 
-    min_circulation = 0
-    max_circulation = 0
-    sectors = []
-    companies = []
+    # genes
+    fin_statement_lag = 0
+    fundamental_to_all = 0
 
 
 def read_config():
-    config = configparser.ConfigParser()
-    config.read('../config.ini')
+    with open('../config_ga.json') as f:
+        dict_config = json.load(f)
 
-    Config.appName = config['ROOT']['APP_NAME']
-    Config.version = config['ROOT']['VERSION']
-    Config.geometry = config['ROOT']['GEOMETRY']
+    database = dict_config['database']
+    Config.min_circulation = int(database['min_circulation'])
+    Config.max_circulation = int(database['max_circulation'])
+    Config.sectors = database['sectors']
+    Config.companies = database['companies']
 
-    Config.last_used_ticker = config['LAST_USED']['TICKER']
+    simulation = dict_config['simulation']
+    Config.timedelta = int(simulation['timedelta'])
+    Config.iterations = int(simulation['iterations'])
+    Config.initial_population = int(simulation['initial_population'])
+    Config.start_date = datetime.datetime.strptime(simulation['learning']['start_date'], '%Y-%m-%d')
+    Config.end_date = datetime.datetime.strptime(simulation['learning']['end_date'], '%Y-%m-%d')
 
-    Config.timedelta = int(config['GA']['TIMEDELTA'])
-    Config.initial_population = int(config['GA']['INITIAL_POPULATION'])
+    for test in simulation['testing']:
+        start_date = datetime.datetime.strptime(test['start_date'], '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(test['end_date'], '%Y-%m-%d')
+        Config.validations.append( (start_date, end_date) )
 
-    Config.agents_to_save = float(config['GA']['AGENTS_TO_SAVE'])
-    Config.constant_length = (config['GA']['CONSTANT_LENGTH'] == 'True')
-    Config.initial_length = int(config['GA']['INITIAL_LENGTH'])
-    Config.max_genes = int(config['GA']['MAX_GENES'])
-    Config.iterations = int(config['GA']['ITERATIONS'])
+    selection = dict_config['selection']
+    Config.agents_to_save = selection['agents_to_save']
 
-    Config.start_cash = float(config['WALLET']['START_CASH'])
-    Config.start_date = datetime.datetime.strptime(config['WALLET']['START_DATE'], '%Y-%m-%d')
-    Config.end_date = datetime.datetime.strptime(config['WALLET']['END_DATE'], '%Y-%m-%d')
-    Config.validation_start_date = datetime.datetime.strptime(config['WALLET']['VALID_START_DATE'], '%Y-%m-%d')
-    Config.validation_end_date = datetime.datetime.strptime(config['WALLET']['VALID_END_DATE'], '%Y-%m-%d')
-    Config.return_method = config['WALLET']['RETURN_METHOD']
-    Config.benchmark = config['WALLET']['BENCHMARK']
-    Config.risk_free_return = float(config['WALLET']['RISK_FREE_RETURN'])
-    Config.fee_min = float(config['WALLET']['FEE_MIN'])
-    Config.fee_rate = float(config['WALLET']['FEE_RATE'])
-    Config.fee_added = float(config['WALLET']['FEE_ADDED'])
-    Config.fee_max = float(config['WALLET']['FEE_MAX'])
+    crossover = dict_config['crossover']
+    Config.constant_length = crossover['constant_length']
+    Config.initial_length = crossover['initial_genes']
+    Config.max_genes = crossover['max_genes']
+    Config.mutation_rate = crossover['mutation_rate']
 
-    Config.stocks_to_buy = int(config['WALLET']['STOCKS_TO_BUY'])
-    Config.stocks_to_hold = int(config['WALLET']['STOCKS_TO_HOLD'])
+    wallet = dict_config['wallet']
+    Config.start_cash = wallet['start_cash']
+    Config.return_method = wallet['return_method']
+    Config.benchmark = wallet['benchmark']
+    Config.risk_free_return = wallet['risk_free_return']
+    Config.fee_min = wallet['fees']['min']
+    Config.fee_rate = wallet['fees']['rate']
+    Config.fee_added = wallet['fees']['added']
+    Config.fee_max = wallet['fees']['max']
+    Config.stocks_to_buy = wallet['stocks_to_buy']
+    Config.stocks_to_hold = wallet['stocks_to_hold']
 
-    Config.min_circulation = int(config['FILTER']['MIN_CIRCULATION'])
-    Config.max_circulation = int(config['FILTER']['MAX_CIRCULATION'])
-
-    Config.sectors = config['FILTER']['SECTORS'].split(', ')
-    Config.companies = config['FILTER']['COMPANIES'].split(', ')
-
-
-# TODO update 2018-10-24
-def reset():
-    last_used = 'CDR'
-    return_method = 'TotalCash'
-    benchmark = 'WIG'
-    risk_free_return = 0.025
+    genes = dict_config['genes']
+    Config.fin_statement_lag = genes['fin_statement_lag']
+    Config.fundamental_to_all = genes['fundamental_to_all']
 
 
-# TODO save_config

@@ -1,0 +1,10 @@
+{
+  "basic_info" : {
+    "app_name": "WSEOptimizer",
+    "version": "0.5.1",
+    "geometry": "800x600+60+20"
+  },
+  "main_window" : {
+    "last_used_ticker": "11b"
+  }
+}

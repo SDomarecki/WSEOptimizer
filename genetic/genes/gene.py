@@ -1,11 +1,7 @@
-# if(indicator comparator value):
-#     return result_true
-# else:
-#     return result_false
-#
-# W uogólnieniu value i indicator mogłyby być zamienne oraz result_true/false byłyby kolejnymi genami
 import random
 import pandas as pd
+
+from config import Config
 
 
 class Gene:
@@ -30,6 +26,6 @@ class Gene:
     @staticmethod
     def date_to_quarter(date) -> str:
         import datetime
-        fin_statement_lag = datetime.timedelta(days=135)
+        fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag)
         lag_date = date - fin_statement_lag
         return str(lag_date.year) + "/Q" + str(pd.Timestamp(lag_date).quarter)
