@@ -10,7 +10,7 @@
     "iterations": 100,
     "initial_population": 100,
     "learning": {
-      "start_date": "2014-01-01",
+      "start_date": "2010-01-01",
       "end_date": "2015-12-31"
     },
     "testing": [
@@ -37,8 +37,8 @@
       "added": 1,
       "max": 125
     },
-    "stocks_to_buy": 5,
-    "stocks_to_hold": 10
+    "stocks_to_buy": 3,
+    "stocks_to_hold": 6
   },
   "genes": {
     "fin_statement_lag": 135,

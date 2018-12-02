@@ -23,14 +23,9 @@ class TrixGene(Gene):
             else:
                 return False
 
-    def to_string(self):
+    def condition_to_string(self):
         if self.comparator == 'more_than':
             c = ">"
         else:
             c = "<"
-        return "If(Trix " \
-               + c \
-               + " Trix signal) then " \
-               + str(self.result_true) \
-               + " else " \
-               + str(self.result_false)
+        return "Trix " + c + " Trix Signal"

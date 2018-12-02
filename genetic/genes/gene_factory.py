@@ -8,6 +8,22 @@ class GeneFactory:
 
     @staticmethod
     def create_random_gene() -> Gene:
+        if random.uniform(0.0, 1.0) <= 0.4:
+            return GeneFactory.create_logic_gene()
+        else:
+            return GeneFactory.create_non_logic_gene()
+
+    @staticmethod
+    def create_logic_gene() -> Gene:
+        from genes.logical.and_gene import AndGene
+        from genes.logical.or_gene import OrGene
+        from genes.logical.xor_gene import XorGene
+
+        possible_genes = [AndGene, OrGene, XorGene]
+        return random.choice(possible_genes)()
+
+    @staticmethod
+    def create_non_logic_gene() -> Gene:
         if random.uniform(0.0, 1.0) <= Config.fundamental_to_all:
             return GeneFactory.create_fundamental_gene()
         else:
@@ -25,9 +41,22 @@ class GeneFactory:
         from genetic.genes.fundamental.roa_gene import ROAGene
         from genetic.genes.fundamental.sector_gene import SectorGene
 
-        possible_genes = [PEGene, PBVGene, PSGene,
-                          PENowGene, PBVNowGene, PSNowGene,
-                          ROEGene, ROAGene, SectorGene]
+        from genes.fundamental.pe_qq import PEqq
+        from genes.fundamental.pe_yy import PEyy
+        from genes.fundamental.pbv_qq import PBVqq
+        from genes.fundamental.pbv_yy import PBVyy
+        from genes.fundamental.ps_yy import PSyy
+        from genes.fundamental.ps_qq import PSqq
+        from genes.fundamental.roe_yy import ROEyy
+        from genes.fundamental.roe_qq import ROEqq
+        from genes.fundamental.roa_qq import ROAqq
+
+        possible_genes = [PEGene, PENowGene, PEqq, PEyy,
+                          PBVGene, PBVNowGene, PBVqq, PBVyy,
+                          PSGene, PSNowGene, PSqq, PSyy,
+                          ROEGene, ROEqq, ROEyy,
+                          ROAGene, ROAqq, ROEyy,
+                          SectorGene]
         return random.choice(possible_genes)()
 
     @staticmethod

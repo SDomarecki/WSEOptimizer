@@ -44,8 +44,8 @@ class GA:
             print('Generation: ' + str(generation))
 
             for agent in self.agents:
-                agent.calculate_fitness(current_database, Config.start_date, Config.end_date)
-
+                fit = agent.calculate_fitness(current_database, Config.start_date, Config.end_date)
+                print('[' + str(agent.id) + "] fitness - " + str(fit))
             self.selection()
 
             if generation < self.generations - 1:
@@ -56,7 +56,8 @@ class GA:
         # Iteration with whole database
         print('Last generation')
         for agent in self.agents:
-            agent.calculate_fitness(self.database, Config.start_date, Config.end_date)
+            fit = agent.calculate_fitness(self.database, Config.start_date, Config.end_date)
+            print('[' + str(agent.id) + "] fitness - " + str(fit))
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
 
     # fukcja sortująca i niszcząca słabe osobniki
@@ -145,7 +146,8 @@ class GA:
 
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
         for idx, validation in enumerate(Config.validations):
-            best_agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
+            fit = best_agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
+            print('[' + str(best_agent.id) + "] validation #" + str(idx) + " - " + str(fit))
 
             self.best_scores.append(best_agent.validations[0])
             x = mdates.date2num(best_agent.wallet.valueTimestamps)
@@ -170,7 +172,7 @@ class GA:
             plt.close()
 
         print('Best agent performance')
-        print('Learning:: ' + str(best_agent.fitness))
+        print('Learning: ' + str(best_agent.fitness))
         print('Validations: ')
         for val in best_agent.validations:
             print(str(val))
@@ -196,7 +198,8 @@ class GA:
     def get_result_string(self) -> str:
         for counter, agent in enumerate(self.agents[:5]):
             for idx, validation in enumerate(Config.validations):
-                agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
+                fit = agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
+                print('[' + str(agent.id) + "] validation #" + str(idx) + " - " + str(fit))
         return self.toJSON()
 
     def save_to_file(self, result: str, save_path: str):

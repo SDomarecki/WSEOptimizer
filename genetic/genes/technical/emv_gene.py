@@ -23,14 +23,9 @@ class EMVGene(Gene):
             else:
                 return False
 
-    def to_string(self):
+    def condition_to_string(self):
         if self.comparator == 'more_than':
             c = ">"
         else:
             c = "<"
-        return "If(EMV " \
-               + c \
-               + " Close) then " \
-               + str(self.result_true) \
-               + " else " \
-               + str(self.result_false)
+        return "EMV " + c + " Close"

@@ -115,6 +115,7 @@ dmypy.json
 *.csv
 *.json
 *.db
+*.png
 
 !config_app.json
 !config_ga.json

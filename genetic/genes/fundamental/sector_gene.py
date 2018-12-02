@@ -32,10 +32,5 @@ class SectorGene(Gene):
         else:
             return False
 
-    def to_string(self):
-        return "If(Sector == " \
-               + self.sector \
-               + ") then " \
-               + str(self.result_true) \
-               + " else " \
-               + str(self.result_false)
+    def condition_to_string(self):
+        return "Sector == " + self.sector

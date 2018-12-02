@@ -25,16 +25,9 @@ class EMA200NormalizedGene(Gene):
             else:
                 return False
 
-    def to_string(self):
+    def condition_to_string(self):
         if self.comparator == 'more_than':
             c = ">"
         else:
             c = "<"
-        return "If(EMA200Norm " \
-               + c \
-               + " " \
-               + "{0:.2f}".format(self.compared_value) \
-               + ") then " \
-               + str(self.result_true) \
-               + " else " \
-               + str(self.result_false)
+        return "EMA200Norm " + c + " {0:.2f}".format(self.compared_value)

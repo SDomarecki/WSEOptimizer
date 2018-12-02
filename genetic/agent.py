@@ -14,20 +14,20 @@ class Agent:
         self.weights = [random.uniform(0.0,  1.0) for _ in range(length)]
         self.fitness = 0.0
         self.validations = [0.0] * validation_length
-        self.wallet = Wallet()
+        self.wallet = None
 
     # validation_case = -1 -> learning
-    def calculate_fitness(self, database, start, end, validation_case=-1):
+    def calculate_fitness(self, database, start, end, validation_case=-1) -> float:
         self.wallet = Wallet()
 
         simulation_result = self.simulate(database, start, end)
 
         if validation_case == -1:
             self.fitness = simulation_result
-            print('Agent no. ' + str(self.id) + " fitness - " + str(simulation_result))
         else:
             self.validations[validation_case] = simulation_result
-            print('Agent no. ' + str(self.id) + " validation #" + str(validation_case) + " - " + str(simulation_result))
+
+        return simulation_result
 
     def simulate(self, database, start_date, end_date) -> float:
         day = start_date

@@ -23,14 +23,9 @@ class MACDGene(Gene):
             else:
                 return False
 
-    def to_string(self):
+    def condition_to_string(self):
         if self.comparator == 'more_than':
             c = ">"
         else:
             c = "<"
-        return "If(MACD " \
-               + c \
-               + " MACD Signal) then " \
-               + str(self.result_true) \
-               + " else " \
-               + str(self.result_false)
+        return "MACD " + c + " MACD Signal"

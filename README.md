@@ -1,4 +1,4 @@
-# WSEOptimizer v0.5.1
+# WSEOptimizer v0.5.2
 Project created as base for engineering thesis _"Optimization of stock exchange investment strategy with a genetic algorithm"_ written @ AGH UST 2018.
 
 As a whole it computes winning strategy on WSE stocks basing on fundamental & technical analysis indicators optimized by genetic algorithm.

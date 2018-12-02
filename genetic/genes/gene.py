@@ -7,7 +7,6 @@ from config import Config
 class Gene:
 
     def __init__(self):
-
         self.result_true = random.randint(1, 10) * random.choice([-1, 1])
         self.result_false = random.randint(1, 10) * random.choice([-1, 1])
 
@@ -21,6 +20,12 @@ class Gene:
         raise NotImplementedError("Please Implement this method")
 
     def to_string(self) -> str:
+        return "If(" + self.condition_to_string() + ") then " \
+               + str(self.result_true) \
+               + " else " \
+               + str(self.result_false)
+
+    def condition_to_string(self) -> str:
         raise NotImplementedError("Please Implement this method")
 
     @staticmethod
@@ -29,3 +34,18 @@ class Gene:
         fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag)
         lag_date = date - fin_statement_lag
         return str(lag_date.year) + "/Q" + str(pd.Timestamp(lag_date).quarter)
+
+    @staticmethod
+    def date_to_previous_quarter(date) -> str:
+        import datetime
+        fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag)
+        lag_date = date - fin_statement_lag - 90
+        return str(lag_date.year) + "/Q" + str(pd.Timestamp(lag_date).quarter)
+
+    @staticmethod
+    def date_to_previous_year_quarter(date) -> str:
+        import datetime
+        fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag)
+        lag_date = date - fin_statement_lag - 365
+        return str(lag_date.year) + "/Q" + str(pd.Timestamp(lag_date).quarter)
+
