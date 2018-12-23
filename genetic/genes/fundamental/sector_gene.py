@@ -25,12 +25,7 @@ class SectorGene(Gene):
         self.sector = random.choice(self.possible_sectors)
 
     def condition(self, company, day):
-        company_sector = company.sector
-
-        if company_sector == self.sector:
-            return True
-        else:
-            return False
+        return company.sector == self.sector
 
     def condition_to_string(self):
         return "Sector == " + self.sector

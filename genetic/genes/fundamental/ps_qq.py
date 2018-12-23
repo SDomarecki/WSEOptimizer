@@ -7,7 +7,8 @@ class PSqq(Gene):
 
     def __init__(self):
         super().__init__()
-        self.comparator = random.choice(['more_than', 'less_than'])
+        self.comparator = random.choice(['>', '<'])
+        self.compared_value = random.uniform(-0.5, 0.5)
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
@@ -16,22 +17,10 @@ class PSqq(Gene):
         indicator_value = company.fundamentals.at[quarter, 'P/S']
         previous_indicator_value = company.fundamentals.at[prev_quarter, 'P/S']
 
-        compared_value = random.uniform(-0.5, 0.5)
-
-        if self.comparator == 'more_than':
-            if indicator_value/previous_indicator_value -1 > compared_value:
-                return True
-            else:
-                return False
+        if self.comparator == '>':
+            return indicator_value/previous_indicator_value -1 > self.compared_value
         else:
-            if indicator_value/previous_indicator_value -1 < compared_value:
-                return True
-            else:
-                return False
+            return indicator_value/previous_indicator_value -1 < self.compared_value
 
     def condition_to_string(self):
-        if self.comparator == 'more_than':
-            c = ">"
-        else:
-            c = "<"
-        return "P/S " + c + " PrevQ P/S"
+        return "P/S / PrevQ P/S %s %s" % (self.comparator, self.compared_value)

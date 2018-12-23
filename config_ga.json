@@ -3,11 +3,12 @@
     "min_circulation": 500000,
     "max_circulation": -1,
     "sectors": [],
-    "companies": []
+    "companies": [],
+    "chunks": 8
   },
   "simulation": {
     "timedelta": 7,
-    "iterations": 100,
+    "iterations": 50,
     "initial_population": 100,
     "learning": {
       "start_date": "2010-01-01",

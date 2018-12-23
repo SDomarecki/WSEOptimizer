@@ -12,7 +12,3 @@ class Company:
         return json.dumps(self, default=lambda o: o.__dict__, indent=4, skipkeys=True, ensure_ascii=False)\
             .encode('utf8')\
             .decode('utf-8')
-
-
-
-

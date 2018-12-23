@@ -10,10 +10,7 @@ class OrGene(Gene):
         self.rightGene = GeneFactory.create_non_logic_gene()
 
     def condition(self, company, day):
-        if self.leftGene.condition(company, day) or self.rightGene.condition(company, day):
-            return True
-        else:
-            return False
+        return self.leftGene.condition(company, day) or self.rightGene.condition(company, day)
 
     def condition_to_string(self):
         return "(" + self.leftGene.condition_to_string() + " OR " + self.rightGene.condition_to_string() + ")"

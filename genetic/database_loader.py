@@ -4,127 +4,120 @@ from shared.company import Company
 from shared.config import Config
 
 
-def read_database(path_to_database: str):
-    import json
-    import os
+class DatabaseLoader:
 
-    files = os.listdir(path_to_database + '/basic_info')
+    def __init__(self, path_to_database: str, benchmark_ticker: str):
+        self.path = path_to_database
+        self.learning_database = None
+        self.learning_database_chunks = []
+        self.testing_databases = []
+        self.benchmark = None
+        self.targets = []
 
-    companies = {}
-    for file in files:
-        with open(path_to_database + '/basic_info/' + file) as data_file:
-            json_str = json.loads(data_file.read())
-            company = company_decoder(json_str)
+        self.__read_database()
+        self.__split_database_equally(Config.chunks)
+        self.__read_benchmark(benchmark_ticker)
+        self.__calculate_targets()
 
-        ticker = file.split('.')[0]
-        company.fundamentals = get_fundamentals(path_to_database, ticker)
-        company.technicals = get_technicals(path_to_database, ticker)
-        companies[ticker] = company
+    def __read_database(self):
+        import json
+        import os
 
-    sectors = []
-    for company in companies.values():
-        if company.sector not in sectors:
-            sectors.append(company.sector)
-    print(sectors)
+        files = os.listdir(self.path + '/basic_info')
 
-    databases = filter_database(companies)
+        database = {}
+        for file in files:
+            with open(self.path + '/basic_info/' + file) as data_file:
+                json_str = json.loads(data_file.read())
+                company = self.__decode_company(json_str)
+                if Config.sectors and company.sector not in Config.sectors:
+                    print(company.sector + " wtf")
+                    continue
 
-    return databases
+            ticker = file.split('.')[0]
+            company.fundamentals = self.__get_fundamentals(ticker)
+            company.technicals = self.__get_technicals(ticker)
+            database[ticker] = company
 
+        sectors = []
+        for company in database.values():
+            if company.sector not in sectors:
+                sectors.append(company.sector)
+        print(sectors)
 
-def company_decoder(json) -> Company:
-    company = Company(json['name'], json['ticker'], json['link'])
-    company.sector = json['sector']
-    return company
+        self.learning_database = self.__filter_database_by_dates(database, Config.start_date, Config.end_date)
+        self.testing_databases = [self.__filter_database_by_dates(database, val[0], val[1]) for val in Config.validations]
 
+    def __decode_company(self, json) -> Company:
+        company = Company(json['name'], json['ticker'], json['link'])
+        company.sector = json['sector']
+        return company
 
-def get_fundamentals(path: str, ticker: str):
-    ticker = ticker.lower()
-    df = pd.read_csv(path + '/fundamental/' + ticker + '.csv', delimiter=',', index_col=0)
-    return df
+    def __get_fundamentals(self, ticker: str):
+        df = pd.read_csv(self.path + '/fundamental/' + ticker + '.csv', delimiter=',', index_col=0)
+        return df
 
+    def __get_technicals(self, ticker: str):
+        df = pd.read_csv(self.path + '/technical/' + ticker + '.csv', delimiter=',', index_col='Date')
+        df.index = pd.to_datetime(df.index)
+        return df
 
-def get_technicals(path: str, ticker: str):
-    ticker = ticker.lower()
-    df = pd.read_csv(path + '/technical/' + ticker + '.csv', delimiter=',', index_col='Date')
-    df.index = pd.to_datetime(df.index)
-    return df
+    def __filter_database_by_dates(self, database, start_date, end_date):
+        from copy import deepcopy
 
+        to_delete = []
+        new_database = deepcopy(database)
+        for company in new_database.values():
+            company.technicals = company.technicals.loc[start_date:end_date]
 
-def filter_database(database) -> []:
-    database = filter_by_company_name(database)
-    database = filter_by_sector(database)
+            circulation_mean = float(company.technicals['Circulation'].mean())
+            if Config.min_circulation != -1 and circulation_mean < Config.min_circulation:
+                to_delete.append(company.ticker)
+            if Config.max_circulation != -1 and circulation_mean > Config.max_circulation:
+                to_delete.append(company.ticker)
 
-    databases = []
-    databases.append(filter_database_with_dates(database, Config.start_date, Config.end_date))
-    for validation in Config.validations:
-        databases.append(filter_database_with_dates(database, validation[0], validation[1]))
-    return databases
+        for ticker in to_delete:
+            del new_database[ticker]
 
+        return new_database
 
-def filter_database_with_dates(database, start_date, end_date):
-    from copy import deepcopy
+    def __split_database_equally(self, chunks):
+        self.learning_database_chunks = [dict() for _ in range(chunks)]
+        idx = 0
+        for k, v in self.learning_database.items():
+            self.learning_database_chunks[idx][k] = v
+            if idx < chunks - 1:  # indexes start at 0
+                idx += 1
+            else:
+                idx = 0
 
-    to_delete = []
-    new_database = deepcopy(database)
-    for company in new_database.values():
-        company.technicals = company.technicals.loc[start_date:end_date]
+    def __read_benchmark(self, ticker: str):
+        ticker = ticker.lower()
+        df = pd.read_csv(self.path + '/benchmarks/' + ticker + '.csv',
+                         delimiter=';',
+                         index_col=0)
+        df.index = pd.to_datetime(df.index)
+        self.benchmark = df
 
-        circulation_mean = float(company.technicals['Circulation'].mean())
-        if Config.min_circulation != -1 and circulation_mean < Config.min_circulation:
-            to_delete.append(company.ticker)
-        if Config.max_circulation != -1 and circulation_mean > Config.max_circulation:
-            to_delete.append(company.ticker)
+    def __calculate_targets(self):
+        for idx, el in enumerate(Config.validations):
+            target = round(Config.start_cash * self.__get_target_ratio(el[0], el[1]), 2)
+            self.targets.append(target)
+            print('Validation %s target: %s' % (idx, target))
 
-    for ticker in to_delete:
-        del new_database[ticker]
+    def __get_target_ratio(self, start_date, end_date) -> float:
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date)
+        end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date)
+        return end_value / start_value
 
-    return new_database
+    @staticmethod
+    def __get_closest_value(df, date) -> float:
+        import datetime
+        delta = datetime.timedelta(days=1)
 
-
-def filter_by_company_name(database):
-    return database
-
-
-def filter_by_sector(database):
-    sectors = Config.sectors
-    to_delete = []
-
-    if not sectors or sectors[0] == 'All':
-        return database
-
-    for company in database.values():
-        if company.sector not in sectors:
-            to_delete.append(company.ticker)
-
-    for ticker in to_delete:
-        del database[ticker]
-    return database
-
-
-def get_benchmark(ticker: str, path_to_database):
-    ticker = ticker.lower()
-    df = pd.read_csv(path_to_database + '/benchmarks/' + ticker + '.csv',
-                     delimiter=';',
-                     index_col=0)
-    df.index = pd.to_datetime(df.index)
-    return df
-
-
-def get_target_ratio(benchmark, start_date, end_date) -> float:
-    start_value = get_closest_value(benchmark, start_date)
-    end_value = get_closest_value(benchmark, end_date)
-
-    return end_value / start_value
-
-
-def get_closest_value(df, date):
-    import datetime
-    delta = datetime.timedelta(days=1)
-
-    while True:
-        try:
-            return df.at[date, 'Zamkniecie']
-        except KeyError:
-            date -= delta
-            continue
+        while True:
+            try:
+                return df.at[date, 'Zamkniecie']
+            except KeyError:
+                date -= delta
+                continue

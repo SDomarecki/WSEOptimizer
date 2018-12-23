@@ -1,80 +1,78 @@
 import random
 
+from database_loader import DatabaseLoader
 from genetic.agent import Agent
-from genetic.database_loader import read_database, get_target_ratio, get_benchmark
 from shared.config import Config
-from shared.config import read_config
 
 
-class GA:
+class GeneticAlgorithmWorker:
 
     def __init__(self):
+        loader = DatabaseLoader('../res', Config.benchmark)
+
         self.next_agent_id = 1
-        self.databases = read_database(path_to_database='../res')
-        self.database = self.databases[0]
-        self.constant_length = Config.constant_length
-        if self.constant_length:
-            self.agents = [Agent(self.next_agent_id + i, Config.initial_length, len(Config.validations)) for i in
+        self.learning_database = loader.learning_database
+        self.learning_database_chunks = loader.learning_database_chunks
+        self.testing_database = loader.testing_databases
+        self.agents = []
+        self.generations = Config.iterations
+        self.targets = loader.targets
+        self.best_scores = []
+
+        self.init_agents()
+
+    def init_agents(self):
+        if Config.constant_length:
+            self.agents = [Agent(self.next_agent_id + i, Config.initial_length, len(Config.validations))
+                           for i in
                            range(Config.initial_population)]
         else:
             self.agents = [Agent(self.next_agent_id + i, random.randint(2, Config.max_genes), len(Config.validations))
                            for i in
                            range(Config.initial_population)]
         self.next_agent_id += Config.initial_population
-        self.generations = Config.iterations
-
-        self.benchmark = get_benchmark(Config.benchmark, path_to_database='../res')
-        self.targets = []
-        for idx, el in enumerate(Config.validations):
-            target = round(Config.start_cash * get_target_ratio(self.benchmark, el[0], el[1]), 2)
-            self.targets.append(target)
-            print('Validation ' + str(idx) + ' target: ' + str(target))
-
-        self.best_scores = []
 
     def perform_ga(self):
-        print("Learning database size: " + str(len(self.database)) + " companies")
+        print('Learning database size: %s companies' % len(self.learning_database))
 
-        chunks = 8
-        database_chunks = self.split_database_equally(chunks=chunks)
+        chunks = Config.chunks
 
         for generation in range(1, self.generations):
-            current_database = database_chunks[generation % chunks]
+            current_database = self.learning_database_chunks[generation % chunks]
 
-            print('Generation: ' + str(generation))
+            print('Generation: %s' % generation)
 
             for agent in self.agents:
                 fit = agent.calculate_fitness(current_database, Config.start_date, Config.end_date)
-                print('[' + str(agent.id) + "] fitness - " + str(fit))
+                print('[%s] fitness - %s' % (agent.id, fit))
             self.selection()
 
             if generation < self.generations - 1:
-                to_create = int(Config.initial_population - len(self.agents))
-                self.crossover(to_create)
+                self.crossover()
             self.print_best_agent_performance(generation)
 
         # Iteration with whole database
         print('Last generation')
         for agent in self.agents:
-            fit = agent.calculate_fitness(self.database, Config.start_date, Config.end_date)
-            print('[' + str(agent.id) + "] fitness - " + str(fit))
+            fit = agent.calculate_fitness(self.learning_database, Config.start_date, Config.end_date)
+            print('[%s] fitness - %s' % (agent.id, fit))
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
 
-    # fukcja sortująca i niszcząca słabe osobniki
+    # funkcja sortująca i niszcząca słabe osobniki
     def selection(self):
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
         self.agents = self.agents[:int(Config.agents_to_save * len(self.agents))]
 
-    # fukcja tworząca nowe osobniki
-    def crossover(self, to_create: int):
-
-        if self.constant_length:
-            self.constant_crossover(to_create)
+    # funkcja tworząca nowe osobniki
+    def crossover(self):
+        if Config.constant_length:
+            self.constant_crossover()
         else:
-            self.non_constant_crossover(to_create)
+            self.non_constant_crossover()
 
-    def constant_crossover(self, to_create: int):
-        to_create = int(to_create / 2)
+    def constant_crossover(self):
+        to_create = int((Config.initial_population - len(self.agents)) /2)
+
         offspring = []
 
         for _ in range(to_create):
@@ -87,8 +85,6 @@ class GA:
             split = random.randint(0, Config.initial_length)
             child1.genes = parent1.genes[:split] + parent2.genes[split:]
             child2.genes = parent2.genes[:split] + parent1.genes[split:]
-            child1.weights = parent1.weights[:split] + parent2.weights[split:]
-            child2.weights = parent2.weights[:split] + parent1.weights[split:]
 
             offspring.append(child1)
             offspring.append(child2)
@@ -98,8 +94,8 @@ class GA:
         offspring = self.mutation(offspring)
         self.agents.extend(offspring)
 
-    def non_constant_crossover(self, to_create: int):
-        to_create = int(to_create / 2)
+    def non_constant_crossover(self):
+        to_create = int((Config.initial_population - len(self.agents)) / 2)
 
         offspring = []
         for _ in range(to_create):
@@ -118,8 +114,6 @@ class GA:
 
             child1.genes = parent1.genes[:split1] + parent2.genes[split2:]
             child2.genes = parent2.genes[:split2] + parent1.genes[split1:]
-            child1.weights = parent1.weights[:split1] + parent2.weights[split2:]
-            child2.weights = parent2.weights[:split2] + parent1.weights[split1:]
 
             offspring.append(child1)
             offspring.append(child2)
@@ -129,15 +123,17 @@ class GA:
         offspring = self.mutation(offspring)
         self.agents.extend(offspring)
 
-    # funkcja podmieniająca wagi genów w nowych osobnikach
+    # funkcja podmieniająca geny w nowych osobnikach
     def mutation(self, agents: [Agent]) -> [Agent]:
         import random
         for agent in agents:
             for idx, param in enumerate(agent.genes):
                 if random.uniform(0.0, 1.0) <= Config.mutation_rate:
-                    agent.weights[idx] = random.uniform(0.0, 1.0)
-                    from genes.gene_factory import GeneFactory
-                    agent.genes[idx] = GeneFactory.create_random_gene()
+                    # Szwed mode
+                    agent.genes[idx].weight = random.uniform(0.0, 1.0)
+                    # Normal mode
+                    # from genes.gene_factory import GeneFactory
+                    # agent.genes[idx] = GeneFactory.create_random_gene()
         return agents
 
     def print_best_agent_performance(self, generation):
@@ -146,8 +142,8 @@ class GA:
 
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
         for idx, validation in enumerate(Config.validations):
-            fit = best_agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
-            print('[' + str(best_agent.id) + "] validation #" + str(idx) + " - " + str(fit))
+            fit = best_agent.calculate_fitness(self.testing_database[idx], validation[0], validation[1], validation_case=idx)
+            print('[%s] validation #%s - %s' % (best_agent.id, idx, fit))
 
             self.best_scores.append(best_agent.validations[0])
             x = mdates.date2num(best_agent.wallet.valueTimestamps)
@@ -178,29 +174,17 @@ class GA:
             print(str(val))
         print('Length of genome: ' + str(len(best_agent.genes)))
 
-    def split_database_equally(self, chunks=2):
-        "Splits dict by keys. Returns a list of dictionaries."
-        # prep with empty dicts
-        return_list = [dict() for _ in range(chunks)]
-        idx = 0
-        for k, v in self.database.items():
-            return_list[idx][k] = v
-            if idx < chunks - 1:  # indexes start at 0
-                idx += 1
-            else:
-                idx = 0
-        return return_list
-
     def save_results(self, save_path: str):
-        result_string = self.get_result_string()
+        self.calculate_all_validations()
+        result_string = self.toJSON()
         self.save_to_file(result_string, save_path)
 
-    def get_result_string(self) -> str:
-        for counter, agent in enumerate(self.agents[:5]):
-            for idx, validation in enumerate(Config.validations):
-                fit = agent.calculate_fitness(self.databases[idx + 1], validation[0], validation[1], validation_case=idx)
-                print('[' + str(agent.id) + "] validation #" + str(idx) + " - " + str(fit))
-        return self.toJSON()
+    def calculate_all_validations(self):
+        for _, agent in enumerate(self.agents[:5]):
+            for val_idx, validation in enumerate(Config.validations):
+                fit = agent.calculate_fitness(self.testing_database[val_idx], validation[0], validation[1], validation_case=val_idx)
+                print('[%s] validation #%s - %s' % (agent.id, val_idx, fit))
+        self.best_scores.append(self.agents[0].validations[0])
 
     def save_to_file(self, result: str, save_path: str):
         file = open(save_path, 'w')
@@ -231,14 +215,13 @@ class GA:
             self.agents = list(map(lambda ag: ag.to_json_ready(), agents))
 
     def toJSON(self):
-        self.best_scores.append(self.agents[0].validations[0])
         import json
         return json.dumps(self.JSONPack(self.agents[:5], self.targets).__dict__, default=str, indent=2)
 
 
 if __name__ == "__main__":
-    read_config()
-    worker = GA()
+    Config()
+    worker = GeneticAlgorithmWorker()
     worker.perform_ga()
 
     from time import strftime, localtime

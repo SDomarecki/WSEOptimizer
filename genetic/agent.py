@@ -1,5 +1,4 @@
 import datetime
-import random
 
 from genetic.genes.gene_factory import GeneFactory
 from genetic.wallet import Wallet
@@ -11,7 +10,6 @@ class Agent:
     def __init__(self, id, length, validation_length):
         self.id = id
         self.genes = [GeneFactory.create_random_gene() for _ in range(length)]
-        self.weights = [random.uniform(0.0,  1.0) for _ in range(length)]
         self.fitness = 0.0
         self.validations = [0.0] * validation_length
         self.wallet = None
@@ -19,7 +17,6 @@ class Agent:
     # validation_case = -1 -> learning
     def calculate_fitness(self, database, start, end, validation_case=-1) -> float:
         self.wallet = Wallet()
-
         simulation_result = self.simulate(database, start, end)
 
         if validation_case == -1:
@@ -38,16 +35,7 @@ class Agent:
             if day.weekday() == 6:
                 day += datetime.timedelta(days=1)
 
-            stock_strengths = {}
-            for stock in database.values():
-                strength = self.calculate_strength(stock, day)
-                stock_strengths[stock] = strength
-
-            ordered_stocks = []
-            ordered_tuples = sorted(stock_strengths.items(), key=lambda kv: kv[1], reverse=True)
-            for key, value in ordered_tuples:
-                ordered_stocks.append(key)
-
+            ordered_stocks = sorted(database.values(), key=lambda s: self.calculate_strength(s, day), reverse=True)
             self.wallet.trade(ordered_stocks, day, database)
             day += delta
 
@@ -55,29 +43,18 @@ class Agent:
             return self.wallet.get_total_value(database, end_date)
         elif Config.return_method == "sharpe":
             return self.wallet.get_current_sharpe(database, end_date)
-        else:
-            return self.wallet.get_current_information_ratio()
 
     def calculate_strength(self, stock, day) -> float:
-        strength = 0.
-        for i in range(len(self.genes)):
-            try:
-                strength += self.genes[i].get_substrength(stock, day) * self.weights[i]
-            except KeyError:
-                continue
-        return strength
+        return sum([g.get_substrength(stock, day) for g in self.genes])
 
     def to_json_ready(self):
         validations_str = ["{0:.2f}".format(self.validations[i]) for i in range(len(self.validations))]
         return {
             "id": self.id,
-            "strategy": self.to_string(),
+            "strategy": self.genome_to_string(),
             "fitness": "{0:.2f}".format(self.fitness),
             "validations": validations_str
         }
 
-    def to_string(self) -> [str]:
-        weighted_gene_str = []
-        for i in range(len(self.genes)):
-            weighted_gene_str.append("{0:.2f}".format(self.weights[i]) + " x " + self.genes[i].to_string())
-        return weighted_gene_str
+    def genome_to_string(self) -> [str]:
+        return [g.to_string() for g in self.genes]

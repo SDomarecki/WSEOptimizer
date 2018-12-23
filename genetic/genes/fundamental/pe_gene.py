@@ -7,29 +7,19 @@ class PEGene(Gene):
 
     def __init__(self):
         super().__init__()
-        self.comparator = random.choice(['more_than', 'less_than'])
+        self.comparator = random.choice(['>', '<'])
         self.compared_value = random.uniform(2, 40)
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
         indicator_value = company.fundamentals.at[quarter, 'P/E']
         if indicator_value is None:
-            return False
+            indicator_value = -1
 
-        if self.comparator == 'more_than':
-            if indicator_value > self.compared_value:
-                return True
-            else:
-                return False
+        if self.comparator == '>':
+            return indicator_value > self.compared_value
         else:
-            if indicator_value < self.compared_value:
-                return True
-            else:
-                return False
+            return indicator_value < self.compared_value
 
     def condition_to_string(self):
-        if self.comparator == 'more_than':
-            c = ">"
-        else:
-            c = "<"
-        return "P/E " + c + " {0:.2f}".format(self.compared_value)
+        return "P/E %s %s" % (self.comparator, "{0:.2f}".format(self.compared_value))

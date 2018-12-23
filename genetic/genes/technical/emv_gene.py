@@ -6,26 +6,16 @@ class EMVGene(Gene):
 
     def __init__(self):
         super().__init__()
-        self.comparator = random.choice(['more_than', 'less_than'])
+        self.comparator = random.choice(['>', '<'])
         self.close_value = random.uniform(-1, 1)
 
     def condition(self, company, day):
         indicator_value = company.technicals.at[day, 'emv']
 
-        if self.comparator == 'more_than':
-            if indicator_value > self.close_value:
-                return True
-            else:
-                return False
+        if self.comparator == '>':
+            return indicator_value > self.close_value
         else:
-            if indicator_value < self.close_value:
-                return True
-            else:
-                return False
+            return indicator_value < self.close_value
 
     def condition_to_string(self):
-        if self.comparator == 'more_than':
-            c = ">"
-        else:
-            c = "<"
-        return "EMV " + c + " Close"
+        return "EMV %s Close" % self.comparator

@@ -76,26 +76,22 @@ class Wallet:
         return round(s.median([Config.fee_min, round(charge * Config.fee_rate/100 + Config.fee_added, 2), Config.fee_max]), 2)
 
     def get_total_value(self, database, date) -> float:
-        total = self.cash
-        for stock in self.stocksHold.values():
-            company = database[stock.ticker]
-            today_price = self.get_closest_day_price(company.technicals, date)
-            total += today_price * stock.amount
+        total = self.cash + \
+                sum([self.get_closest_day_price(database[stock.ticker].technicals, date) * stock.amount
+                     for stock
+                     in self.stocksHold.values()])
         return round(total, 2)
 
     def get_closest_day_price(self, technicals, day) -> float:
         import datetime
 
-        price = -1
         delta = datetime.timedelta(days=1)
-        while price == -1:
+        while True:
             try:
-                price = technicals.at[day, 'Close']
+                return technicals.at[day, 'Close']
             except KeyError:
                 day -= delta
                 continue
-
-        return price
 
     def get_current_sharpe(self, database, date) -> float:
         import statistics
