@@ -49,7 +49,9 @@ class GeneticAlgorithmWorker:
 
             if generation < self.generations - 1:
                 self.crossover()
-            self.print_best_agent_performance(generation)
+            self.calculate_best_agent_performance()
+            self.print_best_agent_value_history(generation)
+            self.print_best_agents_performance()
 
         # Iteration with whole database
         print('Last generation')
@@ -57,6 +59,9 @@ class GeneticAlgorithmWorker:
             fit = agent.calculate_fitness(self.learning_database, Config.start_date, Config.end_date)
             print('[%s] fitness - %s' % (agent.id, fit))
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
+        self.calculate_best_agent_performance()
+        self.print_best_agent_value_history('last')
+        self.print_best_agents_performance()
 
     # funkcja sortująca i niszcząca słabe osobniki
     def selection(self):
@@ -72,9 +77,7 @@ class GeneticAlgorithmWorker:
 
     def constant_crossover(self):
         to_create = int((Config.initial_population - len(self.agents)) /2)
-
         offspring = []
-
         for _ in range(to_create):
             parent1 = random.choice(self.agents)
             parent2 = random.choice(self.agents)
@@ -96,7 +99,6 @@ class GeneticAlgorithmWorker:
 
     def non_constant_crossover(self):
         to_create = int((Config.initial_population - len(self.agents)) / 2)
-
         offspring = []
         for _ in range(to_create):
             parent1 = random.choice(self.agents)
@@ -129,43 +131,21 @@ class GeneticAlgorithmWorker:
         for agent in agents:
             for idx, param in enumerate(agent.genes):
                 if random.uniform(0.0, 1.0) <= Config.mutation_rate:
-                    # Szwed mode
                     agent.genes[idx].weight = random.uniform(0.0, 1.0)
                     # Normal mode
                     # from genes.gene_factory import GeneFactory
                     # agent.genes[idx] = GeneFactory.create_random_gene()
         return agents
 
-    def print_best_agent_performance(self, generation):
-        import matplotlib.dates as mdates
-        import matplotlib.pyplot as plt
-
+    def calculate_best_agent_performance(self):
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
         for idx, validation in enumerate(Config.validations):
             fit = best_agent.calculate_fitness(self.testing_database[idx], validation[0], validation[1], validation_case=idx)
             print('[%s] validation #%s - %s' % (best_agent.id, idx, fit))
-
-            self.best_scores.append(best_agent.validations[0])
-            x = mdates.date2num(best_agent.wallet.valueTimestamps)
-            y = best_agent.wallet.valueHistory
-            plt.xticks(rotation=45)
-            plt.gcf().subplots_adjust(bottom=0.15)
-            plt.hlines(self.targets[idx],
-                       xmin=validation[0],
-                       xmax=validation[1],
-                       color='r',
-                       linestyle='--')
-            plt.plot_date(x, y, '-g')
-
-            plt.savefig('../' + str(generation) + '_' + str(idx) + '.png', dpi=500)
-            plt.close()
-
-            plt.plot(self.best_scores)
-            plt.axhline(self.targets[idx],
-                        color='r',
-                        linestyle='--')
-            plt.show()
-            plt.close()
+            if Config.return_method == 'total_value':
+                self.best_scores.append(best_agent.validations[0])
+            else:
+                self.best_scores.append(best_agent.wallet.get_total_value(self.testing_database[idx], validation[1]))
 
         print('Best agent performance')
         print('Learning: ' + str(best_agent.fitness))
@@ -174,8 +154,44 @@ class GeneticAlgorithmWorker:
             print(str(val))
         print('Length of genome: ' + str(len(best_agent.genes)))
 
+    def print_best_agent_value_history(self, generation):
+        import matplotlib.dates as mdates
+        import matplotlib.pyplot as plt
+
+        best_agent = max(self.agents, key=lambda ag: ag.fitness)
+        for idx, validation in enumerate(Config.validations):
+            x = mdates.date2num(best_agent.wallet.valueTimestamps)
+            y = best_agent.wallet.valueHistory
+            plt.xticks(rotation=45)
+            plt.gcf().subplots_adjust(bottom=0.15)
+            plt.hlines(self.targets[idx],
+                       xmin=validation[0],
+                       xmax=validation[1],
+                       color='r',
+                       linestyle='--',
+                       label='Target')
+            plt.plot_date(x, y, '-g',
+                          label='Total value')
+            plt.legend(loc='upper left')
+            plt.savefig('../' + str(generation) + '_' + str(idx) + '.png', dpi=500)
+            plt.close()
+
+    def print_best_agents_performance(self):
+        import matplotlib.pyplot as plt
+        for idx, _ in enumerate(Config.validations):
+            plt.plot(self.best_scores,
+                     label='Best agent end value')
+            plt.axhline(self.targets[idx],
+                        color='r',
+                        linestyle='--',
+                        label='Target')
+            plt.legend(loc='upper left')
+            plt.savefig('../elite_perf_' + str(idx) + '.png', dpi=500)
+            plt.close()
+
     def save_results(self, save_path: str):
         self.calculate_all_validations()
+        self.print_best_agents_performance()
         result_string = self.toJSON()
         self.save_to_file(result_string, save_path)
 
@@ -184,19 +200,15 @@ class GeneticAlgorithmWorker:
             for val_idx, validation in enumerate(Config.validations):
                 fit = agent.calculate_fitness(self.testing_database[val_idx], validation[0], validation[1], validation_case=val_idx)
                 print('[%s] validation #%s - %s' % (agent.id, val_idx, fit))
-        self.best_scores.append(self.agents[0].validations[0])
+        if Config.return_method == 'total_value':
+            self.best_scores.append(self.agents[0].validations[0])
+        else:
+            self.best_scores.append(self.agents[0].wallet.get_total_value(self.testing_database[0], Config.validations[0][1]))
 
     def save_to_file(self, result: str, save_path: str):
         file = open(save_path, 'w')
         file.write(result)
         file.close()
-
-        import matplotlib.pyplot as plt
-        plt.plot(self.best_scores)
-        plt.axhline(self.targets[0],
-                    color='r',
-                    linestyle='--')
-        plt.show()
 
     class JSONPack:
         def __init__(self, agents, targets):

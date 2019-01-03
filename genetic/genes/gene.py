@@ -9,6 +9,8 @@ class Gene:
     def __init__(self):
         self.result_true = random.randint(1, 10) * random.choice([-1, 1])
         self.result_false = random.randint(1, 10) * random.choice([-1, 1])
+        while self.result_false == self.result_true:
+            self.result_false = random.randint(1, 10) * random.choice([-1, 1])
         self.weight = round(random.uniform(0.0, 1.0), 2)
 
     def get_substrength(self, company, day) -> float:
