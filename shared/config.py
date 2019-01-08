@@ -20,6 +20,7 @@ class Config:
     validations = []
 
     # selection
+    selection_method = ""
     agents_to_save = 0
 
     # crossover
@@ -68,6 +69,7 @@ class Config:
             Config.validations.append( (start_date, end_date) )
 
         selection = dict_config['selection']
+        Config.selection_method = selection['method']
         Config.agents_to_save = selection['agents_to_save']
 
         crossover = dict_config['crossover']

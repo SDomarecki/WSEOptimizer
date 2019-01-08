@@ -8,7 +8,7 @@ class ROEqq(Gene):
     def __init__(self):
         super().__init__()
         self.comparator = random.choice(['>', '<'])
-        self.compared_value = random.uniform(-0.8, 3.0)
+        self.compared_value = random.uniform(0.8, 4.0)
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
@@ -21,9 +21,9 @@ class ROEqq(Gene):
             previous_indicator_value = .1
 
         if self.comparator == '>':
-            return indicator_value/previous_indicator_value -1 > self.compared_value
+            return indicator_value/previous_indicator_value > self.compared_value
         else:
-            return indicator_value/previous_indicator_value -1 < self.compared_value
+            return indicator_value/previous_indicator_value < self.compared_value
 
     def condition_to_string(self):
         return "ROE / PrevQ ROE %s %s" % (self.comparator, self.compared_value)

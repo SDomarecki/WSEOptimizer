@@ -567,27 +567,27 @@ def positive_volume_index(data, periods=255, close_col='<CLOSE>', vol_col='<VOL>
 
 
 """
-Momentum
+Rate of change
 Source: https://en.wikipedia.org/wiki/Momentum_(technical_analysis)
 Params: 
     data: pandas DataFrame
-    periods: period for calculating momentum
+    periods: period for calculating ROC
     close_col: the name of the CLOSE values column
 
 Returns:
-    copy of 'data' DataFrame with 'momentum' column added
+    copy of 'data' DataFrame with 'roc' column added
 """
 
 
-def momentum(data, periods=14, close_col='<CLOSE>'):
-    data['momentum'] = 0.
+def roc(data, periods=14, close_col='<CLOSE>'):
+    data['roc'] = 0.
 
     for index, row in data.iterrows():
         if index >= periods:
             prev_close = data.at[index - periods, close_col]
             val_perc = (row[close_col] - prev_close) / prev_close
 
-            data.set_value(index, 'momentum', val_perc)
+            data.set_value(index, 'roc', val_perc)
 
     return data
 
@@ -743,6 +743,7 @@ def trix(data, periods=14, signal_periods=9, close_col='<CLOSE>'):
     data['trix'] = data[close_col].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
     data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
     data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
+    data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=1, adjust=True).mean()
     data['trix_signal'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=signal_periods, adjust=True).mean()
 
     return data

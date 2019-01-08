@@ -12,12 +12,15 @@ class DatabaseLoader:
         self.learning_database_chunks = []
         self.testing_databases = []
         self.benchmark = None
+        self.benchmark_learning_wallet = None
+        self.benchmark_testing_wallets = []
         self.targets = []
 
         self.__read_database()
         self.__split_database_equally(Config.chunks)
         self.__read_benchmark(benchmark_ticker)
         self.__calculate_targets()
+        self.__calculate_wallets()
 
     def __read_database(self):
         import json
@@ -100,6 +103,10 @@ class DatabaseLoader:
         self.benchmark = df
 
     def __calculate_targets(self):
+        target = round(Config.start_cash * self.__get_target_ratio(Config.start_date, Config.end_date), 2)
+        self.targets.append(target)
+        print('Learning target: %s' % target)
+
         for idx, el in enumerate(Config.validations):
             target = round(Config.start_cash * self.__get_target_ratio(el[0], el[1]), 2)
             self.targets.append(target)
@@ -109,6 +116,24 @@ class DatabaseLoader:
         start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date)
         end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date)
         return end_value / start_value
+
+    def __calculate_wallets(self):
+        self.benchmark_learning_wallet = self.__calculate_benchmark_wallet(Config.start_date, Config.end_date)
+        for idx, el in enumerate(Config.validations):
+            self.benchmark_testing_wallets.append(self.__calculate_benchmark_wallet(el[0], el[1]))
+
+    def __calculate_benchmark_wallet(self, start_date, end_date):
+        start_cash = Config.start_cash
+        import datetime
+        delta = datetime.timedelta(days=Config.timedelta)
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date)
+        history = []
+        day = start_date
+        while day < end_date:
+            today_value = DatabaseLoader.__get_closest_value(self.benchmark, day)
+            history.append(start_cash * today_value/start_value)
+            day += delta
+        return history
 
     @staticmethod
     def __get_closest_value(df, date) -> float:

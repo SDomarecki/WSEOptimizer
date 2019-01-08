@@ -17,8 +17,10 @@ class GeneFactory:
         from genes.logical.and_gene import AndGene
         from genes.logical.or_gene import OrGene
         from genes.logical.xor_gene import XorGene
+        from genes.logical.impl_gene import ImplGene
+        from genes.logical.eq_gene import EqGene
 
-        possible_genes = [AndGene, OrGene, XorGene]
+        possible_genes = [AndGene, OrGene, XorGene, ImplGene, EqGene]
         return random.choice(possible_genes)()
 
     @staticmethod
@@ -65,7 +67,7 @@ class GeneFactory:
         from genetic.genes.technical.trix_gene import TrixGene
         from genetic.genes.technical.williams_gene import WilliamsGene
         from genetic.genes.technical.mfi_gene import MFIGene
-        from genetic.genes.technical.momentum_gene import MomentumGene
+        from genetic.genes.technical.roc_gene import ROCGene
         from genetic.genes.technical.emv_gene import EMVGene
         from genetic.genes.technical.sma15_normalized_gene import SMA15NormalizedGene
         from genetic.genes.technical.sma40_normalized_gene import SMA40NormalizedGene
@@ -73,5 +75,5 @@ class GeneFactory:
 
         possible_genes = [SMA15NormalizedGene, SMA40NormalizedGene, EMA200NormalizedGene,
                           RSIGene, MACDGene, TrixGene, WilliamsGene,
-                          MFIGene, MomentumGene, EMVGene]
+                          MFIGene, ROCGene, EMVGene]
         return random.choice(possible_genes)()

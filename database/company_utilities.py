@@ -42,7 +42,7 @@ def calculate_all_technicals(company: Company) -> Company:
                                               low_col='Low',
                                               close_col='Close',
                                               vol_col='Volume')
-    company.technicals = ind.momentum(company.technicals, periods=14, close_col='Close')
+    company.technicals = ind.roc(company.technicals, periods=14, close_col='Close')
     company.technicals = ind.ease_of_movement(company.technicals,
                                               period=14,
                                               high_col='High',

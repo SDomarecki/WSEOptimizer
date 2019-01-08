@@ -17,7 +17,10 @@ class GeneticAlgorithmWorker:
         self.agents = []
         self.generations = Config.iterations
         self.targets = loader.targets
-        self.best_scores = []
+        self.benchmark_learning_wallet = loader.benchmark_learning_wallet
+        self.benchmark_testing_wallets = loader.benchmark_testing_wallets
+        self.best_scores_learning = []
+        self.best_scores_testing = [[]]
 
         self.init_agents()
 
@@ -49,8 +52,11 @@ class GeneticAlgorithmWorker:
 
             if generation < self.generations - 1:
                 self.crossover()
-            self.calculate_best_agent_performance()
-            self.print_best_agent_value_history(generation)
+
+            # self.print_agent_value_history(generation)
+            self.calculate_best_agent_validation_performance()
+            for idx, _ in enumerate(Config.validations):
+                self.print_agent_value_history(generation, idx)
             self.print_best_agents_performance()
 
         # Iteration with whole database
@@ -59,16 +65,50 @@ class GeneticAlgorithmWorker:
             fit = agent.calculate_fitness(self.learning_database, Config.start_date, Config.end_date)
             print('[%s] fitness - %s' % (agent.id, fit))
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
-        self.calculate_best_agent_performance()
-        self.print_best_agent_value_history('last')
+
+        self.print_agent_value_history('last')
+        self.calculate_best_agent_validation_performance()
+        for idx, _ in enumerate(Config.validations):
+            self.print_agent_value_history('last', idx)
         self.print_best_agents_performance()
 
-    # funkcja sortująca i niszcząca słabe osobniki
     def selection(self):
+        if Config.selection_method == 'rating':
+            self.rating_selection()
+        elif Config.selection_method == 'tournament':
+            self.tournament_selection()
+        elif Config.selection_method == 'roulette':
+            self.roulette_selection()
+        else:
+            raise NotImplementedError('Wrong selection method')
+
+    def rating_selection(self):
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
         self.agents = self.agents[:int(Config.agents_to_save * len(self.agents))]
 
-    # funkcja tworząca nowe osobniki
+    def tournament_selection(self):
+        selected = []
+        selection_target = int(Config.agents_to_save * len(self.agents))
+        tournament_size = 2
+        while len(selected) < selection_target:
+            aspirants = [random.choice(self.agents) for i in range(tournament_size)]
+            selected.append(max(aspirants, key=lambda ag: ag.fitness))
+        self.agents = selected
+
+    def roulette_selection(self):
+        selected = []
+        selection_target = int(Config.agents_to_save * len(self.agents))
+        fitness_sum = sum(agent.fitness for agent in self.agents)
+        while len(selected) < selection_target:
+            pick = random.uniform(0, fitness_sum)
+            current = 0
+            for ag in self.agents:
+                current += ag.fitness
+                if current > pick:
+                    selected.append(ag)
+                    break
+        self.agents = selected
+
     def crossover(self):
         if Config.constant_length:
             self.constant_crossover()
@@ -137,15 +177,21 @@ class GeneticAlgorithmWorker:
                     # agent.genes[idx] = GeneFactory.create_random_gene()
         return agents
 
-    def calculate_best_agent_performance(self):
+    def calculate_best_agent_validation_performance(self):
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
+        if Config.return_method == 'total_value':
+            self.best_scores_learning.append(best_agent.fitness)
+        else:
+            self.best_scores_learning.append(
+                best_agent.wallet.get_total_value(self.learning_database, Config.end_date))
+
         for idx, validation in enumerate(Config.validations):
             fit = best_agent.calculate_fitness(self.testing_database[idx], validation[0], validation[1], validation_case=idx)
             print('[%s] validation #%s - %s' % (best_agent.id, idx, fit))
             if Config.return_method == 'total_value':
-                self.best_scores.append(best_agent.validations[0])
+                self.best_scores_testing[idx].append(best_agent.validations[0])
             else:
-                self.best_scores.append(best_agent.wallet.get_total_value(self.testing_database[idx], validation[1]))
+                self.best_scores_testing[idx].append(best_agent.wallet.get_total_value(self.testing_database[idx], validation[1]))
 
         print('Best agent performance')
         print('Learning: ' + str(best_agent.fitness))
@@ -154,39 +200,54 @@ class GeneticAlgorithmWorker:
             print(str(val))
         print('Length of genome: ' + str(len(best_agent.genes)))
 
-    def print_best_agent_value_history(self, generation):
+    def print_agent_value_history(self, generation, benchmark_wallet_index=-1):
         import matplotlib.dates as mdates
         import matplotlib.pyplot as plt
 
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
-        for idx, validation in enumerate(Config.validations):
-            x = mdates.date2num(best_agent.wallet.valueTimestamps)
-            y = best_agent.wallet.valueHistory
-            plt.xticks(rotation=45)
-            plt.gcf().subplots_adjust(bottom=0.15)
-            plt.hlines(self.targets[idx],
-                       xmin=validation[0],
-                       xmax=validation[1],
-                       color='r',
-                       linestyle='--',
-                       label='Target')
-            plt.plot_date(x, y, '-g',
-                          label='Total value')
-            plt.legend(loc='upper left')
-            plt.savefig('../' + str(generation) + '_' + str(idx) + '.png', dpi=500)
-            plt.close()
+        if benchmark_wallet_index == -1:
+            benchmark_wallet = self.benchmark_learning_wallet
+        else:
+            benchmark_wallet = self.benchmark_testing_wallets[benchmark_wallet_index]
+
+        x = mdates.date2num(best_agent.wallet.valueTimestamps)
+        y = best_agent.wallet.valueHistory
+        plt.xticks(rotation=45)
+        plt.gcf().subplots_adjust(bottom=0.15)
+        plt.plot_date(x, benchmark_wallet,
+                      color='#d62f2f',
+                      linestyle='solid',
+                      marker="",
+                      label='Target')
+        plt.plot_date(x, y, '-g',
+                      label='Total value')
+        plt.legend(loc='upper left')
+        plt.savefig('../' + str(generation) + '_' + str(benchmark_wallet_index) + '.png', dpi=500)
+        plt.close()
 
     def print_best_agents_performance(self):
         import matplotlib.pyplot as plt
+
+        plt.plot(self.best_scores_learning,
+                 label='Best agent end value')
+        plt.axhline(self.targets[0],
+                    color='r',
+                    linestyle='--',
+                    label='Target end value')
+        plt.legend(loc='upper left')
+        plt.savefig('../elite_perf_learning.png', dpi=500)
+        plt.close()
+
+        targets = self.targets[1:]
         for idx, _ in enumerate(Config.validations):
-            plt.plot(self.best_scores,
+            plt.plot(self.best_scores_testing[idx],
                      label='Best agent end value')
-            plt.axhline(self.targets[idx],
+            plt.axhline(targets[idx],
                         color='r',
                         linestyle='--',
-                        label='Target')
+                        label='Target end value')
             plt.legend(loc='upper left')
-            plt.savefig('../elite_perf_' + str(idx) + '.png', dpi=500)
+            plt.savefig('../elite_perf_test_' + str(idx) + '.png', dpi=500)
             plt.close()
 
     def save_results(self, save_path: str):
@@ -200,10 +261,12 @@ class GeneticAlgorithmWorker:
             for val_idx, validation in enumerate(Config.validations):
                 fit = agent.calculate_fitness(self.testing_database[val_idx], validation[0], validation[1], validation_case=val_idx)
                 print('[%s] validation #%s - %s' % (agent.id, val_idx, fit))
-        if Config.return_method == 'total_value':
-            self.best_scores.append(self.agents[0].validations[0])
-        else:
-            self.best_scores.append(self.agents[0].wallet.get_total_value(self.testing_database[0], Config.validations[0][1]))
+
+        for val_idx, validation in enumerate(Config.validations):
+            if Config.return_method == 'total_value':
+                self.best_scores_testing[val_idx].append(self.agents[0].validations[val_idx])
+            else:
+                self.best_scores_testing[val_idx].append(self.agents[0].wallet.get_total_value(self.testing_database[val_idx], Config.validations[val_idx][1]))
 
     def save_to_file(self, result: str, save_path: str):
         file = open(save_path, 'w')
@@ -228,7 +291,7 @@ class GeneticAlgorithmWorker:
 
     def toJSON(self):
         import json
-        return json.dumps(self.JSONPack(self.agents[:5], self.targets).__dict__, default=str, indent=2)
+        return json.dumps(self.JSONPack(self.agents[:5], self.targets[1:]).__dict__, default=str, indent=2)
 
 
 if __name__ == "__main__":

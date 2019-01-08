@@ -2,7 +2,7 @@ from genetic.genes.gene import Gene
 import random
 
 
-class MomentumGene(Gene):
+class ROCGene(Gene):
 
     def __init__(self):
         super().__init__()
@@ -10,7 +10,7 @@ class MomentumGene(Gene):
         self.compared_value = random.uniform(-0.25, 0.25)
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, 'momentum']
+        indicator_value = company.technicals.at[day, 'roc']
 
         if self.comparator == '>':
             return indicator_value > self.compared_value

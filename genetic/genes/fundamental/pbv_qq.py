@@ -8,7 +8,7 @@ class PBVqq(Gene):
     def __init__(self):
         super().__init__()
         self.comparator = random.choice(['>', '<'])
-        self.compared_value = random.uniform(-0.5, 0.5)
+        self.compared_value = random.uniform(0.5, 1.5)
 
     def condition(self, company, day):
         quarter = Gene.date_to_quarter(day)
@@ -18,9 +18,9 @@ class PBVqq(Gene):
         previous_indicator_value = company.fundamentals.at[prev_quarter, 'P/BV']
 
         if self.comparator == '>':
-            return indicator_value/previous_indicator_value -1 > self.compared_value
+            return indicator_value/previous_indicator_value > self.compared_value
         else:
-            return indicator_value/previous_indicator_value -1 < self.compared_value
+            return indicator_value/previous_indicator_value < self.compared_value
 
     def condition_to_string(self):
         return "P/BV / PrevQ P/BV %s %s" % (self.comparator, self.compared_value)
