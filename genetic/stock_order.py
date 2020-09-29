@@ -11,8 +11,5 @@ class StockOrder:
         self.cash_remaining = cash_remaining
 
     def to_string(self) -> str:
-        return "%s %s %s %s x %s [Fee: %s] [Remains: %s]" % \
-               (self.date.strftime('%Y-%m-%d'), self.direction,
-                self.ticker, self.amount, self.price,
-                self.fee, self.cash_remaining)
-
+        return f'{self.date.strftime("%Y-%m-%d")} {self.direction} ' \
+               f'{self.ticker} {self.amount} x {self.price} [Fee: {self.fee}] [Remains: {self.cash_remaining}]'

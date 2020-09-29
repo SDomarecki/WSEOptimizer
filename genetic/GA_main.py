@@ -1,8 +1,11 @@
 import random
 
-from database_loader import DatabaseLoader
+from genetic.database_loader import DatabaseLoader
 from genetic.agent import Agent
 from shared.config import Config
+
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
 
 class GeneticAlgorithmWorker:
@@ -36,18 +39,18 @@ class GeneticAlgorithmWorker:
         self.next_agent_id += Config.initial_population
 
     def perform_ga(self):
-        print('Learning database size: %s companies' % len(self.learning_database))
+        print(f'Learning database size: {len(self.learning_database)} companies')
 
         chunks = Config.chunks
 
         for generation in range(1, self.generations):
             current_database = self.learning_database_chunks[generation % chunks]
 
-            print('Generation: %s' % generation)
+            print(f'Generation: {generation}')
 
             for agent in self.agents:
                 fit = agent.calculate_fitness(current_database, Config.start_date, Config.end_date)
-                print('[%s] fitness - %s' % (agent.id, fit))
+                print(f'[{agent.id}] fitness - {fit}')
             self.selection()
 
             if generation < self.generations - 1:
@@ -63,7 +66,7 @@ class GeneticAlgorithmWorker:
         print('Last generation')
         for agent in self.agents:
             fit = agent.calculate_fitness(self.learning_database, Config.start_date, Config.end_date)
-            print('[%s] fitness - %s' % (agent.id, fit))
+            print(f'[{agent.id}] fitness - {fit}')
         self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
 
         self.print_agent_value_history('last')
@@ -165,7 +168,6 @@ class GeneticAlgorithmWorker:
         offspring = self.mutation(offspring)
         self.agents.extend(offspring)
 
-    # funkcja podmieniająca geny w nowych osobnikach
     def mutation(self, agents: [Agent]) -> [Agent]:
         import random
         for agent in agents:
@@ -187,23 +189,20 @@ class GeneticAlgorithmWorker:
 
         for idx, validation in enumerate(Config.validations):
             fit = best_agent.calculate_fitness(self.testing_database[idx], validation[0], validation[1], validation_case=idx)
-            print('[%s] validation #%s - %s' % (best_agent.id, idx, fit))
+            print(f'[{best_agent.id}] validation #{idx} - {fit}')
             if Config.return_method == 'total_value':
                 self.best_scores_testing[idx].append(best_agent.validations[0])
             else:
                 self.best_scores_testing[idx].append(best_agent.wallet.get_total_value(self.testing_database[idx], validation[1]))
 
         print('Best agent performance')
-        print('Learning: ' + str(best_agent.fitness))
+        print(f'Learning: {str(best_agent.fitness)}')
         print('Validations: ')
         for val in best_agent.validations:
             print(str(val))
-        print('Length of genome: ' + str(len(best_agent.genes)))
+        print(f'Length of genome: {str(len(best_agent.genes))}')
 
     def print_agent_value_history(self, generation, benchmark_wallet_index=-1):
-        import matplotlib.dates as mdates
-        import matplotlib.pyplot as plt
-
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
         if benchmark_wallet_index == -1:
             benchmark_wallet = self.benchmark_learning_wallet
@@ -222,11 +221,11 @@ class GeneticAlgorithmWorker:
         plt.plot_date(x, y, '-g',
                       label='Total value')
         plt.legend(loc='upper left')
-        plt.savefig('../' + str(generation) + '_' + str(benchmark_wallet_index) + '.png', dpi=500)
+        plt.savefig(f'../{str(generation)}_{str(benchmark_wallet_index)}.png', dpi=500)
         plt.close()
 
     def print_best_agents_performance(self):
-        import matplotlib.pyplot as plt
+
 
         plt.plot(self.best_scores_learning,
                  label='Best agent end value')
@@ -247,7 +246,7 @@ class GeneticAlgorithmWorker:
                         linestyle='--',
                         label='Target end value')
             plt.legend(loc='upper left')
-            plt.savefig('../elite_perf_test_' + str(idx) + '.png', dpi=500)
+            plt.savefig(f'../elite_perf_test_{str(idx)}.png', dpi=500)
             plt.close()
 
     def save_results(self, save_path: str):
@@ -260,7 +259,7 @@ class GeneticAlgorithmWorker:
         for _, agent in enumerate(self.agents[:5]):
             for val_idx, validation in enumerate(Config.validations):
                 fit = agent.calculate_fitness(self.testing_database[val_idx], validation[0], validation[1], validation_case=val_idx)
-                print('[%s] validation #%s - %s' % (agent.id, val_idx, fit))
+                print(f'[{agent.id}] validation #{val_idx} - {fit}')
 
         for val_idx, validation in enumerate(Config.validations):
             if Config.return_method == 'total_value':
@@ -275,16 +274,16 @@ class GeneticAlgorithmWorker:
 
     class JSONPack:
         def __init__(self, agents, targets):
-            self.timestamp = strftime("%Y-%m-%d %H-%M-%S", localtime())
+            self.timestamp = strftime('%Y-%m-%d %H-%M-%S', localtime())
             self.fitness_start = Config.start_date
             self.fitness_end = Config.end_date
 
             self.validations = []
             for idx, target in enumerate(targets):
                 self.validations.append({
-                    "start_date": Config.validations[idx][0],
-                    "end_date": Config.validations[idx][1],
-                    "target": target
+                    'start_date': Config.validations[idx][0],
+                    'end_date': Config.validations[idx][1],
+                    'target': target
                 })
             self.start_cash = Config.start_cash
             self.agents = list(map(lambda ag: ag.to_json_ready(), agents))
@@ -294,13 +293,13 @@ class GeneticAlgorithmWorker:
         return json.dumps(self.JSONPack(self.agents[:5], self.targets[1:]).__dict__, default=str, indent=2)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     Config()
     worker = GeneticAlgorithmWorker()
     worker.perform_ga()
 
     from time import strftime, localtime
 
-    filename = strftime("%Y-%m-%d %H-%M-%S", localtime())
+    filename = strftime('%Y-%m-%d %H-%M-%S', localtime())
 
-    worker.save_results('../' + filename + '.json')
+    worker.save_results(f'../{filename}.json')

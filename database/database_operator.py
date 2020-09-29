@@ -15,7 +15,7 @@ class DatabaseOperator:
 
         companies = BRscraper.get_companies()
         self.toFetch = len(companies)
-        print('To fetch: ' + str(self.toFetch) + ' companies')
+        print(f'To fetch: {str(self.toFetch)} companies')
         pool = ThreadPool(4)
 
         pool.map(self.collect_company_info, companies.values())
@@ -33,17 +33,17 @@ class DatabaseOperator:
         self.save_company(company)
 
     def save_company(self, company: Company):
-        company.fundamentals.to_csv('../res/fundamental/' + company.ticker + '.csv')
-        company.technicals.to_csv('../res/technical/' + company.ticker + '.csv')
-        with io.open('../res/basic_info/' + company.ticker + '.json', 'w') as f:
+        company.fundamentals.to_csv(f'../res/fundamental/{company.ticker}.csv')
+        company.technicals.to_csv(f'../res/technical/{company.ticker}.csv')
+        with io.open(f'../res/basic_info/{company.ticker}.json', 'w') as f:
             f.write(company.toJSON())
         self.fetched += 1
-        print('Fetched already ' + str(self.fetched) + '/' + str(self.toFetch) + ' companies')
+        print(f'Fetched already {str(self.fetched)}/{str(self.toFetch)} companies')
         return company
 
     def get_raw_technicals(self, ticker: str):
         ticker = ticker.lower()
-        df = pd.read_csv('../res/stooq_source/' + ticker + '.csv', delimiter=';')
+        df = pd.read_csv(f'../res/stooq_source/{ticker}.csv', delimiter=';')
         return df
 
 

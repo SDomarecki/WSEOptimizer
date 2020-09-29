@@ -1,11 +1,13 @@
+import pandas as pd
+
 class Company:
     def __init__(self, name, ticker, link):
         self.name = name
         self.ticker = ticker
         self.link = link
         self.sector = ""
-        self.fundamentals = None  # Pandas DataFrame object!
-        self.technicals = None  # Pandas DataFrame object!
+        self.fundamentals: pd.DataFrame
+        self.technicals: pd.DataFrame
 
     def toJSON(self):
         import json

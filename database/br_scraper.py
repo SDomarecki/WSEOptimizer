@@ -22,7 +22,7 @@ class BRscraper:
 
     @staticmethod
     def get_sector(link: str):
-        url = 'https://www.biznesradar.pl/notowania' + link
+        url = f'https://www.biznesradar.pl/notowania{link}'
         page = get_page(url)
         soup = BeautifulSoup(page.text, 'html.parser')
         sector = soup.find(text='Sektor:').parent.parent.findNext('td').contents[1].contents[0]
@@ -44,7 +44,7 @@ class BRscraper:
         columns = ['Sales', 'Earnings']
         raw_fundamentals = pd.DataFrame(columns=columns)
 
-        url = 'https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat' + link + ',Q'
+        url = f'https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat{link},Q'
         page = get_page(url)
         soup = BeautifulSoup(page.text, 'html.parser')
         if soup.find("table", class_="report-table") is None:
@@ -78,7 +78,7 @@ class BRscraper:
         columns = ['Book value']
         balance = pd.DataFrame(columns=columns)
 
-        url = 'https://www.biznesradar.pl/raporty-finansowe-bilans' + link + ',Q,0'
+        url = f'https://www.biznesradar.pl/raporty-finansowe-bilans{link},Q,0'
         page = get_page(url)
         soup = BeautifulSoup(page.text, 'html.parser')
         if soup.find("table", class_="report-table") is None:
@@ -108,7 +108,7 @@ class BRscraper:
         columns = ['P/E', 'P/BV', 'P/S', 'EPS', 'BVPS', 'SPS']
         indicators = pd.DataFrame(columns=columns)
 
-        url = 'https://www.biznesradar.pl/wskazniki-wartosci-rynkowej' + link + ',Q'
+        url = f'https://www.biznesradar.pl/wskazniki-wartosci-rynkowej{link},Q'
         page = get_page(url)
         soup = BeautifulSoup(page.text, 'html.parser')
         if soup.find("table", class_="report-table") is None:

@@ -20,34 +20,38 @@ def englishify_columns(company: Company) -> Company:
 
 
 def calculate_all_technicals(company: Company) -> Company:
-    company.technicals = ind.circulation(company.technicals, close_col='Close', vol_col='Volume')
-    company.technicals = ind.sma(company.technicals, period=15, close_col='Close')
-    company.technicals = ind.sma(company.technicals, period=40, close_col='Close')
-    company.technicals = ind.ema(company.technicals, period=200, close_col='Close')
-    company.technicals = ind.rsi(company.technicals, periods=14, close_col='Close')
-    company.technicals = ind.macd(company.technicals,
-                                  period_long=26,
-                                  period_short=12,
-                                  period_signal=9,
-                                  close_col='Close')
-    company.technicals = ind.trix(company.technicals, periods=14, signal_periods=9, close_col='Close')
-    company.technicals = ind.williams_r(company.technicals,
-                                        periods=10,
-                                        high_col='High',
-                                        low_col='Low',
-                                        close_col='Close')
-    company.technicals = ind.money_flow_index(company.technicals,
-                                              periods=14,
-                                              high_col='High',
-                                              low_col='Low',
-                                              close_col='Close',
-                                              vol_col='Volume')
-    company.technicals = ind.roc(company.technicals, periods=14, close_col='Close')
-    company.technicals = ind.ease_of_movement(company.technicals,
-                                              period=14,
-                                              high_col='High',
-                                              low_col='Low',
-                                              vol_col='Volume')
+    t = company.technicals
+
+    t = ind.circulation(t, close_col='Close', vol_col='Volume')
+    t = ind.sma(t, period=15, close_col='Close')
+    t = ind.sma(t, period=40, close_col='Close')
+    t = ind.ema(t, period=200, close_col='Close')
+    t = ind.rsi(t, periods=14, close_col='Close')
+    t = ind.macd(t,
+                 period_long=26,
+                 period_short=12,
+                 period_signal=9,
+                 close_col='Close')
+    t = ind.trix(t, periods=14, signal_periods=9, close_col='Close')
+    t = ind.williams_r(t,
+                       periods=10,
+                       high_col='High',
+                       low_col='Low',
+                       close_col='Close')
+    t = ind.money_flow_index(t,
+                             periods=14,
+                             high_col='High',
+                             low_col='Low',
+                             close_col='Close',
+                             vol_col='Volume')
+    t = ind.roc(t, periods=14, close_col='Close')
+    t = ind.ease_of_movement(t,
+                             period=14,
+                             high_col='High',
+                             low_col='Low',
+                             vol_col='Volume')
+
+    company.technicals = t
     return company
 
 
