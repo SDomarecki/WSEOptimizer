@@ -46,7 +46,7 @@ class Config:
     fundamental_to_all = 0.0
 
     def __init__(self):
-        with open('../config_ga.json') as f:
+        with open('../config.json') as f:
             dict_config = json.load(f)
 
         database = dict_config['database']

@@ -118,4 +118,4 @@ dmypy.json
 *.png
 
 !config_app.json
-!config_ga.json
+!config.json
