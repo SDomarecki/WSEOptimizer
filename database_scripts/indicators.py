@@ -141,7 +141,7 @@ def ease_of_movement(data, period=14, high_col='<HIGH>', low_col='<LOW>', vol_co
         box_ratio = (vol / 100000000) / diff
         emv = midpoint_move / box_ratio
 
-        data.set_value(index, 'emv', emv)
+        data.at[index, 'emv'] = emv
 
     data['emv_ema_' + str(period)] = data['emv'].ewm(ignore_na=False, min_periods=0, com=period, adjust=True).mean()
 
@@ -176,9 +176,9 @@ def money_flow_index(data, periods=14, high_col='<HIGH>', low_col='<LOW>', close
     for index, row in data.iterrows():
         if index > 0:
             if row['typical_price'] < data.at[index - 1, 'typical_price']:
-                data.set_value(index, 'money_flow_positive', row['money_flow'])
+                data.at[index, 'money_flow_positive'] = row['money_flow']
             else:
-                data.set_value(index, 'money_flow_negative', row['money_flow'])
+                data.at[index, 'money_flow_negative'] = row['money_flow']
 
         if index >= periods:
             period_slice = data['money_flow'][index - periods:index]
@@ -192,8 +192,8 @@ def money_flow_index(data, periods=14, high_col='<HIGH>', low_col='<LOW>', close
 
             mfi = 1 - (1 / (1 + m_r))
 
-            data.set_value(index, 'money_ratio', m_r)
-            data.set_value(index, 'money_flow_index', mfi)
+            data.at[index, 'money_ratio'] = m_r
+            data.at[index, 'money_flow_index'] = mfi
 
     data = data.drop(['money_flow', 'money_ratio', 'money_flow_positive', 'money_flow_negative'], axis=1)
 
@@ -224,7 +224,7 @@ def roc(data, periods=14, close_col='<CLOSE>'):
             prev_close = data.at[index - periods, close_col]
             val_perc = (row[close_col] - prev_close) / prev_close
 
-            data.set_value(index, 'roc', val_perc)
+            data.at[index, 'roc'] = val_perc
 
     return data
 
@@ -252,9 +252,9 @@ def rsi(data, periods=14, close_col='<CLOSE>'):
 
             prev_close = data.at[index - periods, close_col]
             if prev_close < row[close_col]:
-                data.set_value(index, 'rsi_u', row[close_col] - prev_close)
+                data.at[index, 'rsi_u'] = row[close_col] - prev_close
             elif prev_close > row[close_col]:
-                data.set_value(index, 'rsi_d', prev_close - row[close_col])
+                data.at[index, 'rsi_d'] = prev_close - row[close_col]
 
     data['rsi'] = data['rsi_u'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean() / (
             data['rsi_u'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean() +
@@ -288,8 +288,8 @@ def williams_r(data, periods=14, high_col='<HIGH>', low_col='<LOW>', close_col='
             price_range = max(data[high_col][index - periods:index]) - min(data[low_col][index - periods:index])
             if price_range == 0:
                 continue
-            data.set_value(index, 'williams_r', ((max(data[high_col][index - periods:index]) - row[close_col]) /
-                                                 price_range) * (-100))
+            data.at[index, 'williams_r'] = ((max(data[high_col][index - periods:index]) - row[close_col]) /
+                                            price_range) * (-100)
 
     return data
 

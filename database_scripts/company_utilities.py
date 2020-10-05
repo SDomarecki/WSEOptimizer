@@ -1,4 +1,4 @@
-import database.indicators as ind
+import database_scripts.indicators as ind
 from shared.company import Company
 
 

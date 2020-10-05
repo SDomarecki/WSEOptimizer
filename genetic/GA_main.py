@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 class GeneticAlgorithmWorker:
 
     def __init__(self):
-        loader = DatabaseLoader('../res', Config.benchmark)
+        loader = DatabaseLoader('database/preprocessed', Config.benchmark)
 
         self.next_agent_id = 1
         self.learning_database = loader.learning_database

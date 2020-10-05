@@ -1,8 +1,9 @@
-from database.company_utilities import boost_company_info
+from database_scripts.company_utilities import boost_company_info
 from shared.company import Company
-from database.br_scraper import BRscraper
+from database_scripts.br_scraper import BRscraper
 import pandas as pd
 import io
+import os
 
 class DatabaseOperator:
 
@@ -16,6 +17,22 @@ class DatabaseOperator:
         companies = BRscraper.get_companies()
         self.toFetch = len(companies)
         print(f'To fetch: {str(self.toFetch)} companies')
+
+        if not os.path.exists('database'):
+            os.mkdir('database')
+
+        if not os.path.exists('database/preprocessed'):
+            os.mkdir('database/preprocessed')
+
+        if not os.path.exists('database/preprocessed/fundamental'):
+            os.mkdir('database/preprocessed/fundamental')
+
+        if not os.path.exists('database/preprocessed/technical'):
+            os.mkdir('database/preprocessed/technical')
+
+        if not os.path.exists('database/preprocessed/basic_info'):
+            os.mkdir('database/preprocessed/basic_info')
+
         pool = ThreadPool(4)
 
         pool.map(self.collect_company_info, companies.values())
@@ -33,9 +50,9 @@ class DatabaseOperator:
         self.save_company(company)
 
     def save_company(self, company: Company):
-        company.fundamentals.to_csv(f'../res/fundamental/{company.ticker}.csv')
-        company.technicals.to_csv(f'../res/technical/{company.ticker}.csv')
-        with io.open(f'../res/basic_info/{company.ticker}.json', 'w') as f:
+        company.fundamentals.to_csv(f'database/preprocessed/fundamental/{company.ticker}.csv')
+        company.technicals.to_csv(f'database/preprocessed/technical/{company.ticker}.csv')
+        with io.open(f'database/preprocessed/basic_info/{company.ticker}.json', 'w') as f:
             f.write(company.toJSON())
         self.fetched += 1
         print(f'Fetched already {str(self.fetched)}/{str(self.toFetch)} companies')
@@ -43,7 +60,7 @@ class DatabaseOperator:
 
     def get_raw_technicals(self, ticker: str):
         ticker = ticker.lower()
-        df = pd.read_csv(f'../res/stooq_source/{ticker}.csv', delimiter=';')
+        df = pd.read_csv(f'database/stooq/{ticker}_d.csv', delimiter=',')
         return df
 
 

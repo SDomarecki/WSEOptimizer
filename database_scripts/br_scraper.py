@@ -193,11 +193,11 @@ def get_page(url):
     page = ''
     while page == '':
         try:
-            print('Connecting with: ' + url)
+            print(f'Connecting with: {url}')
             page = requests.get(url)
             break
         except:
-            print("Za szybki request, ponawiam polaczenie")
+            print('Too fast request, reconnecting...')
             time.sleep(5)
             continue
     print('Success')
