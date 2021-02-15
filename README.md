@@ -33,7 +33,7 @@ It can be kinda slow due to all of the technical indicators computations.
 Last part of application is genetic algorithm itself.
 All you have to do is ~~squish that cat~~ run:
 ```bash
-$ python genetic\\GA_main.py
+$ python genetic\\genetic_algorithm_worker.py
 ```
 in root directory.
 Application as a result will generate at each epoch plot of best model performance comparing to benchmark.
@@ -117,7 +117,7 @@ $ venv/Scripts/activate
 $ pip install -r requirements.txt
 
 # Run script
-$ python genetic\\GA_main.py
+$ python genetic\\genetic_algorithm_worker.py
 ```
 
 Alternative way is to use bundled `PyCharm` configurations.
