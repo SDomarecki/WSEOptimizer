@@ -4,7 +4,7 @@ import statistics
 
 from app.genetic.config import Config
 from app.genetic.stock_order import StockOrder
-from app.shared.company import Company
+from genetic.company import Company
 
 
 class Wallet:

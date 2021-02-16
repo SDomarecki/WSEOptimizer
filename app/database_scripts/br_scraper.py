@@ -2,7 +2,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from app.database_scripts.fetch_page import fetch_page
-from app.shared.company import Company
+from database_scripts.company import Company
 
 
 class BRscraper:

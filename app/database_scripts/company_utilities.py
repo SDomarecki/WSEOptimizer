@@ -1,5 +1,5 @@
 import app.database_scripts.indicators as ind
-from app.shared.company import Company
+from database_scripts.company import Company
 
 
 def boost_company_info(company: Company) -> Company:

@@ -48,12 +48,12 @@ class Agent:
         return sum([g.get_substrength(stock, day) for g in self.genes])
 
     def to_json_ready(self):
-        validations_str = ["{0:.2f}".format(self.validations[i]) for i in range(len(self.validations))]
+        validations_str = [f'{self.validations[i]:.2f}' for i in range(len(self.validations))]
         return {
-            "id": self.id,
-            "strategy": self.genome_to_string(),
-            "fitness": "{0:.2f}".format(self.fitness),
-            "validations": validations_str
+            'id': self.id,
+            'strategy': self.genome_to_string(),
+            'fitness': f'{self.fitness:.2f}',
+            'validations': validations_str
         }
 
     def genome_to_string(self) -> [str]:

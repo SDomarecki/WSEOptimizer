@@ -6,7 +6,7 @@ import pandas as pd
 
 from app.database_scripts.br_scraper import BRscraper
 from app.database_scripts.company_utilities import boost_company_info
-from app.shared.company import Company
+from database_scripts.company import Company
 
 
 class DatabaseOperator:

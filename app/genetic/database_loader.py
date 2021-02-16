@@ -6,7 +6,7 @@ from copy import deepcopy
 import pandas as pd
 
 from app.genetic.config import Config
-from app.shared.company import Company
+from genetic.company import Company
 
 
 class DatabaseLoader:
