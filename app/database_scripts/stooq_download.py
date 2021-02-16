@@ -19,7 +19,7 @@ class StooqDownloader:
         selected_tickers = zip(self.tickers, range(to_download))
         for ticker, i in selected_tickers:
             self.fetch_one(ticker)
-            print(f'Downloaded {ticker} [{i}/{to_download}]')
+            print(f'Downloaded {ticker} [{i + 1}/{to_download}]')
 
     def fetch_one(self, ticker: str):
         url = f'{self.url_base}{ticker}{self.url_end}'

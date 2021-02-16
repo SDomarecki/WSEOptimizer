@@ -1,3 +1,4 @@
+import datetime
 import random
 
 import pandas as pd
@@ -35,21 +36,18 @@ class Gene:
 
     @staticmethod
     def date_to_quarter(date) -> str:
-        import datetime
         fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag)
         lag_date = date - fin_statement_lag
         return "%s/Q%s" % (lag_date.year, pd.Timestamp(lag_date).quarter)
 
     @staticmethod
     def date_to_previous_quarter(date) -> str:
-        import datetime
         fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag + 90)
         lag_date = date - fin_statement_lag
         return "%s/Q%s" % (lag_date.year, pd.Timestamp(lag_date).quarter)
 
     @staticmethod
     def date_to_previous_year_quarter(date) -> str:
-        import datetime
         fin_statement_lag = datetime.timedelta(days=Config.fin_statement_lag + 365)
         lag_date = date - fin_statement_lag
         return "%s/Q%s" % (lag_date.year, pd.Timestamp(lag_date).quarter)

@@ -39,9 +39,9 @@ class Agent:
             self.wallet.trade(ordered_stocks, day, database)
             day += delta
 
-        if Config.return_method == "total_value":
+        if Config.return_method == 'total_value':
             return self.wallet.get_total_value(database, end_date)
-        elif Config.return_method == "sharpe":
+        elif Config.return_method == 'sharpe':
             return self.wallet.get_current_sharpe(database, end_date)
 
     def calculate_strength(self, stock, day) -> float:

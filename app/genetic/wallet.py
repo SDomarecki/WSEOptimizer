@@ -74,9 +74,9 @@ class Wallet:
         self.ordersLog.append(stock_order)
 
     def get_fee_from_charge(self, charge: float) -> float:
-        import statistics as s
         return round(
-            s.median([Config.fee_min, round(charge * Config.fee_rate / 100 + Config.fee_added, 2), Config.fee_max]), 2)
+            statistics.median(
+                [Config.fee_min, round(charge * Config.fee_rate / 100 + Config.fee_added, 2), Config.fee_max]), 2)
 
     def get_total_value(self, database, date) -> float:
         total = self.cash + \

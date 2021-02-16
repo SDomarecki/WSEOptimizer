@@ -8,6 +8,12 @@ import matplotlib.pyplot as plt
 from app.genetic.agent import Agent
 from app.genetic.config import Config
 from app.genetic.database_loader import DatabaseLoader
+from genetic.crossover.constant_crossover_operator import ConstantCrossoverOperator
+from genetic.crossover.non_constant_crossover_operator import NonConstantCrossoverOperator
+from genetic.mutation.normalization_mutation_operator import NormalizationMutationOperator
+from genetic.selection.rating_selection import RatingSelectionOperator
+from genetic.selection.roulette_selection import RouletteSelectionOperator
+from genetic.selection.tournament_selection import TournamentSelectionOperator
 
 
 class GeneticAlgorithmWorker:
@@ -28,17 +34,47 @@ class GeneticAlgorithmWorker:
         self.best_scores_testing = [[]]
 
         self.init_agents()
+        self.init_selection_operator()
+        self.init_crossover_operator()
+        self.init_mutation_operator()
 
     def init_agents(self):
         if Config.constant_length:
-            self.agents = [Agent(self.next_agent_id + i, Config.initial_length, len(Config.validations))
-                           for i in
-                           range(Config.initial_population)]
+            self.init_constant_length_agents()
         else:
-            self.agents = [Agent(self.next_agent_id + i, random.randint(2, Config.max_genes), len(Config.validations))
-                           for i in
-                           range(Config.initial_population)]
+            self.init_non_constant_length_agents()
         self.next_agent_id += Config.initial_population
+
+    def init_constant_length_agents(self):
+        self.agents = [Agent(self.next_agent_id + i, Config.initial_length, len(Config.validations))
+                       for i in
+                       range(Config.initial_population)]
+
+    def init_non_constant_length_agents(self):
+        self.agents = [Agent(self.next_agent_id + i, random.randint(2, Config.max_genes), len(Config.validations))
+                       for i in
+                       range(Config.initial_population)]
+
+    def init_selection_operator(self):
+        method = Config.selection_method
+        if method == 'rating':
+            self.selection_operator = RatingSelectionOperator(Config.agents_to_save)
+        elif method == 'tournament':
+            self.selection_operator = TournamentSelectionOperator(Config.agents_to_save)
+        elif method == 'roulette':
+            self.selection_operator = RouletteSelectionOperator(Config.agents_to_save)
+        else:
+            raise NotImplementedError('Wrong selection method')
+
+    def init_crossover_operator(self):
+        to_create = int((Config.initial_population - Config.agents_to_save) / 2)
+        if Config.constant_length:
+            self.crossover_operator = ConstantCrossoverOperator(Config.initial_length, to_create, Config.validations)
+        else:
+            self.crossover_operator = NonConstantCrossoverOperator(Config.max_genes, to_create, Config.validations)
+
+    def init_mutation_operator(self):
+        self.mutation_operator = NormalizationMutationOperator(Config.mutation_rate)
 
     def perform_ga(self):
         print(f'Learning database size: {len(self.learning_database)} companies')
@@ -78,108 +114,18 @@ class GeneticAlgorithmWorker:
         self.print_best_agents_performance()
 
     def selection(self):
-        if Config.selection_method == 'rating':
-            self.rating_selection()
-        elif Config.selection_method == 'tournament':
-            self.tournament_selection()
-        elif Config.selection_method == 'roulette':
-            self.roulette_selection()
-        else:
-            raise NotImplementedError('Wrong selection method')
-
-    def rating_selection(self):
-        self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
-        self.agents = self.agents[:int(Config.agents_to_save * len(self.agents))]
-
-    def tournament_selection(self):
-        selected = []
-        selection_target = int(Config.agents_to_save * len(self.agents))
-        tournament_size = 2
-        while len(selected) < selection_target:
-            aspirants = [random.choice(self.agents) for i in range(tournament_size)]
-            selected.append(max(aspirants, key=lambda ag: ag.fitness))
-        self.agents = selected
-
-    def roulette_selection(self):
-        selected = []
-        selection_target = int(Config.agents_to_save * len(self.agents))
-        fitness_sum = sum(agent.fitness for agent in self.agents)
-        while len(selected) < selection_target:
-            pick = random.uniform(0, fitness_sum)
-            current = 0
-            for ag in self.agents:
-                current += ag.fitness
-                if current > pick:
-                    selected.append(ag)
-                    break
-        self.agents = selected
+        self.agents = self.selection_operator.select(self.agents)
 
     def crossover(self):
-        if Config.constant_length:
-            self.constant_crossover()
-        else:
-            self.non_constant_crossover()
+        offspring = self.crossover_operator.crossover(self.agents, self.next_agent_id)
+        self.next_agent_id += len(offspring)
 
-    def constant_crossover(self):
-        to_create = int((Config.initial_population - len(self.agents)) / 2)
-        offspring = []
-        for _ in range(to_create):
-            parent1 = random.choice(self.agents)
-            parent2 = random.choice(self.agents)
-
-            child1 = Agent(self.next_agent_id, 0, len(Config.validations))
-            child2 = Agent(self.next_agent_id + 1, 0, len(Config.validations))
-
-            split = random.randint(0, Config.initial_length)
-            child1.genes = parent1.genes[:split] + parent2.genes[split:]
-            child2.genes = parent2.genes[:split] + parent1.genes[split:]
-
-            offspring.append(child1)
-            offspring.append(child2)
-
-            self.next_agent_id += 2
-
-        offspring = self.mutation(offspring)
-        self.agents.extend(offspring)
-
-    def non_constant_crossover(self):
-        to_create = int((Config.initial_population - len(self.agents)) / 2)
-        offspring = []
-        for _ in range(to_create):
-            parent1 = random.choice(self.agents)
-            parent2 = random.choice(self.agents)
-
-            child1 = Agent(self.next_agent_id, 0, len(Config.validations))
-            child2 = Agent(self.next_agent_id + 1, 0, len(Config.validations))
-
-            split1 = random.randint(1, len(parent1.genes) - 1)
-
-            min_for_split2 = max(split1 + len(parent2.genes) - Config.max_genes, 1)
-            max_for_split2 = min(split1 - len(parent1.genes) + Config.max_genes, len(parent2.genes) - 1)
-
-            split2 = random.randint(min_for_split2, max_for_split2)
-
-            child1.genes = parent1.genes[:split1] + parent2.genes[split2:]
-            child2.genes = parent2.genes[:split2] + parent1.genes[split1:]
-
-            offspring.append(child1)
-            offspring.append(child2)
-
-            self.next_agent_id += 2
-
-        offspring = self.mutation(offspring)
-        self.agents.extend(offspring)
+        mutated_offspring = self.mutation(offspring)
+        self.agents.extend(mutated_offspring)
 
     def mutation(self, agents: [Agent]) -> [Agent]:
-        import random
-        for agent in agents:
-            for idx, param in enumerate(agent.genes):
-                if random.uniform(0.0, 1.0) <= Config.mutation_rate:
-                    agent.genes[idx].weight = random.uniform(0.0, 1.0)
-                    # Normal mode
-                    # from genes.gene_factory import GeneFactory
-                    # agent.genes[idx] = GeneFactory.create_random_gene()
-        return agents
+        mutated_agents = self.mutation_operator.mutate(agents)
+        return mutated_agents
 
     def calculate_best_agent_validation_performance(self):
         best_agent = max(self.agents, key=lambda ag: ag.fitness)
