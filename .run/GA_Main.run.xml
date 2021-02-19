@@ -1,13 +1,13 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GA_Main" type="PythonConfigurationType" factoryName="Python">
-    <module name="WSEOptimizer" />
-    <option name="INTERPRETER_OPTIONS" value="" />
+  <configuration default="false" name="main" type="PythonConfigurationType" factoryName="Python">
+    <module name="WSEOptimizer"/>
+    <option name="INTERPRETER_OPTIONS" value=""/>
     <option name="PARENT_ENVS" value="true"/>
     <envs>
       <env name="PYTHONUNBUFFERED" value="1"/>
     </envs>
     <option name="SDK_HOME" value=""/>
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/"/>
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app/genetic"/>
     <option name="IS_MODULE_SDK" value="true"/>
     <option name="ADD_CONTENT_ROOTS" value="true"/>
     <option name="ADD_SOURCE_ROOTS" value="true"/>
@@ -22,7 +22,7 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig"/>
       </ENTRIES>
     </EXTENSION>
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/genetic/GA_main.py"/>
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/genetic/main.py"/>
     <option name="PARAMETERS" value=""/>
     <option name="SHOW_COMMAND_LINE" value="false"/>
     <option name="EMULATE_TERMINAL" value="false"/>

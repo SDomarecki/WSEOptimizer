@@ -1,94 +1,67 @@
-import datetime
-import json
+from datetime import datetime, date
 
 
 class Config:
-    # database
-    min_circulation = 0
-    max_circulation = 0
-    sectors = []
-    companies = []
-    chunks = 0
+    def fetch_from_dict(self, dict_config: {}):
+        self._fetch_database_config(dict_config['database'])
+        self._fetch_simulation_config(dict_config['simulation'])
+        self._fetch_selection_config(dict_config['selection_operators'])
+        self._fetch_crossover_config(dict_config['crossover'])
+        self._fetch_wallet_config(dict_config['wallet'])
+        self._fetch_genes_config(dict_config['genes'])
 
-    # simulation
-    timedelta = 0
-    iterations = 0
-    initial_population = 0
-    start_date = None
-    end_date = None
-    validations = []
+    def _fetch_database_config(self, db_config: {}):
+        self.min_circulation = int(db_config.get('min_circulation', 0))
+        self.max_circulation = int(db_config.get('max_circulation', 0))
+        self.sectors = db_config.get('sectors', [])
+        self.companies = db_config.get('companies', [])
+        self.chunks = db_config.get('chunks', 0)
 
-    # selection
-    selection_method = ""
-    agents_to_save = 0
+    def _fetch_simulation_config(self, sim_config: {}):
+        default_date = date(2000, 1, 1)
+        self.timedelta = int(sim_config.get('timedelta', 0))
+        self.iterations = int(sim_config.get('iterations', 0))
+        self.initial_population = int(sim_config.get('initial_population', 0))
+        if 'learning' not in sim_config:
+            self.start_date = default_date
+            self.end_date = default_date
+        else:
+            self.start_date = datetime.strptime(sim_config.get('learning').get('start_date', default_date),
+                                                '%Y-%m-%d').date()
+            self.end_date = datetime.strptime(sim_config.get('learning').get('end_date', default_date),
+                                              '%Y-%m-%d').date()
 
-    # crossover
-    constant_length = True
-    initial_length = 0
-    max_genes = 0
-    mutation_rate = 0.0
+        self.validations = []
+        if 'testing' not in sim_config:
+            return
+        for test in sim_config['testing']:
+            start_date = datetime.strptime(test.get('start_date', default_date), '%Y-%m-%d').date()
+            end_date = datetime.strptime(test.get('end_date', default_date), '%Y-%m-%d').date()
+            self.validations.append((start_date, end_date))
 
-    # wallet
-    start_cash = 0
-    return_method = ""
-    benchmark = ""
-    risk_free_return = 0.0
-    fee_min = 0.0
-    fee_rate = 0.0
-    fee_added = 0.0
-    fee_max = 0.0
-    stocks_to_buy = 0
-    stocks_to_hold = 0
+    def _fetch_selection_config(self, sel_config: {}):
+        self.selection_method = sel_config.get('method', 'roulette')
+        self.agents_to_save = sel_config.get('agents_to_save', 0.0)
 
-    # genes
-    fin_statement_lag = 135
-    fundamental_to_all = 0.0
+    def _fetch_crossover_config(self, cross_config: {}):
+        self.constant_length = cross_config.get('constant_length', True)
+        self.initial_length = cross_config.get('initial_genes', 0)
+        self.max_genes = cross_config.get('max_genes', 0)
+        self.mutation_rate = cross_config.get('mutation_rate', 0.0)
 
-    def __init__(self):
-        with open('../../config.json') as f:
-            dict_config = json.load(f)
+    def _fetch_wallet_config(self, wallet_config: {}):
+        self.start_cash = wallet_config.get('start_cash', 0)
+        self.return_method = wallet_config.get('return_method', 'total_value')
+        self.benchmark = wallet_config.get('benchmark', '')
+        self.risk_free_return = wallet_config.get('risk_free_return', 0.0)
+        self.fee_min = wallet_config.get('fees', {}).get('min', 0.0)
+        self.fee_rate = wallet_config.get('fees', {}).get('rate', 0.0)
+        self.fee_added = wallet_config.get('fees', {}).get('added', 0.0)
+        self.fee_max = wallet_config.get('fees', {}).get('max', 0.0)
+        self.stocks_to_buy = wallet_config.get('stocks_to_buy', 0)
+        self.stocks_to_hold = wallet_config.get('stocks_to_hold', 0)
 
-        database = dict_config['database']
-        Config.min_circulation = int(database['min_circulation'])
-        Config.max_circulation = int(database['max_circulation'])
-        Config.sectors = database['sectors']
-        Config.companies = database['companies']
-        Config.chunks = database['chunks']
-
-        simulation = dict_config['simulation']
-        Config.timedelta = int(simulation['timedelta'])
-        Config.iterations = int(simulation['iterations'])
-        Config.initial_population = int(simulation['initial_population'])
-        Config.start_date = datetime.datetime.strptime(simulation['learning']['start_date'], '%Y-%m-%d')
-        Config.end_date = datetime.datetime.strptime(simulation['learning']['end_date'], '%Y-%m-%d')
-
-        for test in simulation['testing']:
-            start_date = datetime.datetime.strptime(test['start_date'], '%Y-%m-%d')
-            end_date = datetime.datetime.strptime(test['end_date'], '%Y-%m-%d')
-            Config.validations.append((start_date, end_date))
-
-        selection = dict_config['selection']
-        Config.selection_method = selection['method']
-        Config.agents_to_save = selection['agents_to_save']
-
-        crossover = dict_config['crossover']
-        Config.constant_length = crossover['constant_length']
-        Config.initial_length = crossover['initial_genes']
-        Config.max_genes = crossover['max_genes']
-        Config.mutation_rate = crossover['mutation_rate']
-
-        wallet = dict_config['wallet']
-        Config.start_cash = wallet['start_cash']
-        Config.return_method = wallet['return_method']
-        Config.benchmark = wallet['benchmark']
-        Config.risk_free_return = wallet['risk_free_return']
-        Config.fee_min = wallet['fees']['min']
-        Config.fee_rate = wallet['fees']['rate']
-        Config.fee_added = wallet['fees']['added']
-        Config.fee_max = wallet['fees']['max']
-        Config.stocks_to_buy = wallet['stocks_to_buy']
-        Config.stocks_to_hold = wallet['stocks_to_hold']
-
-        genes = dict_config['genes']
-        Config.fin_statement_lag = genes['fin_statement_lag']
-        Config.fundamental_to_all = genes['fundamental_to_all']
+    def _fetch_genes_config(self, genes_config: {}):
+        self.fin_statement_lag = genes_config.get('fin_statement_lag', 135)
+        self.logic_to_all = genes_config.get('logic_to_all', 0.0)
+        self.fundamental_to_all = genes_config.get('fundamental_to_all', 0.0)

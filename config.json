@@ -44,6 +44,7 @@
   },
   "genes": {
     "fin_statement_lag": 135,
+    "logic_to_all": 0.1,
     "fundamental_to_all": 0.7
   }
 }
