@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 from genetic.agent import Agent
 
 
-class SelectionOperator(ABC):
+class Operator(ABC):
     def __init__(self):
         pass
 
     @abstractmethod
-    def select(self, agents: [Agent]) -> [Agent]:
+    def mutate(self, agents: [Agent]) -> [Agent]:
         pass

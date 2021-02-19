@@ -1,15 +1,15 @@
 import random
 
-from genetic.agent import Agent
-from genetic.selection.selection_operator import SelectionOperator
+import genetic as g
+import genetic.selection_operators as op
 
 
-class TournamentSelectionOperator(SelectionOperator):
+class Tournament(op.Operator):
     def __init__(self, to_save: int):
         super().__init__()
         self.to_save = to_save
 
-    def select(self, agents: [Agent]) -> [Agent]:
+    def select(self, agents: [g.Agent]) -> [g.Agent]:
         selected = []
         selection_target = int(self.to_save * len(agents))
         tournament_size = 2
