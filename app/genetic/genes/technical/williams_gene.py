@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class WilliamsGene(Gene):
@@ -18,5 +18,5 @@ class WilliamsGene(Gene):
         else:
             return indicator_value < self.compared_value
 
-    def condition_to_string(self):
-        return "Williams %R " + self.comparator + " {0:.2f}".format(self.compared_value)
+    def condition_to_string(self) -> str:
+        return f'Williams %R {self.comparator} {self.compared_value:.2f}'

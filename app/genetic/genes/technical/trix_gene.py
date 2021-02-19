@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class TrixGene(Gene):
@@ -18,5 +18,5 @@ class TrixGene(Gene):
         else:
             return indicator_value < signal_value
 
-    def condition_to_string(self):
-        return "Trix %s Trix Signal" % self.comparator
+    def condition_to_string(self) -> str:
+        return f'Trix {self.comparator} Trix Signal'

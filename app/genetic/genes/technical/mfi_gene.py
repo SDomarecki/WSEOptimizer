@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class MFIGene(Gene):
@@ -18,5 +18,5 @@ class MFIGene(Gene):
         else:
             return indicator_value < self.compared_value
 
-    def condition_to_string(self):
-        return "MFI %s %s" % (self.comparator, "{0:.2f}".format(self.compared_value))
+    def condition_to_string(self) -> str:
+        return f'MFI {self.comparator} {self.compared_value:.2f}'

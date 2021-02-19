@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class SectorGene(Gene):
@@ -24,8 +24,8 @@ class SectorGene(Gene):
         super().__init__()
         self.sector = random.choice(self.possible_sectors)
 
-    def condition(self, company, day):
+    def condition(self, company, day) -> bool:
         return company.sector == self.sector
 
-    def condition_to_string(self):
-        return "Sector == " + self.sector
+    def condition_to_string(self) -> str:
+        return f'Sector == {self.sector}'

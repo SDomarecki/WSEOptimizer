@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class PSNowGene(Gene):
@@ -10,8 +10,8 @@ class PSNowGene(Gene):
         self.comparator = random.choice(['>', '<'])
         self.compared_value = random.uniform(2, 40)
 
-    def condition(self, company, day):
-        quarter = Gene.date_to_quarter(day)
+    def condition(self, company, day) -> bool:
+        quarter = self.date_to_quarter(day)
         indicator_value = company.technicals.at[day, 'Close'] / \
                           company.fundamentals.at[quarter, 'SPS']
 
@@ -20,5 +20,5 @@ class PSNowGene(Gene):
         else:
             return indicator_value < self.compared_value
 
-    def condition_to_string(self):
-        return "P/S Now %s %s" % (self.comparator, "{0:.2f}".format(self.compared_value))
+    def condition_to_string(self) -> str:
+        return f'P/S Now {self.comparator} {self.compared_value:.2f}'

@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class EMVGene(Gene):
@@ -18,5 +18,5 @@ class EMVGene(Gene):
         else:
             return indicator_value < self.close_value
 
-    def condition_to_string(self):
-        return "EMV %s Close" % self.comparator
+    def condition_to_string(self) -> str:
+        return f'EMV {self.comparator} Close'

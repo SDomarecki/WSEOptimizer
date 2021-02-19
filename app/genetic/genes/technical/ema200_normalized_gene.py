@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class EMA200NormalizedGene(Gene):
@@ -20,5 +20,5 @@ class EMA200NormalizedGene(Gene):
         else:
             return normalized_value < self.compared_value
 
-    def condition_to_string(self):
-        return "EMA200Norm %s %s" % (self.comparator, " {0:.2f}".format(self.compared_value))
+    def condition_to_string(self) -> str:
+        return f'EMA200Norm {self.comparator} {self.compared_value:.2f}'

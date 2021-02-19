@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class ROEyy(Gene):
@@ -10,9 +10,9 @@ class ROEyy(Gene):
         self.comparator = random.choice(['>', '<'])
         self.compared_value = random.uniform(0.8, 4.0)
 
-    def condition(self, company, day):
-        quarter = Gene.date_to_quarter(day)
-        prev_year = Gene.date_to_previous_year_quarter(day)
+    def condition(self, company, day) -> bool:
+        quarter = self.date_to_quarter(day)
+        prev_year = self.date_to_previous_year_quarter(day)
 
         indicator_value = company.fundamentals.at[quarter, 'ROE']
         previous_indicator_value = company.fundamentals.at[prev_year, 'ROE']
@@ -25,5 +25,5 @@ class ROEyy(Gene):
         else:
             return indicator_value / previous_indicator_value < self.compared_value
 
-    def condition_to_string(self):
-        return "ROE / PrevY ROE %s %s" % (self.comparator, self.compared_value)
+    def condition_to_string(self) -> str:
+        return f'ROE / PrevY ROE {self.comparator} {self.compared_value:.2f}'

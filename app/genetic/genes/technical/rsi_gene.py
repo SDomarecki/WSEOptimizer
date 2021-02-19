@@ -1,6 +1,6 @@
 import random
 
-from app.genetic.genes.gene import Gene
+from ..gene import Gene
 
 
 class RSIGene(Gene):
@@ -18,5 +18,5 @@ class RSIGene(Gene):
         else:
             return indicator_value < self.compared_value
 
-    def condition_to_string(self):
-        return "RSI %s %s" % (self.comparator, "{0:.2f}".format(self.compared_value))
+    def condition_to_string(self) -> str:
+        return f'RSI {self.comparator} {self.compared_value:.2f}'
