@@ -35,7 +35,7 @@
     "risk_free_return": 0.025,
     "fees": {
       "min": 0,
-      "rate": 0.098,
+      "rate": 0.00098,
       "added": 1,
       "max": 125
     },

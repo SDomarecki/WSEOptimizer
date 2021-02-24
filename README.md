@@ -15,7 +15,7 @@ Sum of clause values can be used to compare each stock to pick best ones to theo
 To wget all of WSE stocks history a few days or VPN will be needed due to stooq.pl limit of daily downloads.
 Run:
 ```bash
-$ python database_scripts\\stooq_download.py
+$ python database_scripts\\stooq_downloader.py
 ```
 to download 200 stock histories into database/stooq directory.
 Currently (2020-10-05) WSE main market lists 436 companies.
@@ -25,7 +25,7 @@ Currently (2020-10-05) WSE main market lists 436 companies.
 If all stock histories are ready, fundamental data can be scrapped from BiznesRadar.pl and mixed into preprocessed .csv database.
 To scrap:
 ```bash
-$ python database_scripts\\database_operator.py
+$ python database_scripts\\database_preprocessor.py
 ```
 It can be kinda slow due to all of the technical indicators computations.
 
