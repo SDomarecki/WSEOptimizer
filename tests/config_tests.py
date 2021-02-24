@@ -1,6 +1,6 @@
 from datetime import date
 
-from genetic.config import Config
+from app.config import Config
 
 
 def test_init_validData_createsValidConfig():

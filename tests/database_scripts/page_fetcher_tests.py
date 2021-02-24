@@ -1,6 +1,16 @@
 import pytest
+from bs4 import BeautifulSoup
+from requests import RequestException
 
-from database_scripts.page_fetcher import PageFetcher
+from app.database_scripts.page_fetcher import PageFetcher
+
+
+def test_fetch_and_parse_validURL_returnsSoup():
+    url = 'https://www.biznesradar.pl'
+    fetcher = PageFetcher()
+    soup = fetcher.fetch_and_parse(url)
+
+    assert isinstance(soup, BeautifulSoup)
 
 
 def test_fetch_page_validURL_returnsExistingPage():
@@ -15,6 +25,5 @@ def test_fetch_page_invalidURL_throwsException():
     url = 'https://randomstringofnonexistentpage.net'
     fetcher = PageFetcher()
 
-    with pytest.raises(Exception):
+    with pytest.raises(RequestException):
         page = fetcher.fetch_page(url)
-    assert False

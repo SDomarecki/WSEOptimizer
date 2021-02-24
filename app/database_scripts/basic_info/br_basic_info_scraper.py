@@ -1,5 +1,5 @@
-from database_scripts.company_details import CompanyDetails
-from database_scripts.page_fetcher import PageFetcher
+from app.database_scripts.company_details import CompanyDetails
+from app.database_scripts.page_fetcher import PageFetcher
 
 
 class BRBasicInfoScraper:

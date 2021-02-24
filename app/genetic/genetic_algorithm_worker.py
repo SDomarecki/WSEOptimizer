@@ -3,10 +3,10 @@ import json
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from config import Config
-from genetic.agent import Agent
-from genetic.database_loader import DatabaseLoader
-from genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
+from app.config import Config
+from app.genetic.agent import Agent
+from app.genetic.database_loader import DatabaseLoader
+from app.genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
 
 
 class GeneticAlgorithmWorker:

@@ -1,7 +1,7 @@
 import random
 
-from config import Config
-from genetic.genes import Gene
+from app.config import Config
+from app.genetic.genes import Gene
 
 
 class GeneFactory:

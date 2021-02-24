@@ -2,10 +2,10 @@ import datetime
 import math
 import statistics
 
-from config import Config
-from economics.company import Company
-from economics.fee_counter.normal_counter import NormalCounter
-from economics.stock_order import StockOrder
+from app.config import Config
+from app.economics.company import Company
+from app.economics.fee_counter.normal_counter import NormalCounter
+from app.economics.stock_order import StockOrder
 
 
 class Wallet:

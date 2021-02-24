@@ -1,10 +1,10 @@
 import pandas as pd
 
-from app.database_scripts.br_scraper import BRscraper
+from app.database_scripts.fundamentals.biznes_radar.br_scraper import BRScraper
 
 
 def test_get_raw_fundamentals_validURL_shouldReturnFundamentals():
-    br = BRscraper()
+    br = BRScraper()
     link = '/KGHM'
 
     fundamentals: pd.DataFrame = br.get_raw_fundamentals(link)
@@ -13,7 +13,7 @@ def test_get_raw_fundamentals_validURL_shouldReturnFundamentals():
 
 
 def test_get_balance_validURL_shouldReturnBalance():
-    br = BRscraper()
+    br = BRScraper()
     link = '/KGHM'
 
     fundamentals: pd.DataFrame = br.get_balance(link)
@@ -22,7 +22,7 @@ def test_get_balance_validURL_shouldReturnBalance():
 
 
 def test_get_value_indicators_validURL_shouldReturnValueIndicators():
-    br = BRscraper()
+    br = BRScraper()
     link = '/KGHM'
 
     fundamentals: pd.DataFrame = br.get_value_indicators(link)
@@ -31,7 +31,7 @@ def test_get_value_indicators_validURL_shouldReturnValueIndicators():
 
 
 def test_get_profitability_indicators_validURL_shouldReturnProfitabilityIndicators():
-    br = BRscraper()
+    br = BRScraper()
     link = '/KGHM'
 
     fundamentals: pd.DataFrame = br.get_profitability_indicators(link)

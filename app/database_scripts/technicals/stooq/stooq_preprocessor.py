@@ -2,9 +2,9 @@ import os
 
 import pandas as pd
 
-import database_scripts.technicals.stooq.indicators as ind
-from database_scripts.company_details import CompanyDetails
-from database_scripts.technicals.stooq.stooq_downloader import StooqDownloader
+import app.database_scripts.technicals.stooq.indicators as ind
+from app.database_scripts.company_details import CompanyDetails
+from app.database_scripts.technicals.stooq.stooq_downloader import StooqDownloader
 
 
 class StooqPreprocessor:

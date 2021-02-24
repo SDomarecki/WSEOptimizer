@@ -1,8 +1,8 @@
 import random
 
-from config import Config
-from genetic.agent import Agent
-from genetic.crossover_operators import Operator
+from app.config import Config
+from app.genetic.agent import Agent
+from app.genetic.crossover_operators import Operator
 
 
 class NonConstant(Operator):

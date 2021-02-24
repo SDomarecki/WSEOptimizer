@@ -5,8 +5,8 @@ from copy import deepcopy
 
 import pandas as pd
 
-from config import Config
-from economics.company import Company
+from app.config import Config
+from app.economics.company import Company
 
 
 class DatabaseLoader:
@@ -29,17 +29,17 @@ class DatabaseLoader:
         self.__calculate_wallets()
 
     def __read_database(self):
-        files = os.listdir(f'{self.path}')
+        directories = os.listdir(f'{self.path}')
+        tickers = [ticker for ticker in directories if ticker != 'benchmarks']
 
         database = {}
-        for file in files:
-            with open(f'{self.path}/basic_info/{file}') as data_file:
+        for ticker in tickers:
+            with open(f'{self.path}/{ticker}/basic_info.json') as data_file:
                 json_dict = json.loads(data_file.read())
             company = self.__decode_company(json_dict)
             if self.config.sectors and company.sector not in self.config.sectors:
                 continue
 
-            ticker = file.split('.')[0]
             company.fundamentals = self.__get_fundamentals(ticker)
             company.technicals = self.__get_technicals(ticker)
             database[ticker] = company
@@ -54,11 +54,11 @@ class DatabaseLoader:
         return company
 
     def __get_fundamentals(self, ticker: str) -> pd.DataFrame:
-        df = pd.read_csv(f'{self.path}/fundamental/{ticker}.csv', delimiter=',', index_col=0)
+        df = pd.read_csv(f'{self.path}/{ticker}/fundamental.csv', delimiter=',', index_col=0)
         return df
 
     def __get_technicals(self, ticker: str) -> pd.DataFrame:
-        df = pd.read_csv(f'{self.path}/technical/{ticker}.csv', delimiter=',', index_col='Date')
+        df = pd.read_csv(f'{self.path}/{ticker}/technical.csv', delimiter=',', index_col='Date')
         df.index = pd.to_datetime(df.index)
         return df
 
@@ -99,8 +99,8 @@ class DatabaseLoader:
     def __read_benchmark(self, ticker: str):
         ticker = ticker.lower()
         df = pd.read_csv(f'{self.path}/benchmarks/{ticker}.csv',
-                         delimiter=';',
-                         index_col=0)
+                         delimiter=',',
+                         index_col='Date')
         df.index = pd.to_datetime(df.index)
         self.benchmark = df
 
@@ -116,8 +116,8 @@ class DatabaseLoader:
             print(f'Validation {idx} target: {target}')
 
     def __get_target_ratio(self, start_date, end_date) -> float:
-        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Zamkniecie')
-        end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date, 'Zamkniecie')
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Close')
+        end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date, 'Close')
         return end_value / start_value
 
     def __calculate_wallets(self):
@@ -128,22 +128,22 @@ class DatabaseLoader:
     def __calculate_benchmark_wallet(self, start_date, end_date):
         start_cash = self.config.start_cash
         delta = datetime.timedelta(days=self.config.timedelta)
-        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Zamkniecie')
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Close')
         history = []
         day = start_date
         while day < end_date:
-            today_value = DatabaseLoader.__get_closest_value(self.benchmark, day, 'Zamkniecie')
+            today_value = DatabaseLoader.__get_closest_value(self.benchmark, day, 'Close')
             history.append(start_cash * today_value / start_value)
             day += delta
         return history
 
     @staticmethod
-    def __get_closest_value(df, date, column) -> float:
+    def __get_closest_value(df, day, column) -> float:
         delta = datetime.timedelta(days=1)
 
         while True:
             try:
-                return df.at[date, column]
+                return df.at[day, column]
             except KeyError:
-                date -= delta
+                day -= delta
                 continue

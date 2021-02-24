@@ -3,11 +3,11 @@ import json
 import os
 import shutil
 
-from config import Config
-from database_scripts.basic_info.br_basic_info_scraper import BRBasicInfoScraper
-from database_scripts.company_details import CompanyDetails
-from database_scripts.fundamentals.biznes_radar.br_scraper import BRScraper
-from database_scripts.technicals.stooq.stooq_preprocessor import StooqPreprocessor
+from app.config import Config
+from app.database_scripts.basic_info.br_basic_info_scraper import BRBasicInfoScraper
+from app.database_scripts.company_details import CompanyDetails
+from app.database_scripts.fundamentals.biznes_radar.br_scraper import BRScraper
+from app.database_scripts.technicals.stooq.stooq_preprocessor import StooqPreprocessor
 
 
 class DatabasePreprocessor:
@@ -80,4 +80,5 @@ class DatabasePreprocessor:
     def preprocess_benchmark(self, ticker: str):
         df = self.technicals_fetcher.fetch_raw_history(ticker)
         df = self.technicals_fetcher.change_column_names_from_polish_to_english(df)
-        df.to_csv(f'database/preprocessed/benchmarks/{ticker}')
+        df = self.technicals_fetcher.set_date_as_index(df)
+        df.to_csv(f'database/preprocessed/benchmarks/{ticker}.csv')

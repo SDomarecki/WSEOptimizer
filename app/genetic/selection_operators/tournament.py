@@ -1,6 +1,6 @@
 import random
 
-from genetic.selection_operators import Operator, Agent
+from app.genetic.selection_operators import Operator, Agent
 
 
 class Tournament(Operator):

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from genetic.agent import Agent
+from app.genetic.agent import Agent
 
 
 class Operator(ABC):

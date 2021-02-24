@@ -22,6 +22,6 @@ class PageFetcher:
                 time.sleep(2)
                 tries += 1
         if page == '':
-            raise Exception('Connection failed')
+            raise requests.exceptions.RequestException('Connection failed')
         print('Success')
         return page

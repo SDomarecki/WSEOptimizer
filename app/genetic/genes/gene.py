@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pandas as pd
 
-from economics.company import Company
+from app.economics.company import Company
 
 
 class Gene:

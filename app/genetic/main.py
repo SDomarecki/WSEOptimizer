@@ -1,10 +1,10 @@
 import json
 from time import strftime, localtime
 
-from config import Config
-from genetic.database_loader import DatabaseLoader
-from genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
-from genetic.genetic_algorithm_worker_builder import GeneticAlgorithmWorkerBuilder
+from app.config import Config
+from app.genetic.database_loader import DatabaseLoader
+from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
+from app.genetic.genetic_algorithm_worker_builder import GeneticAlgorithmWorkerBuilder
 
 
 def load_config(path: str) -> Config:

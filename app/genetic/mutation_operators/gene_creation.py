@@ -1,8 +1,8 @@
 import random
 
-from genetic.agent import Agent
-from genetic.genes import GeneFactory
-from genetic.mutation_operators import Operator
+from app.genetic.agent import Agent
+from app.genetic.genes import GeneFactory
+from app.genetic.mutation_operators import Operator
 
 
 class GeneCreation(Operator):

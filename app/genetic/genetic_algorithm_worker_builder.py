@@ -1,12 +1,12 @@
 import random
 
-from config import Config
-from genetic import crossover_operators
-from genetic import mutation_operators
-from genetic import selection_operators
-from genetic.agent import Agent
-from genetic.database_loader import DatabaseLoader
-from genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
+from app.config import Config
+from app.genetic import crossover_operators
+from app.genetic import mutation_operators
+from app.genetic import selection_operators
+from app.genetic.agent import Agent
+from app.genetic.database_loader import DatabaseLoader
+from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
 
 
 class GeneticAlgorithmWorkerBuilder:

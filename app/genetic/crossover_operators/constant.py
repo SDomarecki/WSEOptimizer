@@ -1,7 +1,7 @@
 import random
 
-import genetic.crossover_operators as op
-from genetic.agent import Agent
+import app.genetic.crossover_operators as op
+from app.genetic.agent import Agent
 
 
 class Constant(op.Operator):

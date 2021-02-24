@@ -1,8 +1,8 @@
 import datetime
 
-from config import Config
-from economics.wallet import Wallet
-from genetic.genes import GeneFactory
+from app.config import Config
+from app.economics.wallet import Wallet
+from app.genetic.genes import GeneFactory
 
 
 class Agent:

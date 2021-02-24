@@ -1,8 +1,8 @@
 import os
 import pathlib
 
-from database_scripts.database_preprocessor import DatabasePreprocessor
-from genetic.main import load_config, load_database, run_genetic_algorithm, save_results
+from app.database_scripts.database_preprocessor import DatabasePreprocessor
+from app.genetic.main import load_config, load_database, run_genetic_algorithm, save_results
 
 
 def set_pwd_to_application_root():
