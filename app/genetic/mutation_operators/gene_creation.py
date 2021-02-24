@@ -1,17 +1,17 @@
 import random
 
-import genetic as g
-import genetic.genes as genes
-import genetic.mutation_operators as op
+from genetic.agent import Agent
+from genetic.genes import GeneFactory
+from genetic.mutation_operators import Operator
 
 
-class GeneCreation(op.Operator):
-    def __init__(self, mutation_rate: float, factory: genes.GeneFactory):
+class GeneCreation(Operator):
+    def __init__(self, mutation_rate: float, factory: GeneFactory):
         super().__init__()
         self.mutation_rate = mutation_rate
         self.factory = factory
 
-    def mutate(self, agents: [g.Agent]) -> [g.Agent]:
+    def mutate(self, agents: [Agent]) -> [Agent]:
         for agent in agents:
             for idx, param in enumerate(agent.genes):
                 if random.uniform(0.0, 1.0) <= self.mutation_rate:

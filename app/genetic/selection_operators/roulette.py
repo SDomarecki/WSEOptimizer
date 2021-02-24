@@ -1,15 +1,15 @@
 import random
 
-import genetic as g
-import genetic.selection_operators as op
+from genetic.agent import Agent
+from genetic.selection_operators import Operator
 
 
-class Roulette(op.Operator):
+class Roulette(Operator):
     def __init__(self, to_save: int):
         super().__init__()
         self.to_save = to_save
 
-    def select(self, agents: [g.Agent]) -> [g.Agent]:
+    def select(self, agents: [Agent]) -> [Agent]:
         selected = []
         selection_target = int(self.to_save * len(agents))
         fitness_sum = sum(agent.fitness for agent in agents)

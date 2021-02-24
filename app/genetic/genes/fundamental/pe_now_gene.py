@@ -15,8 +15,7 @@ class PENowGene(Gene):
         if company.fundamentals.at[quarter, 'EPS'] is None \
                 or company.fundamentals.at[quarter, 'EPS'] == 0:
             return False
-        indicator_value = company.technicals.at[day, 'Close'] / \
-                          company.fundamentals.at[quarter, 'EPS']
+        indicator_value = company.technicals.at[day, 'Close'] / company.fundamentals.at[quarter, 'EPS']
 
         if self.comparator == '>':
             return indicator_value > self.compared_value

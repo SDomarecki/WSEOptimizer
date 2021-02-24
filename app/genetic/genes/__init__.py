@@ -1,5 +1,2 @@
-from fundamental import *
-from gene import *
-from gene_factory import *
-from logical import *
-from technical import *
+from .gene import Gene
+from .gene_factory import GeneFactory

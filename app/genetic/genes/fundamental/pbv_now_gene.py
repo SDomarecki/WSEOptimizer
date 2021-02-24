@@ -12,8 +12,7 @@ class PBVNowGene(Gene):
 
     def condition(self, company, day) -> bool:
         quarter = self.date_to_quarter(day)
-        indicator_value = company.technicals.at[day, 'Close'] / \
-                          company.fundamentals.at[quarter, 'BVPS']
+        indicator_value = company.technicals.at[day, 'Close'] / company.fundamentals.at[quarter, 'BVPS']
 
         if self.comparator == '>':
             return indicator_value > self.compared_value

@@ -1,25 +1,27 @@
 import random
 
-import genetic as g
-import genetic.crossover_operators as op
+from config import Config
+from genetic.agent import Agent
+from genetic.crossover_operators import Operator
 
 
-class NonConstant(op.Operator):
-    def __init__(self, max_genes: int, to_create: int, validations: []):
+class NonConstant(Operator):
+    def __init__(self, max_genes: int, to_create: int, validations: [], config: Config):
         super().__init__()
         self.max_genes = max_genes
         self.to_create = to_create
         self.validations = len(validations)
+        self.config = config
 
-    def crossover(self, agents: [g.Agent], last_agent_id: int) -> [g.Agent]:
+    def crossover(self, agents: [Agent], last_agent_id: int) -> [Agent]:
         agent_id = last_agent_id
         offspring = []
         for _ in range(self.to_create):
             parent1 = random.choice(agents)
             parent2 = random.choice(agents)
 
-            child1 = g.Agent(agent_id, 0, self.validations)
-            child2 = g.Agent(agent_id + 1, 0, self.validations)
+            child1 = Agent(agent_id, 0, self.config)
+            child2 = Agent(agent_id + 1, 0, self.config)
 
             split1 = random.randint(1, len(parent1.genes) - 1)
 

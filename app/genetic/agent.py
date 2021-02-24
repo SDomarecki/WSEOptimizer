@@ -1,22 +1,23 @@
 import datetime
 
-from app.genetic.config import Config
-from app.genetic.genes.gene_factory import GeneFactory
-from app.genetic.wallet import Wallet
+from config import Config
+from economics.wallet import Wallet
+from genetic.genes import GeneFactory
 
 
 class Agent:
 
-    def __init__(self, id, length, validation_length):
+    def __init__(self, id, genome_length, gene_factory: GeneFactory, config: Config):
         self.id = id
-        self.genes = [GeneFactory.create_random_gene() for _ in range(length)]
+        self.genes = [gene_factory.create_random_gene() for _ in range(genome_length)]
         self.fitness = 0.0
-        self.validations = [0.0] * validation_length
+        self.validations = [0.0] * len(config.validations)
         self.wallet = None
+        self.config = config
 
     # validation_case = -1 -> learning
     def calculate_fitness(self, database, start, end, validation_case=-1) -> float:
-        self.wallet = Wallet()
+        self.wallet = Wallet(self.config)
         simulation_result = self.simulate(database, start, end)
 
         if validation_case == -1:
@@ -28,7 +29,7 @@ class Agent:
 
     def simulate(self, database, start_date, end_date) -> float:
         day = start_date
-        delta = datetime.timedelta(days=Config.timedelta)
+        delta = datetime.timedelta(days=self.config.timedelta)
         while day < end_date:
             if day.weekday() == 5:
                 day += datetime.timedelta(days=2)
@@ -39,15 +40,15 @@ class Agent:
             self.wallet.trade(ordered_stocks, day, database)
             day += delta
 
-        if Config.return_method == 'total_value':
+        if self.config.return_method == 'total_value':
             return self.wallet.get_total_value(database, end_date)
-        elif Config.return_method == 'sharpe':
+        elif self.config.return_method == 'sharpe':
             return self.wallet.get_current_sharpe(database, end_date)
 
     def calculate_strength(self, stock, day) -> float:
         return sum([g.get_substrength(stock, day) for g in self.genes])
 
-    def to_json_ready(self):
+    def to_json_ready(self) -> dict:
         validations_str = [f'{self.validations[i]:.2f}' for i in range(len(self.validations))]
         return {
             'id': self.id,

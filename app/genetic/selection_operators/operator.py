@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-import genetic as g
+from genetic.agent import Agent
 
 
 class Operator(ABC):
@@ -8,5 +8,5 @@ class Operator(ABC):
         pass
 
     @abstractmethod
-    def select(self, agents: [g.Agent]) -> [g.Agent]:
+    def select(self, agents: [Agent]) -> [Agent]:
         pass

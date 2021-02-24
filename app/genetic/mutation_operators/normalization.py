@@ -1,15 +1,15 @@
 import random
 
-import genetic as g
-import genetic.mutation_operators as op
+from genetic.agent import Agent
+from genetic.mutation_operators import Operator
 
 
-class Normalization(op.Operator):
+class Normalization(Operator):
     def __init__(self, mutation_rate: float):
         super().__init__()
         self.mutation_rate = mutation_rate
 
-    def mutate(self, agents: [g.Agent]) -> [g.Agent]:
+    def mutate(self, agents: [Agent]) -> [Agent]:
         for agent in agents:
             for idx, param in enumerate(agent.genes):
                 if random.uniform(0.0, 1.0) <= self.mutation_rate:

@@ -5,14 +5,15 @@ from copy import deepcopy
 
 import pandas as pd
 
-from app.genetic.config import Config
-from genetic.company import Company
+from config import Config
+from economics.company import Company
 
 
 class DatabaseLoader:
-
-    def __init__(self, path_to_database: str, benchmark_ticker: str):
+    def __init__(self, path_to_database: str, config: Config):
+        self.config = config
         self.path = path_to_database
+
         self.learning_database = None
         self.learning_database_chunks = []
         self.testing_databases = []
@@ -22,20 +23,20 @@ class DatabaseLoader:
         self.targets = []
 
         self.__read_database()
-        self.__split_database_equally(Config.chunks)
-        self.__read_benchmark(benchmark_ticker)
+        self.__split_database_equally(self.config.chunks)
+        self.__read_benchmark(config.benchmark)
         self.__calculate_targets()
         self.__calculate_wallets()
 
     def __read_database(self):
-        files = os.listdir(f'{self.path}/basic_info')
+        files = os.listdir(f'{self.path}')
 
         database = {}
         for file in files:
             with open(f'{self.path}/basic_info/{file}') as data_file:
-                json_str = json.loads(data_file.read())
-            company = self.__decode_company(json_str)
-            if Config.sectors and company.sector not in Config.sectors:
+                json_dict = json.loads(data_file.read())
+            company = self.__decode_company(json_dict)
+            if self.config.sectors and company.sector not in self.config.sectors:
                 continue
 
             ticker = file.split('.')[0]
@@ -43,17 +44,11 @@ class DatabaseLoader:
             company.technicals = self.__get_technicals(ticker)
             database[ticker] = company
 
-        sectors = []
-        for company in database.values():
-            if company.sector not in sectors:
-                sectors.append(company.sector)
-        print(sectors)
+        self.learning_database = self.__filter_database(database, self.config.start_date, self.config.end_date)
+        self.testing_databases = [self.__filter_database(database, val[0], val[1]) for val in
+                                  self.config.validations]
 
-        self.learning_database = self.__filter_database_by_dates(database, Config.start_date, Config.end_date)
-        self.testing_databases = [self.__filter_database_by_dates(database, val[0], val[1]) for val in
-                                  Config.validations]
-
-    def __decode_company(self, json) -> Company:
+    def __decode_company(self, json: dict) -> Company:
         company = Company(json['name'], json['ticker'], json['link'])
         company.sector = json['sector']
         return company
@@ -67,22 +62,29 @@ class DatabaseLoader:
         df.index = pd.to_datetime(df.index)
         return df
 
-    def __filter_database_by_dates(self, database, start_date, end_date):
-        to_delete = []
+    def __filter_database(self, database, start_date, end_date) -> dict:
         new_database = deepcopy(database)
-        for company in new_database.values():
+        self.__filter_database_by_dates(new_database, start_date, end_date)
+        self.__filter_database_by_circulation(new_database)
+        return new_database
+
+    def __filter_database_by_dates(self, database: dict, start_date, end_date):
+        for company in database.values():
             company.technicals = company.technicals.loc[start_date:end_date]
 
+    def __filter_database_by_circulation(self, database: dict) -> dict:
+        to_delete = []
+        for company in database.values():
             circulation_mean = float(company.technicals['Circulation'].mean())
-            if Config.min_circulation != -1 and circulation_mean < Config.min_circulation:
+            if self.config.min_circulation != -1 and circulation_mean < self.config.min_circulation:
                 to_delete.append(company.ticker)
-            if Config.max_circulation != -1 and circulation_mean > Config.max_circulation:
+            if self.config.max_circulation != -1 and circulation_mean > self.config.max_circulation:
                 to_delete.append(company.ticker)
 
         for ticker in to_delete:
-            del new_database[ticker]
+            del database[ticker]
 
-        return new_database
+        return database
 
     def __split_database_equally(self, chunks):
         self.learning_database_chunks = [dict() for _ in range(chunks)]
@@ -103,44 +105,45 @@ class DatabaseLoader:
         self.benchmark = df
 
     def __calculate_targets(self):
-        target = round(Config.start_cash * self.__get_target_ratio(Config.start_date, Config.end_date), 2)
+        target = round(self.config.start_cash * self.__get_target_ratio(self.config.start_date, self.config.end_date),
+                       2)
         self.targets.append(target)
         print(f'Learning target: {target}')
 
-        for idx, el in enumerate(Config.validations):
-            target = round(Config.start_cash * self.__get_target_ratio(el[0], el[1]), 2)
+        for idx, el in enumerate(self.config.validations):
+            target = round(self.config.start_cash * self.__get_target_ratio(el[0], el[1]), 2)
             self.targets.append(target)
             print(f'Validation {idx} target: {target}')
 
     def __get_target_ratio(self, start_date, end_date) -> float:
-        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date)
-        end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date)
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Zamkniecie')
+        end_value = DatabaseLoader.__get_closest_value(self.benchmark, end_date, 'Zamkniecie')
         return end_value / start_value
 
     def __calculate_wallets(self):
-        self.benchmark_learning_wallet = self.__calculate_benchmark_wallet(Config.start_date, Config.end_date)
-        for idx, el in enumerate(Config.validations):
+        self.benchmark_learning_wallet = self.__calculate_benchmark_wallet(self.config.start_date, self.config.end_date)
+        for idx, el in enumerate(self.config.validations):
             self.benchmark_testing_wallets.append(self.__calculate_benchmark_wallet(el[0], el[1]))
 
     def __calculate_benchmark_wallet(self, start_date, end_date):
-        start_cash = Config.start_cash
-        delta = datetime.timedelta(days=Config.timedelta)
-        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date)
+        start_cash = self.config.start_cash
+        delta = datetime.timedelta(days=self.config.timedelta)
+        start_value = DatabaseLoader.__get_closest_value(self.benchmark, start_date, 'Zamkniecie')
         history = []
         day = start_date
         while day < end_date:
-            today_value = DatabaseLoader.__get_closest_value(self.benchmark, day)
+            today_value = DatabaseLoader.__get_closest_value(self.benchmark, day, 'Zamkniecie')
             history.append(start_cash * today_value / start_value)
             day += delta
         return history
 
     @staticmethod
-    def __get_closest_value(df, date) -> float:
+    def __get_closest_value(df, date, column) -> float:
         delta = datetime.timedelta(days=1)
 
         while True:
             try:
-                return df.at[date, 'Zamkniecie']
+                return df.at[date, column]
             except KeyError:
                 date -= delta
                 continue
