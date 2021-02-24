@@ -1,7 +1,6 @@
 import shutil
 
 import pytest
-
 from app.database_scripts.stooq_download import StooqDownloader
 
 

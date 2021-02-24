@@ -3,12 +3,12 @@ from datetime import datetime, date
 
 class Config:
     def fetch_from_dict(self, dict_config: {}):
-        self._fetch_database_config(dict_config['database'])
-        self._fetch_simulation_config(dict_config['simulation'])
-        self._fetch_selection_config(dict_config['selection_operators'])
-        self._fetch_crossover_config(dict_config['crossover'])
-        self._fetch_wallet_config(dict_config['wallet'])
-        self._fetch_genes_config(dict_config['genes'])
+        self._fetch_database_config(dict_config.get('database', {}))
+        self._fetch_simulation_config(dict_config.get('simulation', {}))
+        self._fetch_selection_config(dict_config.get('selection', {}))
+        self._fetch_crossover_config(dict_config.get('crossover', {}))
+        self._fetch_wallet_config(dict_config.get('wallet', {}))
+        self._fetch_genes_config(dict_config.get('genes', {}))
 
     def _fetch_database_config(self, db_config: {}):
         self.min_circulation = int(db_config.get('min_circulation', 0))

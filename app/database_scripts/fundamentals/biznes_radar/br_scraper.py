@@ -1,38 +1,21 @@
 import pandas as pd
-from bs4 import BeautifulSoup
 
-from app.database_scripts.fetch_page import fetch_page
-from database_scripts.company import Company
+from database_scripts.company_details import CompanyDetails
+from database_scripts.page_fetcher import PageFetcher
 
 
-class BRscraper:
+class BRScraper:
     root_url = 'https://www.biznesradar.pl'
-    main_list_url = f'{root_url}/gielda/akcje_gpw'
-    company_sector_url_base = f'{root_url}/notowania'
     raw_fundamentals_url_base = f'{root_url}/raporty-finansowe-rachunek-zyskow-i-strat'
     balance_url_base = f'{root_url}/raporty-finansowe-bilans'
     value_url_base = f'{root_url}/wskazniki-wartosci-rynkowej'
     profitability_url_base = f'{root_url}/wskazniki-rentownosci'
 
-    def get_companies(self) -> dict:
-        url = BRscraper.main_list_url
-        page = self._fetch_and_parse(url)
+    def __init__(self):
+        self.page_fetcher = PageFetcher()
 
-        companies = {}
-        for a in page.find_all('a', class_='s_tt'):
-            name = a['title']
-            ticker = a.text.split(' ')[0]
-            link = '/' + a['href'].split('/')[2]
-            companies[ticker] = Company(name, ticker, link)
-        return companies
-
-    def get_sector(self, link: str) -> str:
-        url = f'{BRscraper.company_sector_url_base}{link}'
-        page = self._fetch_and_parse(url)
-        sector = page.find(text='Sektor:').parent.parent.findNext('td').contents[1].contents[0]
-        return sector
-
-    def get_fundamentals(self, link: str) -> pd.DataFrame:
+    def get_fundamentals(self, company: CompanyDetails) -> pd.DataFrame:
+        link = company.link
         df1 = self.get_raw_fundamentals(link)
         df2 = self.get_balance(link)
         df3 = self.get_value_indicators(link)
@@ -46,14 +29,14 @@ class BRscraper:
             'Sales': 2,
             'Earnings': 6
         }
-        url = f'{BRscraper.raw_fundamentals_url_base}{link},Q'
+        url = f'{BRScraper.raw_fundamentals_url_base}{link},Q'
         return self._get_indicators_from_link_and_positions(indicators_name_and_locations, url)
 
     def get_balance(self, link: str):
         indicators_name_and_locations = {
             'Book value': 17
         }
-        url = f'{BRscraper.balance_url_base}{link},Q'
+        url = f'{BRScraper.balance_url_base}{link},Q'
         return self._get_indicators_from_link_and_positions(indicators_name_and_locations, url)
 
     def get_value_indicators(self, link: str) -> pd.DataFrame:
@@ -65,7 +48,7 @@ class BRscraper:
             'BVPS': 3,
             'SPS': 7,
         }
-        url = f'{BRscraper.value_url_base}{link},Q'
+        url = f'{BRScraper.value_url_base}{link},Q'
         return self._get_indicators_from_link_and_positions(indicators_name_and_locations, url)
 
     def get_profitability_indicators(self, link: str) -> pd.DataFrame:
@@ -73,13 +56,13 @@ class BRscraper:
             'ROE': 1,
             'ROA': 2,
         }
-        url = f'{BRscraper.profitability_url_base}{link},Q'
+        url = f'{BRScraper.profitability_url_base}{link},Q'
         return self._get_indicators_from_link_and_positions(indicators_name_and_locations, url)
 
     def _get_indicators_from_link_and_positions(self, name_and_loc, url) -> pd.DataFrame:
         indicators = pd.DataFrame(columns=list(name_and_loc))
 
-        page = self._fetch_and_parse(url)
+        page = self.page_fetcher.fetch_and_parse(url)
         table = page.find('table', class_='report-table')
         if table is None:
             return indicators
@@ -103,11 +86,6 @@ class BRscraper:
             return float(ind.strip('%'))
         else:
             return float(ind)
-
-    def _fetch_and_parse(self, url: str) -> BeautifulSoup:
-        page = fetch_page(url)
-        soup = BeautifulSoup(page, 'html.parser')
-        return soup
 
     def _get_seasons_from_first_row(self, row):
         headers = row.find_all('th')[1:-1]

@@ -165,7 +165,7 @@ Returns:
 
 def money_flow_index(data: pd.DataFrame, periods: int, high_col: str, low_col: str, close_col: str, vol_col: str):
     remove_tp_col = False
-    if not 'typical_price' in data.columns:
+    if 'typical_price' not in data.columns:
         data = typical_price(data, high_col=high_col, low_col=low_col, close_col=close_col)
         remove_tp_col = True
 
@@ -183,7 +183,6 @@ def money_flow_index(data: pd.DataFrame, periods: int, high_col: str, low_col: s
                 data.at[index, 'money_flow_negative'] = row['money_flow']
 
         if index >= periods:
-            period_slice = data['money_flow'][index - periods:index]
             positive_sum = data['money_flow_positive'][index - periods:index].sum()
             negative_sum = data['money_flow_negative'][index - periods:index].sum()
 
