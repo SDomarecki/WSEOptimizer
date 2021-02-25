@@ -1,5 +1,9 @@
 # WSEOptimizer
 
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
+[![Updates](https://pyup.io/repos/github/SDomarecki/WSEOptimizer/shield.svg)](https://pyup.io/repos/github/SDomarecki/WSEOptimizer/)
+[![Actions Status](https://github.com/SDomarecki/WSEOptimizer/workflows/Python%20application/badge.svg)](https://github.com/SDomarecki/WSEOptimizer/actions)
+
 WSEO is trading strategy optimization library based on genetic algorithm and fundamental & technical analysis indicators.
 
 Code was tested on data of Warsaw Stock Exchange stocks -
