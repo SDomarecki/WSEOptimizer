@@ -4,7 +4,7 @@ from app.config import Config
 from app.genetic.genes import GeneFactory
 
 
-@pytest.fixture(scope='package')
+@pytest.fixture(scope="package")
 def config():
     agents_to_save_rate = 0.5
     config = Config()
@@ -15,6 +15,6 @@ def config():
     return config
 
 
-@pytest.fixture(scope='package')
+@pytest.fixture(scope="package")
 def gene_factory(config):
     return GeneFactory(config)

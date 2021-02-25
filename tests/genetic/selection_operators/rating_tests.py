@@ -14,6 +14,8 @@ def test_select_validAgents_returnsSelectedAmount(config, gene_factory):
     agents[3].fitness = 3.0
     new_agents = rating.select(agents)
 
-    assert new_agents[0].fitness == 10.0 \
-           and new_agents[1].fitness == 7.0 \
-           and len(new_agents) == 2
+    assert (
+        new_agents[0].fitness == 10.0
+        and new_agents[1].fitness == 7.0
+        and len(new_agents) == 2
+    )

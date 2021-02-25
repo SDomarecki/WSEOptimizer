@@ -11,7 +11,10 @@ class Tournament(Operator):
     def select(self, agents: [Agent]) -> [Agent]:
         selection_target_amount = int(self.to_save_rate * len(agents))
         tournament_size = 2
-        selected = [self.select_one_aspirant(agents, tournament_size) for _ in range(selection_target_amount)]
+        selected = [
+            self.select_one_aspirant(agents, tournament_size)
+            for _ in range(selection_target_amount)
+        ]
         return selected
 
     def select_one_aspirant(self, agents: [Agent], tournament_size: int) -> Agent:

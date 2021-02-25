@@ -52,12 +52,27 @@ class GeneFactory:
         from fundamental.roe_qq import ROEqq
         from fundamental.roa_qq import ROAqq
 
-        possible_genes = [PEGene, PENowGene, PEqq, PEyy,
-                          PBVGene, PBVNowGene, PBVqq, PBVyy,
-                          PSGene, PSNowGene, PSqq, PSyy,
-                          ROEGene, ROEqq, ROEyy,
-                          ROAGene, ROAqq, ROEyy,
-                          SectorGene]
+        possible_genes = [
+            PEGene,
+            PENowGene,
+            PEqq,
+            PEyy,
+            PBVGene,
+            PBVNowGene,
+            PBVqq,
+            PBVyy,
+            PSGene,
+            PSNowGene,
+            PSqq,
+            PSyy,
+            ROEGene,
+            ROEqq,
+            ROEyy,
+            ROAGene,
+            ROAqq,
+            ROEyy,
+            SectorGene,
+        ]
         return random.choice(possible_genes)()
 
     def create_technical_gene(self) -> Gene:
@@ -72,7 +87,16 @@ class GeneFactory:
         from technical.sma40_normalized_gene import SMA40NormalizedGene
         from technical.ema200_normalized_gene import EMA200NormalizedGene
 
-        possible_genes = [SMA15NormalizedGene, SMA40NormalizedGene, EMA200NormalizedGene,
-                          RSIGene, MACDGene, TrixGene, WilliamsGene,
-                          MFIGene, ROCGene, EMVGene]
+        possible_genes = [
+            SMA15NormalizedGene,
+            SMA40NormalizedGene,
+            EMA200NormalizedGene,
+            RSIGene,
+            MACDGene,
+            TrixGene,
+            WilliamsGene,
+            MFIGene,
+            ROCGene,
+            EMVGene,
+        ]
         return random.choice(possible_genes)()

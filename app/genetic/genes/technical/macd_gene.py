@@ -4,19 +4,18 @@ from ..gene import Gene
 
 
 class MACDGene(Gene):
-
     def __init__(self):
         super().__init__()
-        self.comparator = random.choice(['>', '<'])
+        self.comparator = random.choice([">", "<"])
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, 'macd_val']
-        signal_value = company.technicals.at[day, 'macd_signal_line']
+        indicator_value = company.technicals.at[day, "macd_val"]
+        signal_value = company.technicals.at[day, "macd_signal_line"]
 
-        if self.comparator == '>':
+        if self.comparator == ">":
             return indicator_value > signal_value
         else:
             return indicator_value < signal_value
 
     def condition_to_string(self) -> str:
-        return f'MACD {self.comparator} MACD Signal'
+        return f"MACD {self.comparator} MACD Signal"

@@ -2,7 +2,9 @@ from statistics import median
 
 
 class NormalCounter:
-    def __init__(self, fee_min: float, fee_rate: float, fee_added: float, fee_max: float):
+    def __init__(
+        self, fee_min: float, fee_rate: float, fee_added: float, fee_max: float
+    ):
         self.fee_min = fee_min
         self.fee_rate = fee_rate
         self.fee_added = fee_added

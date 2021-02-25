@@ -3,7 +3,7 @@ import pandas as pd
 """
 Circulation
 Source: ===
-Params: 
+Params:
     data: pandas DataFrame
     period: smoothing period
     close_col: the name of the CLOSE values column
@@ -14,14 +14,14 @@ Returns:
 
 
 def circulation(data: pd.DataFrame, close_col: str, vol_col: str):
-    data['Circulation'] = data[close_col] * data[vol_col]
+    data["Circulation"] = data[close_col] * data[vol_col]
     return data
 
 
 """
 Simple moving average
 Source: ===
-Params: 
+Params:
     data: pandas DataFrame
     period: smoothing period
     close_col: the name of the CLOSE values column
@@ -32,38 +32,42 @@ Returns:
 
 
 def sma(data: pd.DataFrame, period: int, close_col: str):
-    data['sma' + str(period)] = data[close_col].rolling(window=period).mean()
+    data["sma" + str(period)] = data[close_col].rolling(window=period).mean()
     return data
 
 
 """
 Exponential moving average
 Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages
-Params: 
+Params:
     data: pandas DataFrame
     period: smoothing period
     column: the name of the column with values for calculating EMA in the 'data' DataFrame
-    
+
 Returns:
     copy of 'data' DataFrame with 'ema[period]' column added
 """
 
 
 def ema(data: pd.DataFrame, period: int, close_col: str):
-    data['ema' + str(period)] = data[close_col].ewm(ignore_na=False, min_periods=period, com=period, adjust=True).mean()
+    data["ema" + str(period)] = (
+        data[close_col]
+        .ewm(ignore_na=False, min_periods=period, com=period, adjust=True)
+        .mean()
+    )
     return data
 
 
 """
 Moving Average Convergence/Divergence Oscillator (MACD)
 Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
-Params: 
+Params:
     data: pandas DataFrame
     period_long: the longer period EMA (26 days recommended)
     period_short: the shorter period EMA (12 days recommended)
     period_signal: signal line EMA (9 days recommended)
     column: the name of the column with values for calculating MACD in the 'data' DataFrame
-    
+
 Returns:
     copy of 'data' DataFrame with 'macd_val' and 'macd_signal_line' columns added
 """
@@ -71,17 +75,20 @@ Returns:
 
 def macd(data: pd.DataFrame, period_long, period_short, period_signal, close_col: str):
     remove_cols = []
-    if not 'ema' + str(period_long) in data.columns:
+    if not "ema" + str(period_long) in data.columns:
         data = ema(data, period=period_long, close_col=close_col)
-        remove_cols.append('ema' + str(period_long))
+        remove_cols.append("ema" + str(period_long))
 
-    if not 'ema' + str(period_short) in data.columns:
+    if not "ema" + str(period_short) in data.columns:
         data = ema(data, period=period_short, close_col=close_col)
-        remove_cols.append('ema' + str(period_short))
+        remove_cols.append("ema" + str(period_short))
 
-    data['macd_val'] = data['ema' + str(period_short)] - data['ema' + str(period_long)]
-    data['macd_signal_line'] = data['macd_val'].ewm(ignore_na=False, min_periods=0, com=period_signal,
-                                                    adjust=True).mean()
+    data["macd_val"] = data["ema" + str(period_short)] - data["ema" + str(period_long)]
+    data["macd_signal_line"] = (
+        data["macd_val"]
+        .ewm(ignore_na=False, min_periods=0, com=period_signal, adjust=True)
+        .mean()
+    )
 
     data = data.drop(remove_cols, axis=1)
 
@@ -91,7 +98,7 @@ def macd(data: pd.DataFrame, period_long, period_short, period_signal, close_col
 """
 Typical Price
 Source: https://en.wikipedia.org/wiki/Typical_price
-Params: 
+Params:
     data: pandas DataFrame
     high_col: the name of the HIGH values column
     low_col: the name of the LOW values column
@@ -103,7 +110,7 @@ Returns:
 
 
 def typical_price(data: pd.DataFrame, high_col: str, low_col: str, close_col: str):
-    data['typical_price'] = (data[high_col] + data[low_col] + data[close_col]) / 3
+    data["typical_price"] = (data[high_col] + data[low_col] + data[close_col]) / 3
 
     return data
 
@@ -111,7 +118,7 @@ def typical_price(data: pd.DataFrame, high_col: str, low_col: str, close_col: st
 """
 Ease of Movement
 Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ease_of_movement_emv
-Params: 
+Params:
     data: pandas DataFrame
     period: period for calculating EMV
     high_col: the name of the HIGH values column
@@ -123,11 +130,14 @@ Returns:
 """
 
 
-def ease_of_movement(data: pd.DataFrame, period: int, high_col: str, low_col: str, vol_col: str):
+def ease_of_movement(
+    data: pd.DataFrame, period: int, high_col: str, low_col: str, vol_col: str
+):
     for index, row in data.iterrows():
         if index > 0:
             midpoint_move = (row[high_col] + row[low_col]) / 2 - (
-                    data.at[index - 1, high_col] + data.at[index - 1, low_col]) / 2
+                data.at[index - 1, high_col] + data.at[index - 1, low_col]
+            ) / 2
         else:
             midpoint_move = 0
 
@@ -143,9 +153,11 @@ def ease_of_movement(data: pd.DataFrame, period: int, high_col: str, low_col: st
         box_ratio = (vol / 100000000) / diff
         emv = midpoint_move / box_ratio
 
-        data.at[index, 'emv'] = emv
+        data.at[index, "emv"] = emv
 
-    data['emv_ema_' + str(period)] = data['emv'].ewm(ignore_na=False, min_periods=0, com=period, adjust=True).mean()
+    data["emv_ema_" + str(period)] = (
+        data["emv"].ewm(ignore_na=False, min_periods=0, com=period, adjust=True).mean()
+    )
 
     return data
 
@@ -153,7 +165,7 @@ def ease_of_movement(data: pd.DataFrame, period: int, high_col: str, low_col: st
 """
 Money Flow Index (MFI)
 Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi
-Params: 
+Params:
     data: pandas DataFrame
     periods: period for calculating MFI (14 days recommended)
     vol_col: the name of the VOL values column
@@ -163,43 +175,55 @@ Returns:
 """
 
 
-def money_flow_index(data: pd.DataFrame, periods: int, high_col: str, low_col: str, close_col: str, vol_col: str):
+def money_flow_index(
+    data: pd.DataFrame,
+    periods: int,
+    high_col: str,
+    low_col: str,
+    close_col: str,
+    vol_col: str,
+):
     remove_tp_col = False
-    if 'typical_price' not in data.columns:
-        data = typical_price(data, high_col=high_col, low_col=low_col, close_col=close_col)
+    if "typical_price" not in data.columns:
+        data = typical_price(
+            data, high_col=high_col, low_col=low_col, close_col=close_col
+        )
         remove_tp_col = True
 
-    data['money_flow'] = data['typical_price'] * data[vol_col]
-    data['money_ratio'] = 0.
-    data['money_flow_index'] = 0.
-    data['money_flow_positive'] = 0.
-    data['money_flow_negative'] = 0.
+    data["money_flow"] = data["typical_price"] * data[vol_col]
+    data["money_ratio"] = 0.0
+    data["money_flow_index"] = 0.0
+    data["money_flow_positive"] = 0.0
+    data["money_flow_negative"] = 0.0
 
     for index, row in data.iterrows():
         if index > 0:
-            if row['typical_price'] < data.at[index - 1, 'typical_price']:
-                data.at[index, 'money_flow_positive'] = row['money_flow']
+            if row["typical_price"] < data.at[index - 1, "typical_price"]:
+                data.at[index, "money_flow_positive"] = row["money_flow"]
             else:
-                data.at[index, 'money_flow_negative'] = row['money_flow']
+                data.at[index, "money_flow_negative"] = row["money_flow"]
 
         if index >= periods:
-            positive_sum = data['money_flow_positive'][index - periods:index].sum()
-            negative_sum = data['money_flow_negative'][index - periods:index].sum()
+            positive_sum = data["money_flow_positive"][index - periods : index].sum()
+            negative_sum = data["money_flow_negative"][index - periods : index].sum()
 
-            if negative_sum == 0.:
+            if negative_sum == 0.0:
                 # this is to avoid division by zero below
                 negative_sum = 0.00001
             m_r = positive_sum / negative_sum
 
             mfi = 1 - (1 / (1 + m_r))
 
-            data.at[index, 'money_ratio'] = m_r
-            data.at[index, 'money_flow_index'] = mfi
+            data.at[index, "money_ratio"] = m_r
+            data.at[index, "money_flow_index"] = mfi
 
-    data = data.drop(['money_flow', 'money_ratio', 'money_flow_positive', 'money_flow_negative'], axis=1)
+    data = data.drop(
+        ["money_flow", "money_ratio", "money_flow_positive", "money_flow_negative"],
+        axis=1,
+    )
 
     if remove_tp_col:
-        data = data.drop(['typical_price'], axis=1)
+        data = data.drop(["typical_price"], axis=1)
 
     return data
 
@@ -207,7 +231,7 @@ def money_flow_index(data: pd.DataFrame, periods: int, high_col: str, low_col: s
 """
 Rate of change
 Source: https://en.wikipedia.org/wiki/Momentum_(technical_analysis)
-Params: 
+Params:
     data: pandas DataFrame
     periods: period for calculating ROC
     close_col: the name of the CLOSE values column
@@ -218,14 +242,14 @@ Returns:
 
 
 def roc(data: pd.DataFrame, periods: int, close_col: str):
-    data['roc'] = 0.
+    data["roc"] = 0.0
 
     for index, row in data.iterrows():
         if index >= periods:
             prev_close = data.at[index - periods, close_col]
             val_perc = (row[close_col] - prev_close) / prev_close
 
-            data.at[index, 'roc'] = val_perc
+            data.at[index, "roc"] = val_perc
 
     return data
 
@@ -233,35 +257,42 @@ def roc(data: pd.DataFrame, periods: int, close_col: str):
 """
 Relative Strength Index
 Source: https://en.wikipedia.org/wiki/Relative_strength_index
-Params: 
+Params:
     data: pandas DataFrame
     periods: period for calculating momentum
     close_col: the name of the CLOSE values column
-    
+
 Returns:
     copy of 'data' DataFrame with 'rsi' column added
 """
 
 
 def rsi(data: pd.DataFrame, periods: int, close_col: str):
-    data['rsi_u'] = 0.
-    data['rsi_d'] = 0.
-    data['rsi'] = 0.
+    data["rsi_u"] = 0.0
+    data["rsi_d"] = 0.0
+    data["rsi"] = 0.0
 
     for index, row in data.iterrows():
         if index >= periods:
 
             prev_close = data.at[index - periods, close_col]
             if prev_close < row[close_col]:
-                data.at[index, 'rsi_u'] = row[close_col] - prev_close
+                data.at[index, "rsi_u"] = row[close_col] - prev_close
             elif prev_close > row[close_col]:
-                data.at[index, 'rsi_d'] = prev_close - row[close_col]
+                data.at[index, "rsi_d"] = prev_close - row[close_col]
 
-    data['rsi'] = data['rsi_u'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean() / (
-            data['rsi_u'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean() +
-            data['rsi_d'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean())
+    data["rsi"] = data["rsi_u"].ewm(
+        ignore_na=False, min_periods=0, com=periods, adjust=True
+    ).mean() / (
+        data["rsi_u"]
+        .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)
+        .mean()
+        + data["rsi_d"]
+        .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)
+        .mean()
+    )
 
-    data = data.drop(['rsi_u', 'rsi_d'], axis=1)
+    data = data.drop(["rsi_u", "rsi_d"], axis=1)
 
     return data
 
@@ -269,7 +300,7 @@ def rsi(data: pd.DataFrame, periods: int, close_col: str):
 """
 William's % R
 Source: https://www.metastock.com/customer/resources/taaz/?p=126
-Params: 
+Params:
     data: pandas DataFrame
     periods: the period over which to calculate the indicator value
     high_col: the name of the HIGH values column
@@ -281,16 +312,22 @@ Returns:
 """
 
 
-def williams_r(data: pd.DataFrame, periods: int, high_col: str, low_col: str, close_col: str):
-    data['williams_r'] = 0.
+def williams_r(
+    data: pd.DataFrame, periods: int, high_col: str, low_col: str, close_col: str
+):
+    data["williams_r"] = 0.0
 
     for index, row in data.iterrows():
         if index > periods:
-            price_range = max(data[high_col][index - periods:index]) - min(data[low_col][index - periods:index])
+            price_range = max(data[high_col][index - periods : index]) - min(
+                data[low_col][index - periods : index]
+            )
             if price_range == 0:
                 continue
-            data.at[index, 'williams_r'] = ((max(data[high_col][index - periods:index]) - row[close_col]) /
-                                            price_range) * (-100)
+            data.at[index, "williams_r"] = (
+                (max(data[high_col][index - periods : index]) - row[close_col])
+                / price_range
+            ) * (-100)
 
     return data
 
@@ -298,22 +335,40 @@ def williams_r(data: pd.DataFrame, periods: int, high_col: str, low_col: str, cl
 """
 TRIX
 Source: https://www.metastock.com/customer/resources/taaz/?p=114
-Params: 
+Params:
     data: pandas DataFrame
     periods: the period over which to calculate the indicator value
     signal_periods: the period for signal moving average
     close_col: the name of the CLOSE values column
-    
+
 Returns:
     copy of 'data' DataFrame with 'trix' and 'trix_signal' columns added
 """
 
 
 def trix(data: pd.DataFrame, periods: int, signal_periods: int, close_col: str):
-    data['trix'] = data[close_col].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
-    data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
-    data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=periods, adjust=True).mean()
-    data['trix'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=1, adjust=True).mean()
-    data['trix_signal'] = data['trix'].ewm(ignore_na=False, min_periods=0, com=signal_periods, adjust=True).mean()
+    data["trix"] = (
+        data[close_col]
+        .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)
+        .mean()
+    )
+    data["trix"] = (
+        data["trix"]
+        .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)
+        .mean()
+    )
+    data["trix"] = (
+        data["trix"]
+        .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)
+        .mean()
+    )
+    data["trix"] = (
+        data["trix"].ewm(ignore_na=False, min_periods=0, com=1, adjust=True).mean()
+    )
+    data["trix_signal"] = (
+        data["trix"]
+        .ewm(ignore_na=False, min_periods=0, com=signal_periods, adjust=True)
+        .mean()
+    )
 
     return data

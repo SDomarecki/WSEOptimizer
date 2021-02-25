@@ -3,7 +3,6 @@ from ..gene_factory import GeneFactory
 
 
 class XorGene(Gene):
-
     def __init__(self, factory: GeneFactory):
         super().__init__()
         self.leftGene = factory.create_non_logic_gene()
@@ -15,4 +14,4 @@ class XorGene(Gene):
         return (left_cond or right_cond) and not (left_cond and right_cond)
 
     def condition_to_string(self) -> str:
-        return f'({self.leftGene.condition_to_string()} XOR {self.rightGene.condition_to_string()}'
+        return f"({self.leftGene.condition_to_string()} XOR {self.rightGene.condition_to_string()}"

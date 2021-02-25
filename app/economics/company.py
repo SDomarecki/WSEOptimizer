@@ -6,6 +6,6 @@ class Company:
         self.name = name
         self.ticker = ticker
         self.link = link
-        self.sector = ''
+        self.sector = ""
         self.fundamentals: pd.DataFrame
         self.technicals: pd.DataFrame

@@ -2,7 +2,12 @@ import os
 import pathlib
 
 from app.database_scripts.database_preprocessor import DatabasePreprocessor
-from app.genetic.main import load_config, load_database, run_genetic_algorithm, save_results
+from app.genetic.main import (
+    load_config,
+    load_database,
+    run_genetic_algorithm,
+    save_results,
+)
 
 
 def set_pwd_to_application_root():
@@ -10,14 +15,14 @@ def set_pwd_to_application_root():
     os.chdir(wseo_root)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     set_pwd_to_application_root()
 
-    config = load_config('examples/main/config.json')
+    config = load_config("examples/main/config.json")
 
     dbo = DatabasePreprocessor(config)
     dbo.create_database()
 
-    database_loader = load_database('database/preprocessed', config)
+    database_loader = load_database("database/preprocessed", config)
     worker = run_genetic_algorithm(database_loader, config)
     save_results(worker)

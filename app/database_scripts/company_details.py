@@ -3,4 +3,4 @@ class CompanyDetails:
         self.name = name
         self.ticker = ticker
         self.link = link
-        self.sector = ''
+        self.sector = ""

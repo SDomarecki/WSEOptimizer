@@ -6,7 +6,6 @@ from app.genetic.genes import GeneFactory
 
 
 class Agent:
-
     def __init__(self, id, genome_length, gene_factory: GeneFactory, config: Config):
         self.id = id
         self.genes = [gene_factory.create_random_gene() for _ in range(genome_length)]
@@ -36,25 +35,31 @@ class Agent:
             if day.weekday() == 6:
                 day += datetime.timedelta(days=1)
 
-            ordered_stocks = sorted(database.values(), key=lambda s: self.calculate_strength(s, day), reverse=True)
+            ordered_stocks = sorted(
+                database.values(),
+                key=lambda s: self.calculate_strength(s, day),
+                reverse=True,
+            )
             self.wallet.trade(ordered_stocks, day, database)
             day += delta
 
-        if self.config.return_method == 'total_value':
+        if self.config.return_method == "total_value":
             return self.wallet.get_total_value(database, end_date)
-        elif self.config.return_method == 'sharpe':
+        elif self.config.return_method == "sharpe":
             return self.wallet.get_current_sharpe(database, end_date)
 
     def calculate_strength(self, stock, day) -> float:
         return sum([g.get_substrength(stock, day) for g in self.genes])
 
     def to_json_ready(self) -> dict:
-        validations_str = [f'{self.validations[i]:.2f}' for i in range(len(self.validations))]
+        validations_str = [
+            f"{self.validations[i]:.2f}" for i in range(len(self.validations))
+        ]
         return {
-            'id': self.id,
-            'strategy': self.genome_to_string(),
-            'fitness': f'{self.fitness:.2f}',
-            'validations': validations_str
+            "id": self.id,
+            "strategy": self.genome_to_string(),
+            "fitness": f"{self.fitness:.2f}",
+            "validations": validations_str,
         }
 
     def genome_to_string(self) -> [str]:

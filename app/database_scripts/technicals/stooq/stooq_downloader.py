@@ -22,14 +22,18 @@ class StooqDownloader:
         selected_tickers = zip(tickers, range(to_download))
         for ticker, i in selected_tickers:
             self.fetch_one(ticker)
-            print(f'Downloaded {ticker} [{i + 1}/{to_download}]')
+            print(f"Downloaded {ticker} [{i + 1}/{to_download}]")
 
     def fetch_one(self, ticker: str):
         if self.fetched > self.fetch_limit:
-            raise Exception('Too may fetches in one run')
-        url = f'{self.url_base}{ticker}{self.url_end}'
+            raise Exception("Too may fetches in one run")
+        url = f"{self.url_base}{ticker}{self.url_end}"
         wget.download(url, out=self.save_dir)
         self.fetched += 1
 
     def delete_ticker_if_data_exists(self, tickers: [str]) -> [str]:
-        return [ticker for ticker in tickers if not os.path.isfile(f'{self.save_dir}/{ticker}_d.csv')]
+        return [
+            ticker
+            for ticker in tickers
+            if not os.path.isfile(f"{self.save_dir}/{ticker}_d.csv")
+        ]

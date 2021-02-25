@@ -25,15 +25,15 @@ class DatabasePreprocessor:
         self.preprocess_benchmark(self.config.benchmark)
 
     def init_directory_tree(self):
-        os.makedirs('database/preprocessed', exist_ok=True)
-        os.makedirs('database/preprocessed/benchmarks', exist_ok=True)
+        os.makedirs("database/preprocessed", exist_ok=True)
+        os.makedirs("database/preprocessed/benchmarks", exist_ok=True)
 
     def preprocess_companies(self, tickers: [str]):
         companies = self.basic_info_fetcher.get_companies()
         if tickers:
             companies = self.limit_companies_to_fetch(companies, tickers)
         self.to_fetch = len(companies)
-        print(f'To fetch: {str(self.to_fetch)} companies')
+        print(f"To fetch: {str(self.to_fetch)} companies")
 
         for company in companies.values():
             self.collect_company_info(company)
@@ -47,38 +47,42 @@ class DatabasePreprocessor:
 
     def collect_company_info(self, company: CompanyDetails):
         try:
-            os.makedirs(f'database/preprocessed/{company.ticker}')
+            os.makedirs(f"database/preprocessed/{company.ticker}")
             self.fetch_and_save_company_details(company)
-            print('>Basic info fetched.')
+            print(">Basic info fetched.")
             self.fetch_and_save_company_technicals(company)
-            print('>Technicals fetched.')
+            print(">Technicals fetched.")
             self.fetch_and_save_company_fundamentals(company)
-            print('>Fundamentals fetched.')
+            print(">Fundamentals fetched.")
         except FileExistsError:
-            print(f'{company.ticker} already exists. Skipping.')
+            print(f"{company.ticker} already exists. Skipping.")
         except (FileNotFoundError, AttributeError) as error:
             print(error)
-            print(f'Fetching failed for {company.ticker}. Rolling back changes.')
-            shutil.rmtree(f'database/preprocessed/{company.ticker}', ignore_errors=True)
+            print(f"Fetching failed for {company.ticker}. Rolling back changes.")
+            shutil.rmtree(f"database/preprocessed/{company.ticker}", ignore_errors=True)
         else:
             self.fetched += 1
-            print(f'Fetched already {str(self.fetched)}/{str(self.to_fetch)} companies.')
+            print(
+                f"Fetched already {str(self.fetched)}/{str(self.to_fetch)} companies."
+            )
 
     def fetch_and_save_company_details(self, company: CompanyDetails):
         company.sector = self.basic_info_fetcher.get_sector(company.link)
-        with io.open(f'database/preprocessed/{company.ticker}/basic_info.json', 'w') as f:
+        with io.open(
+            f"database/preprocessed/{company.ticker}/basic_info.json", "w"
+        ) as f:
             f.write(json.dumps(company.__dict__))
 
     def fetch_and_save_company_technicals(self, company: CompanyDetails):
         technicals = self.technicals_fetcher.fetch_technicals(company)
-        technicals.to_csv(f'database/preprocessed/{company.ticker}/technical.csv')
+        technicals.to_csv(f"database/preprocessed/{company.ticker}/technical.csv")
 
     def fetch_and_save_company_fundamentals(self, company: CompanyDetails):
         fundamentals = self.fundamentals_fetcher.get_fundamentals(company)
-        fundamentals.to_csv(f'database/preprocessed/{company.ticker}/fundamental.csv')
+        fundamentals.to_csv(f"database/preprocessed/{company.ticker}/fundamental.csv")
 
     def preprocess_benchmark(self, ticker: str):
         df = self.technicals_fetcher.fetch_raw_history(ticker)
         df = self.technicals_fetcher.change_column_names_from_polish_to_english(df)
         df = self.technicals_fetcher.set_date_as_index(df)
-        df.to_csv(f'database/preprocessed/benchmarks/{ticker}.csv')
+        df.to_csv(f"database/preprocessed/benchmarks/{ticker}.csv")

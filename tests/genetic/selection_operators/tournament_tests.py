@@ -17,7 +17,9 @@ def test_select_validAgents_returnsSelectedAmount(config, gene_factory):
     assert len(new_agents) == 2
 
 
-def test_select_one_aspirant_validAgents_returnsAgentWithGreaterFitness(config, gene_factory):
+def test_select_one_aspirant_validAgents_returnsAgentWithGreaterFitness(
+    config, gene_factory
+):
     agents_to_create = 2
     agents_to_save_rate = 0.0
     rating = Tournament(agents_to_save_rate)

@@ -16,7 +16,9 @@ class Wallet:
         self.ordersLog: [StockOrder] = []
         self.valueHistory: [float] = []
         self.valueTimestamps: [datetime] = []
-        self.fee_counter = NormalCounter(config.fee_min, config.fee_rate, config.fee_added, config.fee_max)
+        self.fee_counter = NormalCounter(
+            config.fee_min, config.fee_rate, config.fee_added, config.fee_max
+        )
 
     def trade(self, stock_strengths, day, database):
         current_total = self.get_total_value(database, date=day)
@@ -33,10 +35,10 @@ class Wallet:
                 self.sell_one(stock_strengths[i], day)
 
     def sell_one(self, stock: Company, day):
-        direction = 'SELL'
+        direction = "SELL"
         ticker = stock.ticker
         try:
-            price = stock.technicals.at[day, 'Close']
+            price = stock.technicals.at[day, "Close"]
         except KeyError:
             return
         amount = self.stocksHold[stock.ticker].amount
@@ -59,10 +61,10 @@ class Wallet:
                 self.buy_one(stock_strengths[i], day, current_total)
 
     def buy_one(self, stock: Company, day, total_value: float):
-        direction = 'BUY'
+        direction = "BUY"
         ticker = stock.ticker
         try:
-            price = stock.technicals.at[day, 'Close']
+            price = stock.technicals.at[day, "Close"]
         except KeyError:
             return
 
@@ -93,10 +95,15 @@ class Wallet:
                 continue
 
     def get_total_value(self, database, date) -> float:
-        total = self.cash + \
-                sum([self.get_closest_day_price(database[stock.ticker].technicals, date, 'Close') * stock.amount
-                     for stock
-                     in self.stocksHold.values()])
+        total = self.cash + sum(
+            [
+                self.get_closest_day_price(
+                    database[stock.ticker].technicals, date, "Close"
+                )
+                * stock.amount
+                for stock in self.stocksHold.values()
+            ]
+        )
         return round(total, 2)
 
     def get_current_sharpe(self, database, date) -> float:

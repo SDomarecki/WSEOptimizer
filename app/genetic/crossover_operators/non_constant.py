@@ -26,7 +26,9 @@ class NonConstant(Operator):
             split1 = random.randint(1, len(parent1.genes) - 1)
 
             min_for_split2 = max(split1 + len(parent2.genes) - self.max_genes, 1)
-            max_for_split2 = min(split1 - len(parent1.genes) + self.max_genes, len(parent2.genes) - 1)
+            max_for_split2 = min(
+                split1 - len(parent1.genes) + self.max_genes, len(parent2.genes) - 1
+            )
 
             split2 = random.randint(min_for_split2, max_for_split2)
 
