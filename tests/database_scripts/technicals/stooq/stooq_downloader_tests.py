@@ -5,17 +5,17 @@ import pytest
 from app.database_scripts.technicals.stooq.stooq_downloader import StooqDownloader
 
 
-@pytest.fixture(autouse=True, scope='package')
+@pytest.fixture(autouse=True, scope='module')
 def create_and_destroy_database_directory():
     yield
-    shutil.rmtree('tests')
+    shutil.rmtree('./temp_db')
 
 
 def test_fetch_all_validTickers_shouldSaveAllFiles():
     url_base = 'https://stooq.pl/q/d/l/?s='
     url_end = '&i=d'
     tickers = ['AST', 'ATC']
-    database_dir = 'tests/temp_db'
+    database_dir = 'temp_db'
     downloader = StooqDownloader(url_base, url_end, database_dir)
     to_fetch = len(tickers)
 
@@ -28,7 +28,7 @@ def test_fetch_one_validTicker_shouldSaveOneFile():
     one_ticker = 'pko'
     url_base = 'https://stooq.pl/q/d/l/?s='
     url_end = '&i=d'
-    database_dir = 'tests/temp_db'
+    database_dir = 'temp_db'
     downloader = StooqDownloader(url_base, url_end, database_dir)
 
     downloader.fetch_one(one_ticker)
@@ -37,7 +37,7 @@ def test_fetch_one_validTicker_shouldSaveOneFile():
 
 
 def test_delete_ticker_if_data_exists_ValidTickers_ShouldDeleteSomeTickersToDownload():
-    database_dir = 'tests/temp_db'
+    database_dir = 'temp_db'
     fake_tickers = ['abc', 'def']
     f = open(f'{database_dir}/{fake_tickers[1]}_d.csv', 'w')
     f.close()
