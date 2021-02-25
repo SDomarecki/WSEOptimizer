@@ -4,15 +4,16 @@ from app.genetic.selection_operators import Operator, Agent
 
 
 class Tournament(Operator):
-    def __init__(self, to_save: int):
+    def __init__(self, to_save_rate: float):
         super().__init__()
-        self.to_save = to_save
+        self.to_save_rate = to_save_rate
 
     def select(self, agents: [Agent]) -> [Agent]:
-        selected = []
-        selection_target = int(self.to_save * len(agents))
+        selection_target_amount = int(self.to_save_rate * len(agents))
         tournament_size = 2
-        while len(selected) < selection_target:
-            aspirants = [random.choice(agents) for _ in range(tournament_size)]
-            selected.append(max(aspirants, key=lambda ag: ag.fitness))
+        selected = [self.select_one_aspirant(agents, tournament_size) for _ in range(selection_target_amount)]
         return selected
+
+    def select_one_aspirant(self, agents: [Agent], tournament_size: int) -> Agent:
+        aspirants = [random.choice(agents) for _ in range(tournament_size)]
+        return max(aspirants, key=lambda ag: ag.fitness)

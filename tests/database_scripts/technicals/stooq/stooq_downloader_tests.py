@@ -6,7 +6,7 @@ from app.database_scripts.technicals.stooq.stooq_downloader import StooqDownload
 
 
 @pytest.fixture(autouse=True, scope='module')
-def create_and_destroy_database_directory():
+def destroy_database_directory():
     yield
     shutil.rmtree('./temp_db')
 
