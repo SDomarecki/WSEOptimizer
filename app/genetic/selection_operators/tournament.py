@@ -15,5 +15,5 @@ class Tournament(Operator):
         return selected
 
     def select_one_aspirant(self, agents: [Agent], tournament_size: int) -> Agent:
-        aspirants = [random.choice(agents) for _ in range(tournament_size)]
+        aspirants = random.sample(agents, tournament_size)
         return max(aspirants, key=lambda ag: ag.fitness)

@@ -24,8 +24,7 @@ def test_select_one_aspirant_validAgents_returnsAgentWithGreaterFitness(config, 
 
     agents = [Agent(i, 0, gene_factory, config) for i in range(agents_to_create)]
     agents[0].fitness = 10.0
-    agents[1].fitness = 7.0
+    agents[1].fitness = 17.0
 
     selected_agent = rating.select_one_aspirant(agents, 2)
-
-    assert selected_agent.id == agents[0].id
+    assert selected_agent.id == agents[1].id
