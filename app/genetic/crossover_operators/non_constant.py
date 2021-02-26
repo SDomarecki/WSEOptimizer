@@ -3,15 +3,24 @@ import random
 from app.config import Config
 from app.genetic.agent import Agent
 from app.genetic.crossover_operators import Operator
+from genetic.genes import GeneFactory
 
 
 class NonConstant(Operator):
-    def __init__(self, max_genes: int, to_create: int, validations: [], config: Config):
+    def __init__(
+        self,
+        max_genes: int,
+        to_create: int,
+        validations: [],
+        gene_factory: GeneFactory,
+        config: Config,
+    ):
         super().__init__()
         self.max_genes = max_genes
         self.to_create = to_create
         self.validations = len(validations)
         self.config = config
+        self.gene_factory = gene_factory
 
     def crossover(self, agents: [Agent], last_agent_id: int) -> [Agent]:
         agent_id = last_agent_id
@@ -20,8 +29,8 @@ class NonConstant(Operator):
             parent1 = random.choice(agents)
             parent2 = random.choice(agents)
 
-            child1 = Agent(agent_id, 0, self.config)
-            child2 = Agent(agent_id + 1, 0, self.config)
+            child1 = Agent(agent_id, 0, self.gene_factory, self.config)
+            child2 = Agent(agent_id + 1, 0, self.gene_factory, self.config)
 
             split1 = random.randint(1, len(parent1.genes) - 1)
 

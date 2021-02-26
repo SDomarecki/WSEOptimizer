@@ -1,5 +1,11 @@
-from ..gene import Gene
-from ..gene_factory import GeneFactory
+from __future__ import annotations
+
+from app.genetic.genes import Gene
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.genetic.genes import GeneFactory
 
 
 class EqGene(Gene):

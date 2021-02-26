@@ -1,17 +1,14 @@
 import random
 
-from app.genetic.agent import Agent
-from app.genetic.mutation_operators import Operator
+from app.genetic.mutation_operators.operator import Operator
+from app.genetic.genes import Gene
 
 
 class Normalization(Operator):
     def __init__(self, mutation_rate: float):
-        super().__init__()
-        self.mutation_rate = mutation_rate
+        super().__init__(mutation_rate)
 
-    def mutate(self, agents: [Agent]) -> [Agent]:
-        for agent in agents:
-            for idx, param in enumerate(agent.genes):
-                if random.uniform(0.0, 1.0) <= self.mutation_rate:
-                    agent.genes[idx].weight = random.uniform(0.0, 1.0)
-        return agents
+    def mutate_one_gene(self, gene: Gene) -> Gene:
+        new_gene = gene
+        new_gene.weight = random.uniform(0.0, 1.0)
+        return new_gene

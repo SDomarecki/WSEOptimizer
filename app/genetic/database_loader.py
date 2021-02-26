@@ -101,7 +101,7 @@ class DatabaseLoader:
         return database
 
     def __split_database_equally(self, chunks):
-        self.learning_database_chunks = [dict() for _ in range(chunks)]
+        self.learning_database_chunks = [{} for _ in range(chunks)]
         idx = 0
         for k, v in self.learning_database.items():
             self.learning_database_chunks[idx][k] = v

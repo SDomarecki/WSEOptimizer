@@ -192,9 +192,8 @@ class GeneticAlgorithmWorker:
                 )
 
     def save_to_file(self, result: str, save_path: str):
-        file = open(save_path, "w")
-        file.write(result)
-        file.close()
+        with open(save_path, "w") as file:
+            file.write(result)
 
     def toJSON(self):
         jsonable_self = GeneticAlgorithmWorkerJson(
