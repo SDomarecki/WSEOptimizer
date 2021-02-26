@@ -13,10 +13,10 @@ class StooqDownloader:
         # If script returns blank files (blad.csv) then wait 24h and rerun.
         self.fetch_limit = 200
 
-    def fetch_all(self, tickers: [str], to_download: int):
-        tickers = [ticker.lower() for ticker in tickers]
         os.makedirs(self.save_dir, exist_ok=True)
 
+    def fetch_all(self, tickers: [str], to_download: int):
+        tickers = [ticker.lower() for ticker in tickers]
         tickers = self.delete_ticker_if_data_exists(tickers)
 
         selected_tickers = zip(tickers, range(to_download))

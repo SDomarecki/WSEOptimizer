@@ -16,9 +16,9 @@ def test_fetch_and_parse_validURL_returnsSoup():
 def test_fetch_page_validURL_returnsExistingPage():
     url = "https://www.biznesradar.pl"
     fetcher = PageFetcher()
-    page = fetcher.fetch_page(url)
+    fetcher.fetch_page(url)
 
-    assert page.startswith("<!DOCTYPE html>")
+    assert fetcher.page.startswith("<!DOCTYPE html>")
 
 
 def test_fetch_page_invalidURL_throwsException():
