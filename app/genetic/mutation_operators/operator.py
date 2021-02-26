@@ -3,7 +3,7 @@ import random
 from abc import ABC, abstractmethod
 
 from app.genetic.agent import Agent
-from genetic.genes import Gene
+from app.genetic.genes import Gene
 
 
 class Operator(ABC):
