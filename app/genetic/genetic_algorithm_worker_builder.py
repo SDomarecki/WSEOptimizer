@@ -49,7 +49,7 @@ class GeneticAlgorithmWorkerBuilder:
         method = self.config.selection_method
         if method == "rating":
             return selection_operators.Rating(self.config.agents_to_save)
-        elif method == "tournament":
+        if method == "tournament":
             return selection_operators.Tournament(self.config.agents_to_save)
         return selection_operators.Roulette(self.config.agents_to_save)
 
@@ -65,14 +65,13 @@ class GeneticAlgorithmWorkerBuilder:
                 self.gene_factory,
                 self.config,
             )
-        else:
-            return crossover_operators.NonConstant(
-                self.config.max_genes,
-                to_create,
-                self.config.validations,
-                self.gene_factory,
-                self.config,
-            )
+        return crossover_operators.NonConstant(
+            self.config.max_genes,
+            to_create,
+            self.config.validations,
+            self.gene_factory,
+            self.config,
+        )
 
     def init_mutation_operator(self) -> mutation_operators.Operator:
         return mutation_operators.Normalization(self.config.mutation_rate)

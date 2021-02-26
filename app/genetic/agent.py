@@ -45,7 +45,7 @@ class Agent:
 
         if self.config.return_method == "total_value":
             return self.wallet.get_total_value(database, end_date)
-        elif self.config.return_method == "sharpe":
+        if self.config.return_method == "sharpe":
             return self.wallet.get_current_sharpe(database, end_date)
 
     def calculate_strength(self, stock, day) -> float:
