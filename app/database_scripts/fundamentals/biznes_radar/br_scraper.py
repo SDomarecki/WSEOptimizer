@@ -73,8 +73,7 @@ class BRScraper:
         table = page.find("table", class_="report-table")
         if table is None:
             return indicators
-        else:
-            tr = table.find_all("tr")
+        tr = table.find_all("tr")
 
         seasons = self._get_seasons_from_first_row(tr[0])
         indicator_rows = [
@@ -103,8 +102,7 @@ class BRScraper:
         )
         if "%" in ind:
             return float(ind.strip("%"))
-        else:
-            return float(ind)
+        return float(ind)
 
     def _get_seasons_from_first_row(self, row):
         headers = row.find_all("th")[1:-1]

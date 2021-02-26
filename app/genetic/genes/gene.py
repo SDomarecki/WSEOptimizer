@@ -19,8 +19,7 @@ class Gene:
         try:
             if self.condition(company, day):
                 return self.weight * self.result_true
-            else:
-                return self.weight * self.result_false
+            return self.weight * self.result_false
         except KeyError:
             return 0.0
 
