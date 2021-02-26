@@ -7,6 +7,7 @@ class Config:
         self._fetch_simulation_config(dict_config.get("simulation", {}))
         self._fetch_selection_config(dict_config.get("selection", {}))
         self._fetch_crossover_config(dict_config.get("crossover", {}))
+        self._fetch_mutation_config(dict_config.get("mutation", {}))
         self._fetch_wallet_config(dict_config.get("wallet", {}))
         self._fetch_genes_config(dict_config.get("genes", {}))
 
@@ -53,7 +54,10 @@ class Config:
         self.constant_length = cross_config.get("constant_length", True)
         self.initial_length = cross_config.get("initial_genes", 0)
         self.max_genes = cross_config.get("max_genes", 0)
-        self.mutation_rate = cross_config.get("mutation_rate", 0.0)
+
+    def _fetch_mutation_config(self, mutation_config: {}):
+        self.mutation_method = mutation_config.get("method", "normalization")
+        self.mutation_rate = mutation_config.get("rate", 0.0)
 
     def _fetch_wallet_config(self, wallet_config: {}):
         self.start_cash = wallet_config.get("start_cash", 0)

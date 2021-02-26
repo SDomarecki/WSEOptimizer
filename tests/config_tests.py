@@ -8,6 +8,7 @@ def test_init_validData_createsValidConfig():
     test__fetch_simulation_config_validData_fetchesValidVariables()
     test__fetch_selection_config_validData_fetchesValidVariables()
     test__fetch_crossover_config_validData_fetchesValidVariables()
+    test__fetch_mutation_config_validData_fetchesValidVariables()
     test__fetch_wallet_config_validData_fetchesValidVariables()
     test__fetch_genes_config_validData_fetchesValidVariables()
 
@@ -17,6 +18,7 @@ def test_init_emptyData_createsDefaultConfig():
     test__fetch_simulation_config_emptyDict_returnsDefaultSettings()
     test__fetch_selection_config_emptyDict_returnsDefaultSettings()
     test__fetch_crossover_config_emptyDict_returnsDefaultSettings()
+    test__fetch_mutation_config_emptyDict_returnsDefaultSettings()
     test__fetch_wallet_config_emptyDict_returnsDefaultSettings()
     test__fetch_genes_config_emptyDict_returnsDefaultSettings()
 
@@ -115,12 +117,7 @@ def test__fetch_selection_config_emptyDict_returnsDefaultSettings():
 
 
 def test__fetch_crossover_config_validData_fetchesValidVariables():
-    cross_config = {
-        "constant_length": False,
-        "initial_genes": 1,
-        "max_genes": 1,
-        "mutation_rate": 1.0,
-    }
+    cross_config = {"constant_length": False, "initial_genes": 1, "max_genes": 1}
     config = Config()
 
     config._fetch_crossover_config(cross_config)
@@ -129,7 +126,6 @@ def test__fetch_crossover_config_validData_fetchesValidVariables():
         config.constant_length is False
         and config.initial_length == 1
         and config.max_genes == 1
-        and config.mutation_rate == 1.0
     )
 
 
@@ -143,8 +139,25 @@ def test__fetch_crossover_config_emptyDict_returnsDefaultSettings():
         config.constant_length is True
         and config.initial_length == 0
         and config.max_genes == 0
-        and config.mutation_rate == 0.0
     )
+
+
+def test__fetch_mutation_config_validData_fetchesValidVariables():
+    mutation_config = {"method": "gene_creation", "rate": 0.1}
+    config = Config()
+
+    config._fetch_mutation_config(mutation_config)
+
+    assert config.mutation_method == "gene_creation" and config.mutation_rate == 0.1
+
+
+def test__fetch_mutation_config_emptyDict_returnsDefaultSettings():
+    mutation_config = {}
+    config = Config()
+
+    config._fetch_mutation_config(mutation_config)
+
+    assert config.mutation_method == "normalization" and config.mutation_rate == 0.0
 
 
 def test__fetch_wallet_config_validData_fetchesValidVariables():

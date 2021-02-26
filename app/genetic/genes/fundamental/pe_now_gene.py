@@ -23,8 +23,7 @@ class PENowGene(Gene):
 
         if self.comparator == ">":
             return indicator_value > self.compared_value
-        else:
-            return indicator_value < self.compared_value
+        return indicator_value < self.compared_value
 
     def condition_to_string(self) -> str:
         return f"P/E Now {self.comparator} {self.compared_value:.2f}"

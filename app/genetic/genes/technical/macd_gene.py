@@ -14,8 +14,7 @@ class MACDGene(Gene):
 
         if self.comparator == ">":
             return indicator_value > signal_value
-        else:
-            return indicator_value < signal_value
+        return indicator_value < signal_value
 
     def condition_to_string(self) -> str:
         return f"MACD {self.comparator} MACD Signal"

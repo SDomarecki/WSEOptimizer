@@ -14,8 +14,7 @@ class EMVGene(Gene):
 
         if self.comparator == ">":
             return indicator_value > self.close_value
-        else:
-            return indicator_value < self.close_value
+        return indicator_value < self.close_value
 
     def condition_to_string(self) -> str:
         return f"EMV {self.comparator} Close"

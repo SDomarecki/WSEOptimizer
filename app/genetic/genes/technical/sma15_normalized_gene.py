@@ -16,8 +16,7 @@ class SMA15NormalizedGene(Gene):
 
         if self.comparator == ">":
             return normalized_value > self.compared_value
-        else:
-            return normalized_value < self.compared_value
+        return normalized_value < self.compared_value
 
     def condition_to_string(self) -> str:
         return f"SMA15Norm {self.comparator} {self.compared_value:.2f}"

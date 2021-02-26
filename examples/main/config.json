@@ -25,8 +25,11 @@
   "crossover": {
     "constant_length": true,
     "initial_genes": 5,
-    "max_genes": 10,
-    "mutation_rate": 0.1
+    "max_genes": 10
+  },
+  "mutation": {
+    "method": "normalization",
+    "rate": 0.1
   },
   "wallet": {
     "start_cash": 100000,

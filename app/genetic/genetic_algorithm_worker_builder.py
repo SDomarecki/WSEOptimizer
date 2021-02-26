@@ -26,8 +26,7 @@ class GeneticAlgorithmWorkerBuilder:
     def init_agents(self) -> [Agent]:
         if self.config.constant_length:
             return self.init_constant_length_agents()
-        else:
-            return self.init_non_constant_length_agents()
+        return self.init_non_constant_length_agents()
 
     def init_constant_length_agents(self) -> [Agent]:
         return [
@@ -52,8 +51,7 @@ class GeneticAlgorithmWorkerBuilder:
             return selection_operators.Rating(self.config.agents_to_save)
         elif method == "tournament":
             return selection_operators.Tournament(self.config.agents_to_save)
-        else:
-            return selection_operators.Roulette(self.config.agents_to_save)
+        return selection_operators.Roulette(self.config.agents_to_save)
 
     def init_crossover_operator(self) -> crossover_operators.Operator:
         to_create = int(

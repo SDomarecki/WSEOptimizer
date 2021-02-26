@@ -55,12 +55,13 @@ class Agent:
         validations_str = [
             f"{self.validations[i]:.2f}" for i in range(len(self.validations))
         ]
+        genome_str = [g.to_string() for g in self.genes]
         return {
             "id": self.id,
-            "strategy": self.genome_to_string(),
+            "strategy": genome_str,
             "fitness": f"{self.fitness:.2f}",
             "validations": validations_str,
         }
 
     def genome_to_string(self) -> [str]:
-        return [g.to_string() for g in self.genes]
+        return

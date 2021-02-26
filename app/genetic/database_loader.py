@@ -52,10 +52,13 @@ class DatabaseLoader:
             for val in self.config.validations
         ]
 
-    def __decode_company(self, json: dict) -> Company:
-        company = Company(json["name"], json["ticker"], json["link"])
-        company.sector = json["sector"]
-        return company
+    def __decode_company(self, json_company: dict) -> Company:
+        return Company(
+            json_company["name"],
+            json_company["ticker"],
+            json_company["link"],
+            json_company["sector"],
+        )
 
     def __get_fundamentals(self, ticker: str) -> pd.DataFrame:
         df = pd.read_csv(
@@ -147,9 +150,9 @@ class DatabaseLoader:
         self.benchmark_learning_wallet = self.__calculate_benchmark_wallet(
             self.config.start_date, self.config.end_date
         )
-        for idx, el in enumerate(self.config.validations):
+        for validation in self.config.validations:
             self.benchmark_testing_wallets.append(
-                self.__calculate_benchmark_wallet(el[0], el[1])
+                self.__calculate_benchmark_wallet(validation[0], validation[1])
             )
 
     def __calculate_benchmark_wallet(self, start_date, end_date):

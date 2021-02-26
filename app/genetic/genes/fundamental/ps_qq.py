@@ -18,8 +18,7 @@ class PSqq(Gene):
 
         if self.comparator == ">":
             return indicator_value / previous_indicator_value > self.compared_value
-        else:
-            return indicator_value / previous_indicator_value < self.compared_value
+        return indicator_value / previous_indicator_value < self.compared_value
 
     def condition_to_string(self) -> str:
         return f"P/S / PrevQ P/S {self.comparator} {self.compared_value:.2f}"

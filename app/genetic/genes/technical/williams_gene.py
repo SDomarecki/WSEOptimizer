@@ -14,8 +14,7 @@ class WilliamsGene(Gene):
 
         if self.comparator == ">":
             return indicator_value > self.compared_value
-        else:
-            return indicator_value < self.compared_value
+        return indicator_value < self.compared_value
 
     def condition_to_string(self) -> str:
         return f"Williams %R {self.comparator} {self.compared_value:.2f}"
