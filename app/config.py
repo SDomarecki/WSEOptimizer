@@ -2,6 +2,39 @@ from datetime import datetime, date
 
 
 class Config:
+    def __init__(self):
+        self.min_circulation = 0
+        self.max_circulation = 0
+        self.sectors = []
+        self.companies = []
+        self.chunks = 0
+        self.timedelta = 0
+        self.iterations = 0
+        self.initial_population = 0
+        self.start_date = None
+        self.end_date = None
+        self.validations = []
+        self.selection_method = ""
+        self.agents_to_save = 0.0
+        self.constant_length = False
+        self.initial_length = 0
+        self.max_genes = 0
+        self.mutation_method = ""
+        self.mutation_rate = 0.0
+        self.start_cash = 0
+        self.return_method = ""
+        self.benchmark = ""
+        self.risk_free_return = 0.0
+        self.fee_min = 0.0
+        self.fee_rate = 0.0
+        self.fee_added = 0.0
+        self.fee_max = 0.0
+        self.stocks_to_buy = 0
+        self.stocks_to_hold = 0
+        self.fin_statement_lag = 0
+        self.logic_to_all = 0.0
+        self.fundamental_to_all = 0.0
+
     def fetch_from_dict(self, dict_config: {}):
         self._fetch_database_config(dict_config.get("database", {}))
         self._fetch_simulation_config(dict_config.get("simulation", {}))

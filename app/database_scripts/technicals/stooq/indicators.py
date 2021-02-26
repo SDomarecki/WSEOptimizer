@@ -1,55 +1,50 @@
 import pandas as pd
 
-"""
-Circulation
-Source: ===
-Params:
-    data: pandas DataFrame
-    period: smoothing period
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'ema[period]' column added
-"""
-
 
 def circulation(data: pd.DataFrame, close_col: str, vol_col: str):
+    """
+    Circulation
+    Source: ===
+    Params:
+        data: pandas DataFrame
+        period: smoothing period
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'ema[period]' column added
+    """
     data["Circulation"] = data[close_col] * data[vol_col]
     return data
 
 
-"""
-Simple moving average
-Source: ===
-Params:
-    data: pandas DataFrame
-    period: smoothing period
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'ema[period]' column added
-"""
-
-
 def sma(data: pd.DataFrame, period: int, close_col: str):
+    """
+    Simple moving average
+    Source: ===
+    Params:
+        data: pandas DataFrame
+        period: smoothing period
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'ema[period]' column added
+    """
     data["sma" + str(period)] = data[close_col].rolling(window=period).mean()
     return data
 
 
-"""
-Exponential moving average
-Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages
-Params:
-    data: pandas DataFrame
-    period: smoothing period
-    column: the name of the column with values for calculating EMA in the 'data' DataFrame
-
-Returns:
-    copy of 'data' DataFrame with 'ema[period]' column added
-"""
-
-
 def ema(data: pd.DataFrame, period: int, close_col: str):
+    """
+    Exponential moving average
+    Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_averages
+    Params:
+        data: pandas DataFrame
+        period: smoothing period
+        column: the name of the column with values for calculating EMA in the 'data' DataFrame
+
+    Returns:
+        copy of 'data' DataFrame with 'ema[period]' column added
+    """
     data["ema" + str(period)] = (
         data[close_col]
         .ewm(ignore_na=False, min_periods=period, com=period, adjust=True)
@@ -58,22 +53,20 @@ def ema(data: pd.DataFrame, period: int, close_col: str):
     return data
 
 
-"""
-Moving Average Convergence/Divergence Oscillator (MACD)
-Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
-Params:
-    data: pandas DataFrame
-    period_long: the longer period EMA (26 days recommended)
-    period_short: the shorter period EMA (12 days recommended)
-    period_signal: signal line EMA (9 days recommended)
-    column: the name of the column with values for calculating MACD in the 'data' DataFrame
-
-Returns:
-    copy of 'data' DataFrame with 'macd_val' and 'macd_signal_line' columns added
-"""
-
-
 def macd(data: pd.DataFrame, period_long, period_short, period_signal, close_col: str):
+    """
+    Moving Average Convergence/Divergence Oscillator (MACD)
+    Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
+    Params:
+        data: pandas DataFrame
+        period_long: the longer period EMA (26 days recommended)
+        period_short: the shorter period EMA (12 days recommended)
+        period_signal: signal line EMA (9 days recommended)
+        column: the name of the column with values for calculating MACD in the 'data' DataFrame
+
+    Returns:
+        copy of 'data' DataFrame with 'macd_val' and 'macd_signal_line' columns added
+    """
     remove_cols = []
     if not "ema" + str(period_long) in data.columns:
         data = ema(data, period=period_long, close_col=close_col)
@@ -95,44 +88,39 @@ def macd(data: pd.DataFrame, period_long, period_short, period_signal, close_col
     return data
 
 
-"""
-Typical Price
-Source: https://en.wikipedia.org/wiki/Typical_price
-Params:
-    data: pandas DataFrame
-    high_col: the name of the HIGH values column
-    low_col: the name of the LOW values column
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'typical_price' column added
-"""
-
-
 def typical_price(data: pd.DataFrame, high_col: str, low_col: str, close_col: str):
+    """
+    Typical Price
+    Source: https://en.wikipedia.org/wiki/Typical_price
+    Params:
+        data: pandas DataFrame
+        high_col: the name of the HIGH values column
+        low_col: the name of the LOW values column
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'typical_price' column added
+    """
     data["typical_price"] = (data[high_col] + data[low_col] + data[close_col]) / 3
-
     return data
-
-
-"""
-Ease of Movement
-Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ease_of_movement_emv
-Params:
-    data: pandas DataFrame
-    period: period for calculating EMV
-    high_col: the name of the HIGH values column
-    low_col: the name of the LOW values column
-    vol_col: the name of the VOL values column
-
-Returns:
-    copy of 'data' DataFrame with 'emv' and 'emv_ema_[period]' columns added
-"""
 
 
 def ease_of_movement(
     data: pd.DataFrame, period: int, high_col: str, low_col: str, vol_col: str
 ):
+    """
+    Ease of Movement
+    Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ease_of_movement_emv
+    Params:
+        data: pandas DataFrame
+        period: period for calculating EMV
+        high_col: the name of the HIGH values column
+        low_col: the name of the LOW values column
+        vol_col: the name of the VOL values column
+
+    Returns:
+        copy of 'data' DataFrame with 'emv' and 'emv_ema_[period]' columns added
+    """
     for index, row in data.iterrows():
         if index > 0:
             midpoint_move = (row[high_col] + row[low_col]) / 2 - (
@@ -162,19 +150,6 @@ def ease_of_movement(
     return data
 
 
-"""
-Money Flow Index (MFI)
-Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi
-Params:
-    data: pandas DataFrame
-    periods: period for calculating MFI (14 days recommended)
-    vol_col: the name of the VOL values column
-
-Returns:
-    copy of 'data' DataFrame with 'money_flow_index' column added
-"""
-
-
 def money_flow_index(
     data: pd.DataFrame,
     periods: int,
@@ -183,6 +158,17 @@ def money_flow_index(
     close_col: str,
     vol_col: str,
 ):
+    """
+    Money Flow Index (MFI)
+    Source: http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi
+    Params:
+        data: pandas DataFrame
+        periods: period for calculating MFI (14 days recommended)
+        vol_col: the name of the VOL values column
+
+    Returns:
+        copy of 'data' DataFrame with 'money_flow_index' column added
+    """
     remove_tp_col = False
     if "typical_price" not in data.columns:
         data = typical_price(
@@ -228,20 +214,18 @@ def money_flow_index(
     return data
 
 
-"""
-Rate of change
-Source: https://en.wikipedia.org/wiki/Momentum_(technical_analysis)
-Params:
-    data: pandas DataFrame
-    periods: period for calculating ROC
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'roc' column added
-"""
-
-
 def roc(data: pd.DataFrame, periods: int, close_col: str):
+    """
+    Rate of change
+    Source: https://en.wikipedia.org/wiki/Momentum_(technical_analysis)
+    Params:
+        data: pandas DataFrame
+        periods: period for calculating ROC
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'roc' column added
+    """
     data["roc"] = 0.0
 
     for index, row in data.iterrows():
@@ -254,20 +238,18 @@ def roc(data: pd.DataFrame, periods: int, close_col: str):
     return data
 
 
-"""
-Relative Strength Index
-Source: https://en.wikipedia.org/wiki/Relative_strength_index
-Params:
-    data: pandas DataFrame
-    periods: period for calculating momentum
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'rsi' column added
-"""
-
-
 def rsi(data: pd.DataFrame, periods: int, close_col: str):
+    """
+    Relative Strength Index
+    Source: https://en.wikipedia.org/wiki/Relative_strength_index
+    Params:
+        data: pandas DataFrame
+        periods: period for calculating momentum
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'rsi' column added
+    """
     data["rsi_u"] = 0.0
     data["rsi_d"] = 0.0
     data["rsi"] = 0.0
@@ -297,24 +279,22 @@ def rsi(data: pd.DataFrame, periods: int, close_col: str):
     return data
 
 
-"""
-William's % R
-Source: https://www.metastock.com/customer/resources/taaz/?p=126
-Params:
-    data: pandas DataFrame
-    periods: the period over which to calculate the indicator value
-    high_col: the name of the HIGH values column
-    low_col: the name of the LOW values column
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'williams_r' column added
-"""
-
-
 def williams_r(
     data: pd.DataFrame, periods: int, high_col: str, low_col: str, close_col: str
 ):
+    """
+    William's % R
+    Source: https://www.metastock.com/customer/resources/taaz/?p=126
+    Params:
+        data: pandas DataFrame
+        periods: the period over which to calculate the indicator value
+        high_col: the name of the HIGH values column
+        low_col: the name of the LOW values column
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'williams_r' column added
+    """
     data["williams_r"] = 0.0
 
     for index, row in data.iterrows():
@@ -332,21 +312,19 @@ def williams_r(
     return data
 
 
-"""
-TRIX
-Source: https://www.metastock.com/customer/resources/taaz/?p=114
-Params:
-    data: pandas DataFrame
-    periods: the period over which to calculate the indicator value
-    signal_periods: the period for signal moving average
-    close_col: the name of the CLOSE values column
-
-Returns:
-    copy of 'data' DataFrame with 'trix' and 'trix_signal' columns added
-"""
-
-
 def trix(data: pd.DataFrame, periods: int, signal_periods: int, close_col: str):
+    """
+    TRIX
+    Source: https://www.metastock.com/customer/resources/taaz/?p=114
+    Params:
+        data: pandas DataFrame
+        periods: the period over which to calculate the indicator value
+        signal_periods: the period for signal moving average
+        close_col: the name of the CLOSE values column
+
+    Returns:
+        copy of 'data' DataFrame with 'trix' and 'trix_signal' columns added
+    """
     data["trix"] = (
         data[close_col]
         .ewm(ignore_na=False, min_periods=0, com=periods, adjust=True)

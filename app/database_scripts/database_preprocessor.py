@@ -11,7 +11,8 @@ from app.database_scripts.technicals.stooq.stooq_preprocessor import StooqPrepro
 
 
 class DatabasePreprocessor:
-    def __init__(self, config: Config):
+    def __init__(self, path: str, config: Config):
+        self.path_to_database = path
         self.config = config
         self.fetched = 0
         self.to_fetch = 0
@@ -25,8 +26,8 @@ class DatabasePreprocessor:
         self.preprocess_benchmark(self.config.benchmark)
 
     def init_directory_tree(self):
-        os.makedirs("database/preprocessed", exist_ok=True)
-        os.makedirs("database/preprocessed/benchmarks", exist_ok=True)
+        os.makedirs(self.path_to_database, exist_ok=True)
+        os.makedirs(f"{self.path_to_database}/benchmarks", exist_ok=True)
 
     def preprocess_companies(self, tickers: [str]):
         companies = self.basic_info_fetcher.get_companies()

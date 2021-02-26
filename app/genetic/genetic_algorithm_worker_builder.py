@@ -11,6 +11,10 @@ from app.genetic.genes import GeneFactory
 
 
 class GeneticAlgorithmWorkerBuilder:
+    def __init__(self):
+        self.config = None
+        self.gene_factory = None
+
     def build(self, loader: DatabaseLoader, config: Config) -> GeneticAlgorithmWorker:
         self.config = config
         self.gene_factory = GeneFactory(config)
