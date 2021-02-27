@@ -7,7 +7,7 @@ import pandas as pd
 
 from app.config import Config
 from app.economics.company import Company
-from genetic.get_closest_value import get_closest_value
+from app.genetic.get_closest_value import get_closest_value
 
 
 class DatabaseLoader:

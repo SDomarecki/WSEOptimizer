@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 import pandas as pd
-from economics.company import Company
+from app.economics.company import Company
 
 
 @pytest.fixture(scope="package")

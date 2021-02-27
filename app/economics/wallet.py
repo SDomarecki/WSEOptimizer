@@ -6,7 +6,7 @@ from app.config import Config
 from app.economics.company import Company
 from app.economics.fee_counter.normal_counter import NormalCounter
 from app.economics.stock_order import StockOrder
-from genetic.get_closest_value import get_closest_value
+from app.genetic.get_closest_value import get_closest_value
 
 
 class Wallet:
