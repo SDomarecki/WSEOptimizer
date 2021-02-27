@@ -1,6 +1,6 @@
 from datetime import date
 
-from genetic.genes.fundamental.pbv_now_gene import PBVNowGene
+from app.genetic.genes.fundamental.pbv_now_gene import PBVNowGene
 
 
 def test_condition_isLowerCheckAndIndicatorLowerThanComparedValue_returnsTrue(company):
