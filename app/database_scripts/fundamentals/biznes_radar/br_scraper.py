@@ -89,7 +89,8 @@ class BRScraper:
 
         return indicators
 
-    def _fetch_one_indicator_from_html(self, html) -> float:
+    @staticmethod
+    def _fetch_one_indicator_from_html(html) -> float:
         if html.text == "":
             return 0.0
         ind = (
@@ -104,7 +105,8 @@ class BRScraper:
             return float(ind.strip("%"))
         return float(ind)
 
-    def _get_seasons_from_first_row(self, row):
+    @staticmethod
+    def _get_seasons_from_first_row(row):
         headers = row.find_all("th")[1:-1]
         seasons = []
         for header in headers:

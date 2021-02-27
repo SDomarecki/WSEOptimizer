@@ -31,8 +31,9 @@ class StooqPreprocessor:
         technicals = self.set_date_as_index(technicals)
         return technicals
 
+    @staticmethod
     def change_column_names_from_polish_to_english(
-        self, technicals: pd.DataFrame
+        technicals: pd.DataFrame,
     ) -> pd.DataFrame:
         new_columns = {
             "Data": "Date",
@@ -44,7 +45,8 @@ class StooqPreprocessor:
         }
         return technicals.rename(columns=new_columns)
 
-    def calculate_all_technicals(self, technicals: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def calculate_all_technicals(technicals: pd.DataFrame) -> pd.DataFrame:
         t = technicals
 
         t = ind.circulation(t, close_col="Close", vol_col="Volume")
@@ -74,5 +76,6 @@ class StooqPreprocessor:
 
         return t
 
-    def set_date_as_index(self, technicals: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def set_date_as_index(technicals: pd.DataFrame) -> pd.DataFrame:
         return technicals.set_index("Date")

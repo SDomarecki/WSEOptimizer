@@ -39,7 +39,8 @@ class DatabasePreprocessor:
         for company in companies.values():
             self.collect_company_info(company)
 
-    def limit_companies_to_fetch(self, companies: dict, tickers_to_stay: [str]) -> dict:
+    @staticmethod
+    def limit_companies_to_fetch(companies: dict, tickers_to_stay: [str]) -> dict:
         companies_copy = dict(companies)
         for ticker in companies.keys():
             if ticker not in tickers_to_stay:

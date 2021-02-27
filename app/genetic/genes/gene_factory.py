@@ -92,10 +92,12 @@ class GeneFactory:
     def create_non_logic_gene(self) -> Gene:
         if random.uniform(0.0, 1.0) <= self.fundamental_to_all:
             return self.create_fundamental_gene()
-        return self.create_technical_gene()
+        return GeneFactory.create_technical_gene()
 
-    def create_fundamental_gene(self) -> Gene:
-        return random.choice(GeneFactory.fundamental_genes)()
+    @classmethod
+    def create_fundamental_gene(cls) -> Gene:
+        return random.choice(cls.fundamental_genes)()
 
-    def create_technical_gene(self) -> Gene:
-        return random.choice(GeneFactory.technical_genes)()
+    @classmethod
+    def create_technical_gene(cls) -> Gene:
+        return random.choice(cls.technical_genes)()

@@ -7,6 +7,7 @@ import pandas as pd
 
 from app.config import Config
 from app.economics.company import Company
+from genetic.get_closest_value import get_closest_value
 
 
 class DatabaseLoader:
@@ -52,7 +53,8 @@ class DatabaseLoader:
             for val in self.config.validations
         ]
 
-    def __decode_company(self, json_company: dict) -> Company:
+    @staticmethod
+    def __decode_company(json_company: dict) -> Company:
         return Company(
             json_company["name"],
             json_company["ticker"],
@@ -79,7 +81,8 @@ class DatabaseLoader:
         self.__filter_database_by_circulation(new_database)
         return new_database
 
-    def __filter_database_by_dates(self, database: dict, start_date, end_date):
+    @staticmethod
+    def __filter_database_by_dates(database: dict, start_date, end_date):
         for company in database.values():
             company.technicals = company.technicals.loc[start_date:end_date]
 
@@ -138,12 +141,8 @@ class DatabaseLoader:
             print(f"Validation {idx} target: {target}")
 
     def __get_target_ratio(self, start_date, end_date) -> float:
-        start_value = DatabaseLoader.__get_closest_value(
-            self.benchmark, start_date, "Close"
-        )
-        end_value = DatabaseLoader.__get_closest_value(
-            self.benchmark, end_date, "Close"
-        )
+        start_value = get_closest_value(self.benchmark, start_date, "Close")
+        end_value = get_closest_value(self.benchmark, end_date, "Close")
         return end_value / start_value
 
     def __calculate_wallets(self):
@@ -158,26 +157,11 @@ class DatabaseLoader:
     def __calculate_benchmark_wallet(self, start_date, end_date):
         start_cash = self.config.start_cash
         delta = datetime.timedelta(days=self.config.timedelta)
-        start_value = DatabaseLoader.__get_closest_value(
-            self.benchmark, start_date, "Close"
-        )
+        start_value = get_closest_value(self.benchmark, start_date, "Close")
         history = []
         day = start_date
         while day < end_date:
-            today_value = DatabaseLoader.__get_closest_value(
-                self.benchmark, day, "Close"
-            )
+            today_value = get_closest_value(self.benchmark, day, "Close")
             history.append(start_cash * today_value / start_value)
             day += delta
         return history
-
-    @staticmethod
-    def __get_closest_value(df, day, column) -> float:
-        delta = datetime.timedelta(days=1)
-
-        while True:
-            try:
-                return df.at[day, column]
-            except KeyError:
-                day -= delta
-                continue

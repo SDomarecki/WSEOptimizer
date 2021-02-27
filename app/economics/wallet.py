@@ -6,6 +6,7 @@ from app.config import Config
 from app.economics.company import Company
 from app.economics.fee_counter.normal_counter import NormalCounter
 from app.economics.stock_order import StockOrder
+from genetic.get_closest_value import get_closest_value
 
 
 class Wallet:
@@ -85,26 +86,18 @@ class Wallet:
     def get_fee_from_charge(self, charge: float) -> float:
         return self.fee_counter.count(charge)
 
-    def get_closest_day_price(self, technicals, day, column) -> float:
-        delta = datetime.timedelta(days=1)
-        while True:
-            try:
-                return technicals.at[day, column]
-            except KeyError:
-                day -= delta
-                continue
-
     def get_total_value(self, database, date) -> float:
         total = self.cash + sum(
             [
-                self.get_closest_day_price(
-                    database[stock.ticker].technicals, date, "Close"
-                )
+                get_closest_value(database[stock.ticker].technicals, date, "Close")
                 * stock.amount
                 for stock in self.stocksHold.values()
             ]
         )
         return round(total, 2)
+
+    def get_end_total_value(self, database) -> float:
+        return self.get_total_value(database, self.config.end_date)
 
     def get_current_sharpe(self, database, date) -> float:
         risk_free = self.config.start_cash * (self.config.risk_free_return + 1)
@@ -113,3 +106,6 @@ class Wallet:
         if stdev == 0:
             return 0
         return (current_return - risk_free) / stdev
+
+    def get_end_sharpe(self, database) -> float:
+        return self.get_current_sharpe(database, self.config.end_date)

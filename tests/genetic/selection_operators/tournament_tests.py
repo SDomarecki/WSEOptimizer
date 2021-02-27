@@ -29,4 +29,4 @@ def test_select_one_aspirant_validAgents_returnsAgentWithGreaterFitness(
     agents[1].fitness = 17.0
 
     selected_agent = rating.select_one_aspirant(agents, 2)
-    assert selected_agent.id == agents[1].id
+    assert selected_agent.agent_id == agents[1].agent_id
