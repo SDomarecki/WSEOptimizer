@@ -1,7 +1,7 @@
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from economics.wallet import Wallet
+from app.economics.wallet import Wallet
 
 
 class Plotter:

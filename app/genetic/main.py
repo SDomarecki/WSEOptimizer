@@ -5,7 +5,7 @@ from app.config import Config
 from app.genetic.database_loader import DatabaseLoader
 from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
 from app.genetic.genetic_algorithm_worker_builder import GeneticAlgorithmWorkerBuilder
-from genetic.reporting.reporter import Reporter
+from app.genetic.reporting.reporter import Reporter
 
 
 def load_config(path: str) -> Config:

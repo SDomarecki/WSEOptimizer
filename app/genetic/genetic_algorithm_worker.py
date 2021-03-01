@@ -1,7 +1,7 @@
 from app.config import Config
 from app.genetic.agent import Agent
 from app.genetic.database_loader import DatabaseLoader
-from genetic.reporting.plotter import Plotter
+from app.genetic.reporting.plotter import Plotter
 
 
 class GeneticAlgorithmWorker:

@@ -1,8 +1,8 @@
 import datetime
 
 from app.config import Config
-from economics.trader import Trader
-from genetic.genes.gene_factory import GeneFactory
+from app.economics.trader import Trader
+from app.genetic.genes.gene_factory import GeneFactory
 
 
 class Agent:

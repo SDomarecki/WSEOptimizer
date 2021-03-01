@@ -1,8 +1,8 @@
 import json
 
-from config import Config
-from genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
-from genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
+from app.config import Config
+from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
+from app.genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
 
 
 class Reporter:

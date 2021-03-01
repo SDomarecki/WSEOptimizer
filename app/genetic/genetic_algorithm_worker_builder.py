@@ -9,12 +9,12 @@ from app.genetic.genes.gene_factory import GeneFactory
 from app.genetic.selection_operators.operator import Operator as SelectionOperator
 from app.genetic.crossover_operators.operator import Operator as CrossoverOperator
 from app.genetic.mutation_operators.operator import Operator as MutationOperator
-from genetic.crossover_operators.constant import Constant
-from genetic.crossover_operators.non_constant import NonConstant
-from genetic.mutation_operators.normalization import Normalization
-from genetic.selection_operators.rating import Rating
-from genetic.selection_operators.roulette import Roulette
-from genetic.selection_operators.tournament import Tournament
+from app.genetic.crossover_operators.constant import Constant
+from app.genetic.crossover_operators.non_constant import NonConstant
+from app.genetic.mutation_operators.normalization import Normalization
+from app.genetic.selection_operators.rating import Rating
+from app.genetic.selection_operators.roulette import Roulette
+from app.genetic.selection_operators.tournament import Tournament
 
 
 class GeneticAlgorithmWorkerBuilder:
