@@ -4,7 +4,7 @@ from app.config import Config
 from app.economics.company import Company
 from app.economics.stock_order import StockOrder
 from app.economics.wallet import Wallet
-from genetic.get_closest_value import convert_date_to_datetime
+from app.genetic.get_closest_value import convert_date_to_datetime
 
 
 class Trader:
