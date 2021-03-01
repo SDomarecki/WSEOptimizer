@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from app.genetic.genes import Gene
+from app.genetic.genes.gene import Gene
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.genetic.genes import GeneFactory
+    from app.genetic.genes.gene_factory import GeneFactory
 
 
 class XorGene(Gene):

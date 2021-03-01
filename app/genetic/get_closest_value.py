@@ -1,12 +1,18 @@
-import datetime
+from datetime import date, datetime, timedelta
 
 
-def get_closest_value(df, day, column) -> float:
-    delta = datetime.timedelta(days=1)
+def get_closest_value(df, day: date, column) -> float:
+    lookup = convert_date_to_datetime(day)
+    delta = timedelta(days=1)
 
     while True:
         try:
-            return df.at[day, column]
+            return df.at[lookup, column]
         except KeyError:
-            day -= delta
+            lookup -= delta
             continue
+
+
+def convert_date_to_datetime(day: date) -> datetime:
+    min_time = datetime.min.time()
+    return datetime.combine(day, min_time)

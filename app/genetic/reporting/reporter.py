@@ -1,3 +1,25 @@
+import json
+
+from config import Config
+from genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
+from genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
+
+
 class Reporter:
-    def __init__(self):
-        pass
+    def __init__(self, worker: GeneticAlgorithmWorker, config: Config):
+        self.worker = worker
+        self.config = config
+
+    def save_results(self, save_path: str):
+        result_string = self.toJSON()
+        self.save_to_file(result_string, save_path)
+
+    def toJSON(self):
+        jsonable_self = GeneticAlgorithmWorkerJson(
+            self.worker.agents[:5], self.worker.targets[1:], self.config
+        )
+        return json.dumps(jsonable_self.__dict__, default=str, indent=2)
+
+    def save_to_file(self, result: str, save_path: str):
+        with open(save_path, "w") as file:
+            file.write(result)

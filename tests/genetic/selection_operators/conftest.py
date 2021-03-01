@@ -1,7 +1,7 @@
 import pytest
 
 from app.config import Config
-from app.genetic.genes import GeneFactory
+from app.genetic.genes.gene_factory import GeneFactory
 
 
 @pytest.fixture(scope="package")

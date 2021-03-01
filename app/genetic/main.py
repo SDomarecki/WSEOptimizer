@@ -5,6 +5,7 @@ from app.config import Config
 from app.genetic.database_loader import DatabaseLoader
 from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
 from app.genetic.genetic_algorithm_worker_builder import GeneticAlgorithmWorkerBuilder
+from genetic.reporting.reporter import Reporter
 
 
 def load_config(path: str) -> Config:
@@ -28,6 +29,7 @@ def run_genetic_algorithm(
     return worker
 
 
-def save_results(worker: GeneticAlgorithmWorker):
+def save_results(worker: GeneticAlgorithmWorker, config: Config):
     filename = strftime("%Y-%m-%d %H-%M-%S", localtime())
-    worker.save_results(f"../{filename}.json")
+    reporter = Reporter(worker, config)
+    reporter.save_results(f"../{filename}.json")

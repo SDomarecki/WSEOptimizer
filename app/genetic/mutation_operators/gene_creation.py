@@ -1,5 +1,6 @@
 from app.genetic.mutation_operators.operator import Operator
-from app.genetic.genes import GeneFactory, Gene
+from app.genetic.genes.gene import Gene
+from app.genetic.genes.gene_factory import GeneFactory
 
 
 class GeneCreation(Operator):

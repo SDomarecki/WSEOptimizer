@@ -1,12 +1,7 @@
-import json
-
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-
 from app.config import Config
 from app.genetic.agent import Agent
 from app.genetic.database_loader import DatabaseLoader
-from app.genetic.genetic_algorithm_worker_json import GeneticAlgorithmWorkerJson
+from genetic.reporting.plotter import Plotter
 
 
 class GeneticAlgorithmWorker:
@@ -28,46 +23,73 @@ class GeneticAlgorithmWorker:
         self.crossover_operator = None
         self.mutation_operator = None
 
+        self.plotter = Plotter(config)
+
     def perform_ga(self):
         print(f"Learning database size: {len(self.learning_database)} companies")
 
         chunks = self.config.chunks
 
         for generation in range(1, self.generations):
-            current_database = self.learning_database_chunks[generation % chunks]
+            chunk = generation % chunks
+            current_database = self.learning_database_chunks[chunk]
 
             print(f"Generation: {generation}")
 
-            for agent in self.agents:
-                fit = agent.calculate_fitness(
-                    current_database, self.config.start_date, self.config.end_date
-                )
-                print(f"[{agent.id}] fitness - {fit}")
+            self.calculate_fitness_on_all_agents(current_database, chunk)
             self.selection()
 
             if generation < self.generations - 1:
                 self.crossover()
 
-            # self.print_agent_value_history(generation)
             self.calculate_best_agent_validation_performance()
-            for idx, _ in enumerate(self.config.validations):
-                self.print_agent_value_history(generation, idx)
-            self.print_best_agents_performance()
+            best_agent = max(self.agents, key=lambda ag: ag.learning_fitness)
+            for i in range(len(self.config.validations)):
+                self.plotter.print_agent_value_history(
+                    best_agent.trader.testing_wallets[i],
+                    generation,
+                    self.benchmark_testing_wallets[i],
+                )
+            self.plotter.print_best_agents_learning_performance(
+                self.best_scores_learning, self.targets[0]
+            )
+            self.plotter.print_best_agents_testing_performance(
+                self.best_scores_testing, self.targets[:1]
+            )
 
         # Iteration with whole database
         print("Last generation")
-        for agent in self.agents:
-            fit = agent.calculate_fitness(
-                self.learning_database, self.config.start_date, self.config.end_date
-            )
-            print(f"[{agent.id}] fitness - {fit}")
-        self.agents = sorted(self.agents, key=lambda ag: ag.fitness, reverse=True)
+        self.calculate_fitness_on_all_agents(self.learning_database, chunks)
 
-        self.print_agent_value_history("last")
+        self.agents = sorted(
+            self.agents, key=lambda ag: ag.learning_fitness, reverse=True
+        )
+        best_agent = self.agents[0]
+        wallet_to_print = best_agent.trader.training_wallets[self.config.chunks]
+        self.plotter.print_agent_value_history(
+            wallet_to_print, "last", self.benchmark_learning_wallet
+        )
         self.calculate_best_agent_validation_performance()
-        for idx, _ in enumerate(self.config.validations):
-            self.print_agent_value_history("last", idx)
-        self.print_best_agents_performance()
+        for i in range(len(self.config.validations)):
+            wallet_to_print = best_agent.trader.testing_wallets[i]
+            self.plotter.print_agent_value_history(
+                best_agent.trader.testing_wallets[i],
+                "last",
+                self.benchmark_testing_wallets[i],
+            )
+        self.plotter.print_best_agents_learning_performance(
+            self.best_scores_learning, self.targets[0]
+        )
+        self.plotter.print_best_agents_testing_performance(
+            self.best_scores_testing, self.targets[:1]
+        )
+
+        self.calculate_all_validations()
+
+    def calculate_fitness_on_all_agents(self, current_database, chunk):
+        for agent in self.agents:
+            fit = agent.calculate_learning_fitness(current_database, chunk)
+            print(f"[{agent.agent_id}] fitness - {fit}")
 
     def selection(self):
         self.agents = self.selection_operator.select(self.agents)
@@ -84,119 +106,50 @@ class GeneticAlgorithmWorker:
         return mutated_agents
 
     def calculate_best_agent_validation_performance(self):
-        best_agent = max(self.agents, key=lambda ag: ag.fitness)
-        if self.config.return_method == "total_value":
-            self.best_scores_learning.append(best_agent.fitness)
-        else:
-            self.best_scores_learning.append(
-                best_agent.wallet.get_total_value(
-                    self.learning_database, self.config.end_date
-                )
-            )
+        best_agent = max(self.agents, key=lambda ag: ag.learning_fitness)
 
         for idx, validation in enumerate(self.config.validations):
-            fit = best_agent.calculate_fitness(
+            fit = best_agent.calculate_testing_fitness(
                 self.testing_database[idx],
-                validation[0],
-                validation[1],
-                validation_case=idx,
+                idx,
             )
-            print(f"[{best_agent.id}] validation #{idx} - {fit}")
-            if self.config.return_method == "total_value":
-                self.best_scores_testing[idx].append(best_agent.validations[0])
-            else:
-                self.best_scores_testing[idx].append(
-                    best_agent.wallet.get_total_value(
-                        self.testing_database[idx], validation[1]
-                    )
-                )
+            print(f"[{best_agent.agent_id}] validation #{idx} - {fit}")
+            self.append_best_score_on_testing(best_agent, idx)
 
         print("Best agent performance")
-        print(f"Learning: {str(best_agent.fitness)}")
+        print(f"Learning: {str(best_agent.learning_fitness)}")
         print("Validations: ")
-        for val in best_agent.validations:
+        for val in best_agent.testing_fitnesses:
             print(str(val))
         print(f"Length of genome: {str(len(best_agent.genes))}")
 
-    def print_agent_value_history(self, generation, benchmark_wallet_index=-1):
-        best_agent = max(self.agents, key=lambda ag: ag.fitness)
-        if benchmark_wallet_index == -1:
-            benchmark_wallet = self.benchmark_learning_wallet
-        else:
-            benchmark_wallet = self.benchmark_testing_wallets[benchmark_wallet_index]
-
-        x = mdates.date2num(best_agent.wallet.valueTimestamps)
-        y = best_agent.wallet.valueHistory
-        plt.xticks(rotation=45)
-        plt.gcf().subplots_adjust(bottom=0.15)
-        plt.plot_date(
-            x,
-            benchmark_wallet,
-            color="#d62f2f",
-            linestyle="solid",
-            marker="",
-            label="Target",
-        )
-        plt.plot_date(x, y, "-g", label="Total value")
-        plt.legend(loc="upper left")
-        plt.savefig(f"../{str(generation)}_{str(benchmark_wallet_index)}.png", dpi=500)
-        plt.close()
-
-    def print_best_agents_performance(self):
-        plt.plot(self.best_scores_learning, label="Best agent end value")
-        plt.axhline(
-            self.targets[0], color="r", linestyle="--", label="Target end value"
-        )
-        plt.legend(loc="upper left")
-        plt.savefig("../elite_perf_learning.png", dpi=500)
-        plt.close()
-
-        targets = self.targets[1:]
-        for idx, _ in enumerate(self.config.validations):
-            plt.plot(self.best_scores_testing[idx], label="Best agent end value")
-            plt.axhline(
-                targets[idx], color="r", linestyle="--", label="Target end value"
-            )
-            plt.legend(loc="upper left")
-            plt.savefig(f"../elite_perf_test_{str(idx)}.png", dpi=500)
-            plt.close()
-
-    def save_results(self, save_path: str):
-        self.calculate_all_validations()
-        self.print_best_agents_performance()
-        result_string = self.toJSON()
-        self.save_to_file(result_string, save_path)
-
     def calculate_all_validations(self):
-        for _, agent in enumerate(self.agents[:5]):
+        for agent in self.agents[:5]:
             for val_idx, validation in enumerate(self.config.validations):
-                fit = agent.calculate_fitness(
-                    self.testing_database[val_idx],
-                    validation[0],
-                    validation[1],
-                    validation_case=val_idx,
+                fit = agent.calculate_testing_fitness(
+                    self.testing_database[val_idx], val_idx
                 )
-                print(f"[{agent.id}] validation #{val_idx} - {fit}")
+                print(f"[{agent.agent_id}] validation #{val_idx} - {fit}")
 
         for val_idx, validation in enumerate(self.config.validations):
-            if self.config.return_method == "total_value":
-                self.best_scores_testing[val_idx].append(
-                    self.agents[0].validations[val_idx]
-                )
-            else:
-                self.best_scores_testing[val_idx].append(
-                    self.agents[0].wallet.get_total_value(
-                        self.testing_database[val_idx],
-                        self.config.validations[val_idx][1],
-                    )
-                )
+            self.append_best_score_on_testing(self.agents[0], val_idx)
 
-    def save_to_file(self, result: str, save_path: str):
-        with open(save_path, "w") as file:
-            file.write(result)
+    def append_best_score_on_learning(self, agent: Agent):
+        if self.config.return_method == "total_value":
+            self.best_scores_learning.append(agent.testing_fitnesses[0])
+        else:
+            self.best_scores_learning.append(
+                agent.trader.get_final_testing_fitness(
+                    self.learning_database, self.config.chunks
+                )
+            )
 
-    def toJSON(self):
-        jsonable_self = GeneticAlgorithmWorkerJson(
-            self.agents[:5], self.targets[1:], self.config
-        )
-        return json.dumps(jsonable_self.__dict__, default=str, indent=2)
+    def append_best_score_on_testing(self, agent: Agent, case):
+        if self.config.return_method == "total_value":
+            self.best_scores_testing[case].append(agent.testing_fitnesses[0])
+        else:
+            self.best_scores_testing[case].append(
+                agent.trader.get_final_testing_fitness(
+                    self.testing_database[case], case
+                )
+            )

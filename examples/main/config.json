@@ -1,5 +1,6 @@
 {
   "database": {
+    "fetch_mode": "omit",
     "min_circulation": 500000,
     "max_circulation": -1,
     "sectors": [],
@@ -9,7 +10,7 @@
   "simulation": {
     "timedelta": 7,
     "iterations": 50,
-    "initial_population": 100,
+    "initial_population": 20,
     "learning": {
       "start_date": "2010-01-01",
       "end_date": "2015-12-31"

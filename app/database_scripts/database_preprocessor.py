@@ -21,6 +21,9 @@ class DatabasePreprocessor:
         self.fundamentals_fetcher = BRScraper()
 
     def create_database(self):
+        if self.config.fetch_mode == "omit":
+            print("Creating database omitted")
+            return
         self.init_directory_tree()
         self.preprocess_companies(self.config.companies)
         self.preprocess_benchmark(self.config.benchmark)
@@ -48,6 +51,8 @@ class DatabasePreprocessor:
         return companies_copy
 
     def collect_company_info(self, company: CompanyDetails):
+        if self.config.fetch_mode == "refresh":
+            shutil.rmtree(f"database/preprocessed/{company.ticker}", ignore_errors=True)
         try:
             os.makedirs(f"database/preprocessed/{company.ticker}")
             self.fetch_and_save_company_details(company)

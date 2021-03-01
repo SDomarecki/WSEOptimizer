@@ -2,8 +2,8 @@ import random
 
 from app.config import Config
 from app.genetic.agent import Agent
-from app.genetic.crossover_operators import Operator
-from genetic.genes import GeneFactory
+from app.genetic.crossover_operators.operator import Operator
+from app.genetic.genes.gene_factory import GeneFactory
 
 
 class NonConstant(Operator):

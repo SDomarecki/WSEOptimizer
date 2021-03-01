@@ -1,7 +1,7 @@
 import random
 
 from app.genetic.mutation_operators.operator import Operator
-from app.genetic.genes import Gene
+from app.genetic.genes.gene import Gene
 
 
 class Normalization(Operator):

@@ -1,7 +1,7 @@
 import random
 
 from app.config import Config
-from app.genetic.genes import Gene
+from app.genetic.genes.gene import Gene
 from app.genetic.genes.logical.and_gene import AndGene
 from app.genetic.genes.logical.or_gene import OrGene
 from app.genetic.genes.logical.xor_gene import XorGene

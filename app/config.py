@@ -3,6 +3,7 @@ from datetime import datetime, date
 
 class Config:
     def __init__(self):
+        self.fetch_mode = ""
         self.min_circulation = 0
         self.max_circulation = 0
         self.sectors = []
@@ -45,6 +46,7 @@ class Config:
         self._fetch_genes_config(dict_config.get("genes", {}))
 
     def _fetch_database_config(self, db_config: {}):
+        self.fetch_mode = db_config.get("fetch_mode", "auto")
         self.min_circulation = int(db_config.get("min_circulation", 0))
         self.max_circulation = int(db_config.get("max_circulation", 0))
         self.sectors = db_config.get("sectors", [])

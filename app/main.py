@@ -28,4 +28,4 @@ if __name__ == "__main__":
 
     database_loader = load_database(path_to_database, config)
     worker = run_genetic_algorithm(database_loader, config)
-    save_results(worker)
+    save_results(worker, config)

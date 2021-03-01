@@ -24,7 +24,8 @@ class DatabaseLoader:
         self.targets = []
 
         self.__read_database()
-        self.__split_database_equally(self.config.chunks)
+        self.__split_database_equally()
+
         self.__read_benchmark(config.benchmark)
         self.__calculate_targets()
         self.__calculate_wallets()
@@ -70,9 +71,12 @@ class DatabaseLoader:
 
     def __get_technicals(self, ticker: str) -> pd.DataFrame:
         df = pd.read_csv(
-            f"{self.path}/{ticker}/technical.csv", delimiter=",", index_col="Date"
+            f"{self.path}/{ticker}/technical.csv",
+            delimiter=",",
+            index_col="Date",
+            parse_dates=True,
+            infer_datetime_format=True,
         )
-        df.index = pd.to_datetime(df.index)
         return df
 
     def __filter_database(self, database, start_date, end_date) -> dict:
@@ -106,7 +110,8 @@ class DatabaseLoader:
 
         return database
 
-    def __split_database_equally(self, chunks):
+    def __split_database_equally(self):
+        chunks = self.config.chunks
         self.learning_database_chunks = [{} for _ in range(chunks)]
         idx = 0
         for k, v in self.learning_database.items():
@@ -119,9 +124,12 @@ class DatabaseLoader:
     def __read_benchmark(self, ticker: str):
         ticker = ticker.lower()
         df = pd.read_csv(
-            f"{self.path}/benchmarks/{ticker}.csv", delimiter=",", index_col="Date"
+            f"{self.path}/benchmarks/{ticker}.csv",
+            delimiter=",",
+            index_col="Date",
+            parse_dates=True,
+            infer_datetime_format=True,
         )
-        df.index = pd.to_datetime(df.index)
         self.benchmark = df
 
     def __calculate_targets(self):

@@ -1,13 +1,20 @@
 import random
 
 from app.config import Config
-from app.genetic import crossover_operators
-from app.genetic import mutation_operators
-from app.genetic import selection_operators
+
 from app.genetic.agent import Agent
 from app.genetic.database_loader import DatabaseLoader
 from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
-from app.genetic.genes import GeneFactory
+from app.genetic.genes.gene_factory import GeneFactory
+from app.genetic.selection_operators.operator import Operator as SelectionOperator
+from app.genetic.crossover_operators.operator import Operator as CrossoverOperator
+from app.genetic.mutation_operators.operator import Operator as MutationOperator
+from genetic.crossover_operators.constant import Constant
+from genetic.crossover_operators.non_constant import NonConstant
+from genetic.mutation_operators.normalization import Normalization
+from genetic.selection_operators.rating import Rating
+from genetic.selection_operators.roulette import Roulette
+from genetic.selection_operators.tournament import Tournament
 
 
 class GeneticAlgorithmWorkerBuilder:
@@ -49,27 +56,27 @@ class GeneticAlgorithmWorkerBuilder:
             for i in range(self.config.initial_population)
         ]
 
-    def init_selection_operator(self) -> selection_operators.Operator:
+    def init_selection_operator(self) -> SelectionOperator:
         method = self.config.selection_method
         if method == "rating":
-            return selection_operators.Rating(self.config.agents_to_save)
+            return Rating(self.config.agents_to_save)
         if method == "tournament":
-            return selection_operators.Tournament(self.config.agents_to_save)
-        return selection_operators.Roulette(self.config.agents_to_save)
+            return Tournament(self.config.agents_to_save)
+        return Roulette(self.config.agents_to_save)
 
-    def init_crossover_operator(self) -> crossover_operators.Operator:
+    def init_crossover_operator(self) -> CrossoverOperator:
         to_create = int(
             (self.config.initial_population - self.config.agents_to_save) / 2
         )
         if self.config.constant_length:
-            return crossover_operators.Constant(
+            return Constant(
                 self.config.initial_length,
                 to_create,
                 self.config.validations,
                 self.gene_factory,
                 self.config,
             )
-        return crossover_operators.NonConstant(
+        return NonConstant(
             self.config.max_genes,
             to_create,
             self.config.validations,
@@ -77,5 +84,5 @@ class GeneticAlgorithmWorkerBuilder:
             self.config,
         )
 
-    def init_mutation_operator(self) -> mutation_operators.Operator:
-        return mutation_operators.Normalization(self.config.mutation_rate)
+    def init_mutation_operator(self) -> MutationOperator:
+        return Normalization(self.config.mutation_rate)

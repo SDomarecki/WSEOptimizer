@@ -1,12 +1,12 @@
 import random
 
-import app.genetic.crossover_operators as op
 from app.genetic.agent import Agent
 from app.config import Config
-from app.genetic.genes import GeneFactory
+from app.genetic.crossover_operators.operator import Operator
+from app.genetic.genes.gene_factory import GeneFactory
 
 
-class Constant(op.Operator):
+class Constant(Operator):
     def __init__(
         self,
         agent_len: int,

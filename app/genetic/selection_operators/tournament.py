@@ -1,6 +1,7 @@
 import random
 
-from app.genetic.selection_operators import Operator, Agent
+from app.genetic.agent import Agent
+from app.genetic.selection_operators.operator import Operator
 
 
 class Tournament(Operator):
@@ -19,4 +20,4 @@ class Tournament(Operator):
 
     def select_one_aspirant(self, agents: [Agent], tournament_size: int) -> Agent:
         aspirants = random.sample(agents, tournament_size)
-        return max(aspirants, key=lambda ag: ag.fitness)
+        return max(aspirants, key=lambda ag: ag.learning_fitness)

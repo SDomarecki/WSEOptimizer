@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import app.genetic as g
+    from app.genetic.agent import Agent
 
 
 class Operator(ABC):
@@ -12,5 +12,5 @@ class Operator(ABC):
         pass
 
     @abstractmethod
-    def crossover(self, agents: [g.Agent], last_agent_id: int) -> [g.Agent]:
+    def crossover(self, agents: [Agent], last_agent_id: int) -> [Agent]:
         pass

@@ -1,7 +1,7 @@
 import random
 
 from app.genetic.agent import Agent
-from app.genetic.selection_operators import Operator
+from app.genetic.selection_operators.operator import Operator
 
 
 class Roulette(Operator):
@@ -13,12 +13,12 @@ class Roulette(Operator):
     def select(self, agents: [Agent]) -> [Agent]:
         selected = []
         selection_target = int(self.to_save_rate * len(agents))
-        self.fitness_sum = sum(agent.fitness for agent in agents)
+        self.fitness_sum = sum(agent.learning_fitness for agent in agents)
         while len(selected) < selection_target:
             pick = random.uniform(0, self.fitness_sum)
             current = 0
             for ag in agents:
-                current += ag.fitness
+                current += ag.learning_fitness
                 if current > pick:
                     selected.append(ag)
                     break
