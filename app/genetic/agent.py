@@ -16,19 +16,26 @@ class Agent:
         self.learning_fitness = 0.0
         self.testing_fitnesses = [0.0] * len(config.validations)
 
-    def calculate_learning_fitness(self, database, chunk) -> float:
+    def calculate_learning_fitness(self, database: [], chunk) -> float:
         self.learning_fitness = self.learning_simulate(database, chunk)
         return self.learning_fitness
 
-    def calculate_testing_fitness(self, database, case) -> float:
-        self.testing_fitnesses[case] = self.testing_simulate(database, case)
+    def calculate_testing_fitness(
+        self, database: [], case, start_date, end_date
+    ) -> float:
+        self.testing_fitnesses[case] = self.testing_simulate(
+            database, case, start_date, end_date
+        )
         return self.testing_fitnesses[case]
 
-    def learning_simulate(self, database, chunk) -> float:
+    def learning_simulate(self, database: [], chunk) -> float:
+        if self.trader.training_wallets[chunk].final:
+            return self.trader.training_wallets[chunk].final_value
+
         day = self.next_business_day(self.config.start_date)
         while day < self.config.end_date:
             ordered_stocks = sorted(
-                database.values(),
+                database,
                 key=lambda stock: self.calculate_strength(stock, day),
                 reverse=True,
             )
@@ -36,11 +43,14 @@ class Agent:
             day = self.next_business_day(day)
         return self.trader.get_final_training_fitness(database, chunk)
 
-    def testing_simulate(self, database, case):
-        day = self.next_business_day(self.config.start_date)
-        while day < self.config.end_date:
+    def testing_simulate(self, database: [], case, start_date, end_date):
+        if self.trader.testing_wallets[case].final:
+            return self.trader.testing_wallets[case].final_value
+
+        day = self.next_business_day(start_date)
+        while day < end_date:
             ordered_stocks = sorted(
-                database.values(),
+                database,
                 key=lambda stock: self.calculate_strength(stock, day),
                 reverse=True,
             )

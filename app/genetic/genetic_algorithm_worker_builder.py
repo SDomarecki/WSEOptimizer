@@ -3,9 +3,11 @@ import random
 from app.config import Config
 
 from app.genetic.agent import Agent
+from app.genetic.benchmark_agent import BenchmarkAgent
 from app.genetic.database_loader import DatabaseLoader
 from app.genetic.genetic_algorithm_worker import GeneticAlgorithmWorker
 from app.genetic.genes.gene_factory import GeneFactory
+from app.genetic.reporting.plotter import Plotter
 from app.genetic.selection_operators.operator import Operator as SelectionOperator
 from app.genetic.crossover_operators.operator import Operator as CrossoverOperator
 from app.genetic.mutation_operators.operator import Operator as MutationOperator
@@ -25,19 +27,30 @@ class GeneticAlgorithmWorkerBuilder:
     def build(self, loader: DatabaseLoader, config: Config) -> GeneticAlgorithmWorker:
         self.config = config
         self.gene_factory = GeneFactory(config)
-        worker = GeneticAlgorithmWorker(loader, config)
+        worker = GeneticAlgorithmWorker(config)
 
         worker.agents = self.init_agents()
+        worker.benchmark_agent = self.init_benchmark_agent()
         worker.next_agent_id = self.config.initial_population
         worker.selection_operator = self.init_selection_operator()
         worker.crossover_operator = self.init_crossover_operator()
         worker.mutation_operator = self.init_mutation_operator()
+
+        worker.learning_database = loader.learning_database
+        worker.testing_databases = loader.testing_databases
+        worker.chunk_size = int(
+            len(loader.learning_database.companies) / self.config.chunks
+        )
+        worker.plotter = Plotter(config)
         return worker
 
     def init_agents(self) -> [Agent]:
         if self.config.constant_length:
             return self.init_constant_length_agents()
         return self.init_non_constant_length_agents()
+
+    def init_benchmark_agent(self) -> [BenchmarkAgent]:
+        return BenchmarkAgent(self.config)
 
     def init_constant_length_agents(self) -> [Agent]:
         return [

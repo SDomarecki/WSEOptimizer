@@ -11,6 +11,7 @@ class Plotter:
     def print_agent_value_history(self, wallet: Wallet, generation, benchmark_wallet):
         x = mdates.date2num(wallet.valueTimestamps)
         y = wallet.valueHistory
+        benchmark_wallet = benchmark_wallet[: len(x)]  # lol
         plt.xticks(rotation=45)
         plt.gcf().subplots_adjust(bottom=0.15)
         plt.plot_date(
@@ -36,7 +37,7 @@ class Plotter:
         plt.close()
 
     def print_best_agents_testing_performance(self, best_scores, testing_targets):
-        for idx, _ in range(len(self.config.validations)):
+        for idx in range(len(self.config.validations)):
             plt.plot(best_scores[idx], label="Best agent end value")
             plt.axhline(
                 testing_targets[idx],
