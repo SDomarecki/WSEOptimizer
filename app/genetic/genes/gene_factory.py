@@ -87,7 +87,9 @@ class GeneFactory:
         return self.create_non_logic_gene()
 
     def create_logic_gene(self) -> Gene:
-        return random.choice(GeneFactory.logic_genes)(self)
+        left_gene = self.create_non_logic_gene()
+        right_gene = self.create_non_logic_gene()
+        return random.choice(GeneFactory.logic_genes)(left_gene, right_gene)
 
     def create_non_logic_gene(self) -> Gene:
         if random.uniform(0.0, 1.0) <= self.fundamental_to_all:

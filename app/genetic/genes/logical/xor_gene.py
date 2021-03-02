@@ -1,18 +1,11 @@
-from __future__ import annotations
-
 from app.genetic.genes.gene import Gene
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.genetic.genes.gene_factory import GeneFactory
 
 
 class XorGene(Gene):
-    def __init__(self, factory: GeneFactory):
+    def __init__(self, left_gene: Gene, right_gene: Gene):
         super().__init__()
-        self.leftGene = factory.create_non_logic_gene()
-        self.rightGene = factory.create_non_logic_gene()
+        self.leftGene = left_gene
+        self.rightGene = right_gene
 
     def condition(self, company, day):
         left_cond = self.leftGene.condition(company, day)
