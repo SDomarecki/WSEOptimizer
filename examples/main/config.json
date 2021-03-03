@@ -1,6 +1,6 @@
 {
   "database": {
-    "fetch_mode": "omit",
+    "fetch_mode": "auto",
     "min_circulation": 500000,
     "max_circulation": -1,
     "sectors": [],

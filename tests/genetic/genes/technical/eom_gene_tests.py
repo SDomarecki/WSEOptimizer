@@ -1,11 +1,11 @@
 from datetime import date
 
-from app.genetic.genes.technical.emv_gene import EMVGene
+from app.genetic.genes.technical.eom_gene import EOMGene
 
 
 def test_condition_isLowerCheckAndIndicatorLowerThanComparedValue_returnsTrue(company):
     day = date(2000, 6, 1)
-    gene = EMVGene()
+    gene = EOMGene()
     gene.compared_value = 0.0
     gene.comparator = "<"
 
@@ -18,7 +18,7 @@ def test_condition_isLowerCheckAndIndicatorGreaterThanComparedValue_returnsFalse
     company,
 ):
     day = date(2001, 6, 1)
-    gene = EMVGene()
+    gene = EOMGene()
     gene.compared_value = 0.0
     gene.comparator = "<"
 
@@ -31,7 +31,7 @@ def test_condition_isGreaterCheckAndIndicatorGreaterThanComparedValue_returnsTru
     company,
 ):
     day = date(2001, 6, 1)
-    gene = EMVGene()
+    gene = EOMGene()
     gene.compared_value = 0.0
     gene.comparator = ">"
 
@@ -44,7 +44,7 @@ def test_condition_isGreaterCheckAndIndicatorLowerThanComparedValue_returnsFalse
     company,
 ):
     day = date(2000, 6, 1)
-    gene = EMVGene()
+    gene = EOMGene()
     gene.compared_value = 0.0
     gene.comparator = ">"
 
@@ -54,7 +54,7 @@ def test_condition_isGreaterCheckAndIndicatorLowerThanComparedValue_returnsFalse
 
 
 def test_condition_to_string_validValues_returnsConditionString():
-    gene = EMVGene()
+    gene = EOMGene()
     gene.compared_value = 0.0
     gene.comparator = ">"
     gene.weight = 2.0
@@ -63,4 +63,4 @@ def test_condition_to_string_validValues_returnsConditionString():
 
     condition_str = gene.to_string()
 
-    assert condition_str == "2.00 x If(EMV > 0.0) then 1 else -1"
+    assert condition_str == "2.00 x If(EOM > 0.0) then 1 else -1"

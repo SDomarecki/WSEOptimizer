@@ -1,8 +1,7 @@
 import os
 
 import pandas as pd
-
-import app.database_scripts.technicals.stooq.indicators as ind
+import pandas_ta as ta
 from app.database_scripts.company_details import CompanyDetails
 from app.database_scripts.technicals.stooq.stooq_downloader import StooqDownloader
 
@@ -27,7 +26,7 @@ class StooqPreprocessor:
 
     def boost_technicals(self, technicals: pd.DataFrame) -> pd.DataFrame:
         technicals = self.change_column_names_from_polish_to_english(technicals)
-        technicals = self.calculate_all_technicals(technicals)
+        technicals = self.calculate_all_technicals_with_pandas_ta(technicals)
         technicals = self.set_date_as_index(technicals)
         return technicals
 
@@ -36,46 +35,40 @@ class StooqPreprocessor:
         technicals: pd.DataFrame,
     ) -> pd.DataFrame:
         new_columns = {
-            "Data": "Date",
-            "Otwarcie": "Open",
-            "Najwyzszy": "High",
-            "Najnizszy": "Low",
-            "Zamkniecie": "Close",
-            "Wolumen": "Volume",
+            "Data": "date",
+            "Otwarcie": "open",
+            "Najwyzszy": "high",
+            "Najnizszy": "low",
+            "Zamkniecie": "close",
+            "Wolumen": "volume",
         }
         return technicals.rename(columns=new_columns)
 
     @staticmethod
-    def calculate_all_technicals(technicals: pd.DataFrame) -> pd.DataFrame:
-        t = technicals
-
-        t = ind.circulation(t, close_col="Close", vol_col="Volume")
-        t = ind.sma(t, period=15, close_col="Close")
-        t = ind.sma(t, period=40, close_col="Close")
-        t = ind.ema(t, period=200, close_col="Close")
-        t = ind.rsi(t, periods=14, close_col="Close")
-        t = ind.macd(
-            t, period_long=26, period_short=12, period_signal=9, close_col="Close"
-        )
-        t = ind.trix(t, periods=14, signal_periods=9, close_col="Close")
-        t = ind.williams_r(
-            t, periods=10, high_col="High", low_col="Low", close_col="Close"
-        )
-        t = ind.money_flow_index(
-            t,
-            periods=14,
-            high_col="High",
-            low_col="Low",
-            close_col="Close",
-            vol_col="Volume",
-        )
-        t = ind.roc(t, periods=14, close_col="Close")
-        t = ind.ease_of_movement(
-            t, period=14, high_col="High", low_col="Low", vol_col="Volume"
+    def calculate_all_technicals_with_pandas_ta(
+        technicals: pd.DataFrame,
+    ) -> pd.DataFrame:
+        default_strategy = ta.Strategy(
+            name="Default",
+            description="PVOL, SMA15, SMA40, EMA200, RSI, MACD, Trix, Williams %R, MFI, ROC, EMV",
+            ta=[
+                {"kind": "pvol"},
+                {"kind": "sma", "length": 15},
+                {"kind": "sma", "length": 40},
+                {"kind": "ema", "length": 200},
+                {"kind": "rsi", "length": 14},
+                {"kind": "macd", "fast": 12, "slow": 26, "signal": 9},
+                {"kind": "trix", "length": 14, "signal": 9},
+                {"kind": "willr", "length": 10},
+                {"kind": "mfi", "length": 14},
+                {"kind": "roc", "length": 14},
+                {"kind": "eom", "length": 14},
+            ],
         )
 
-        return t
+        technicals.ta.strategy(default_strategy)
+        return technicals
 
     @staticmethod
     def set_date_as_index(technicals: pd.DataFrame) -> pd.DataFrame:
-        return technicals.set_index("Date")
+        return technicals.set_index("date")

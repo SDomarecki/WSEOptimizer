@@ -22,19 +22,19 @@ def company() -> Company:
     company.fundamentals = pd.DataFrame(fundamental_data, index=fundamental_index)
     technical_index = [date(2000, 6, 1), date(2001, 1, 1), date(2001, 6, 1)]
     technical_data = {
-        "Close": [10.0, 20.0, 30.0],
-        "ema200": [5.0, 20.0, 60.0],
-        "emv": [-0.5, 0.0, 0.5],
-        "macd_val": [10.0, 20.0, 30.0],
-        "macd_signal_line": [20.0, 20.0, 20.0],
-        "money_flow_index": [30.0, 50.0, 70.0],
-        "roc": [-0.2, 0.0, 0.2],
-        "rsi": [30.0, 50.0, 70.0],
-        "sma15": [5.0, 20.0, 60.0],
-        "sma40": [5.0, 20.0, 60.0],
-        "trix": [1.0, 2.0, 3.0],
-        "trix_signal": [2.0, 2.0, 2.0],
-        "williams_r": [-30.0, -50.0, -70.0],
+        "close": [10.0, 20.0, 30.0],
+        "EMA_200": [5.0, 20.0, 60.0],
+        "EOM_14_100000000": [-0.5, 0.0, 0.5],
+        "MACD_12_26_9": [10.0, 20.0, 30.0],
+        "MACDs_12_26_9": [20.0, 20.0, 20.0],
+        "MFI_14": [30.0, 50.0, 70.0],
+        "ROC_14": [-0.2, 0.0, 0.2],
+        "RSI_14": [30.0, 50.0, 70.0],
+        "SMA_15": [5.0, 20.0, 60.0],
+        "SMA_40": [5.0, 20.0, 60.0],
+        "TRIX_14_9": [1.0, 2.0, 3.0],
+        "TRIXs_14_9": [2.0, 2.0, 2.0],
+        "WILLR_10": [-30.0, -50.0, -70.0],
     }
     company.technicals = pd.DataFrame(technical_data, index=technical_index)
     return company

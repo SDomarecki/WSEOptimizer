@@ -10,7 +10,7 @@ class WilliamsGene(Gene):
         self.compared_value = random.uniform(-80, -20)
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, "williams_r"]
+        indicator_value = company.technicals.at[day, "WILLR_10"]
 
         if self.comparator == ">":
             return indicator_value > self.compared_value

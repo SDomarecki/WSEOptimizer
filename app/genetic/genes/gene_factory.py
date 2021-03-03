@@ -33,7 +33,7 @@ from app.genetic.genes.technical.trix_gene import TrixGene
 from app.genetic.genes.technical.williams_gene import WilliamsGene
 from app.genetic.genes.technical.mfi_gene import MFIGene
 from app.genetic.genes.technical.roc_gene import ROCGene
-from app.genetic.genes.technical.emv_gene import EMVGene
+from app.genetic.genes.technical.eom_gene import EOMGene
 from app.genetic.genes.technical.sma15_normalized_gene import SMA15NormalizedGene
 from app.genetic.genes.technical.sma40_normalized_gene import SMA40NormalizedGene
 from app.genetic.genes.technical.ema200_normalized_gene import EMA200NormalizedGene
@@ -74,7 +74,7 @@ class GeneFactory:
         WilliamsGene,
         MFIGene,
         ROCGene,
-        EMVGene,
+        EOMGene,
     ]
 
     def __init__(self, config: Config):

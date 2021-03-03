@@ -17,7 +17,7 @@ class PENowGene(Gene):
         ):
             return False
         indicator_value = (
-            company.technicals.at[day, "Close"]
+            company.technicals.at[day, "close"]
             / company.fundamentals.at[quarter, "EPS"]
         )
 

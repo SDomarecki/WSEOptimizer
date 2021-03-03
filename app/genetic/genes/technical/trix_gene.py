@@ -9,8 +9,8 @@ class TrixGene(Gene):
         self.comparator = random.choice([">", "<"])
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, "trix"]
-        signal_value = company.technicals.at[day, "trix_signal"]
+        indicator_value = company.technicals.at[day, "TRIX_14_9"]
+        signal_value = company.technicals.at[day, "TRIXs_14_9"]
 
         if self.comparator == ">":
             return indicator_value > signal_value

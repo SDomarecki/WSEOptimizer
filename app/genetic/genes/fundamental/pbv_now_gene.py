@@ -12,7 +12,7 @@ class PBVNowGene(Gene):
     def condition(self, company, day) -> bool:
         quarter = self.date_to_quarter(day)
         indicator_value = (
-            company.technicals.at[day, "Close"]
+            company.technicals.at[day, "close"]
             / company.fundamentals.at[quarter, "BVPS"]
         )
 

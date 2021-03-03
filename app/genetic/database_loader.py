@@ -74,7 +74,7 @@ class DatabaseLoader:
         return pd.read_csv(
             f"{self.path}/{ticker}/technical.csv",
             delimiter=",",
-            index_col="Date",
+            index_col="date",
             parse_dates=True,
             infer_datetime_format=True,
         )
@@ -93,7 +93,7 @@ class DatabaseLoader:
     def __filter_database_by_circulation(self, database: []) -> []:
         to_delete = []
         for company in database:
-            circulation_mean = float(company.technicals["Circulation"].mean())
+            circulation_mean = float(company.technicals["PVOL"].mean())
             if (
                 self.config.min_circulation != -1
                 and circulation_mean < self.config.min_circulation
@@ -115,7 +115,7 @@ class DatabaseLoader:
         df = pd.read_csv(
             f"{self.path}/benchmarks/{ticker}.csv",
             delimiter=",",
-            index_col="Date",
+            index_col="date",
             parse_dates=True,
             infer_datetime_format=True,
         )

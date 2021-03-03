@@ -9,8 +9,8 @@ class MACDGene(Gene):
         self.comparator = random.choice([">", "<"])
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, "macd_val"]
-        signal_value = company.technicals.at[day, "macd_signal_line"]
+        indicator_value = company.technicals.at[day, "MACD_12_26_9"]
+        signal_value = company.technicals.at[day, "MACDs_12_26_9"]
 
         if self.comparator == ">":
             return indicator_value > signal_value

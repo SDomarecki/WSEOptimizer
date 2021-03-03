@@ -10,8 +10,8 @@ class EMA200NormalizedGene(Gene):
         self.compared_value = random.uniform(0.5, 2)
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, "ema200"]
-        close_value = company.technicals.at[day, "Close"]
+        indicator_value = company.technicals.at[day, "EMA_200"]
+        close_value = company.technicals.at[day, "close"]
         normalized_value = indicator_value / close_value
 
         if self.comparator == ">":

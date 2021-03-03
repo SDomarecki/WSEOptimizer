@@ -10,7 +10,7 @@ class MFIGene(Gene):
         self.compared_value = random.uniform(20, 80)
 
     def condition(self, company, day):
-        indicator_value = company.technicals.at[day, "money_flow_index"]
+        indicator_value = company.technicals.at[day, "MFI_14"]
 
         if self.comparator == ">":
             return indicator_value > self.compared_value
