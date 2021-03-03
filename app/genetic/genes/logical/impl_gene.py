@@ -8,10 +8,10 @@ class ImplGene(Gene):
         self.rightGene = right_gene
 
     def condition(self, company, day):
-        # not(not a and b)
+        # not(a and not b)
         left_cond = self.leftGene.condition(company, day)
         right_cond = self.rightGene.condition(company, day)
-        return left_cond or right_cond
+        return not left_cond or right_cond
 
     def condition_to_string(self) -> str:
-        return f"({self.leftGene.condition_to_string()} THEN {self.rightGene.condition_to_string()}"
+        return f"IF {self.leftGene.condition_to_string()} THEN {self.rightGene.condition_to_string()}"

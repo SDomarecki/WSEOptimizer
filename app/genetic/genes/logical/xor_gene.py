@@ -10,7 +10,7 @@ class XorGene(Gene):
     def condition(self, company, day):
         left_cond = self.leftGene.condition(company, day)
         right_cond = self.rightGene.condition(company, day)
-        return (left_cond or right_cond) and not (left_cond and right_cond)
+        return left_cond ^ right_cond
 
     def condition_to_string(self) -> str:
-        return f"({self.leftGene.condition_to_string()} XOR {self.rightGene.condition_to_string()}"
+        return f"{self.leftGene.condition_to_string()} XOR {self.rightGene.condition_to_string()}"

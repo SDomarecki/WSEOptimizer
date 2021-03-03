@@ -13,4 +13,4 @@ class EqGene(Gene):
         return left_cond == right_cond
 
     def condition_to_string(self) -> str:
-        return f"({self.leftGene.condition_to_string()} EQUALS {self.rightGene.condition_to_string()}"
+        return f"{self.leftGene.condition_to_string()} EQUALS {self.rightGene.condition_to_string()}"

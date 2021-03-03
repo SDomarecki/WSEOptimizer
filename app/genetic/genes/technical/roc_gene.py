@@ -17,4 +17,4 @@ class ROCGene(Gene):
         return indicator_value < self.compared_value
 
     def condition_to_string(self) -> str:
-        return f"Momentum {self.comparator} {self.compared_value:.2f}"
+        return f"ROC {self.comparator} {self.compared_value:.2f}"

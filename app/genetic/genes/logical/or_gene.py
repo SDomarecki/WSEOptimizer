@@ -13,4 +13,4 @@ class OrGene(Gene):
         return left_cond or right_cond
 
     def condition_to_string(self) -> str:
-        return f"({self.leftGene.condition_to_string()} OR {self.rightGene.condition_to_string()}"
+        return f"{self.leftGene.condition_to_string()} OR {self.rightGene.condition_to_string()}"
