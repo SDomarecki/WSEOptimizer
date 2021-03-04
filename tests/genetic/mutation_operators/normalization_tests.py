@@ -3,13 +3,14 @@ from app.genetic.agent import Agent
 
 
 def test_mutate_validAgent_returnsAgentWithChangedWeights(config, gene_factory):
-    agent = Agent(1, 1, gene_factory, config)
+    one_gene = gene_factory.create_random_gene()
+    agent = Agent(1, [one_gene], config)
 
-    old_weght = agent.genes[0].weight
+    old_weght = one_gene.weight
     operator = Normalization(1.0)
 
     new_agent = operator.mutate([agent])[0]
-    new_weight = new_agent.genes[0].weight
+    new_weight = new_agent.genome[0].weight
     assert new_weight != old_weght
 
 

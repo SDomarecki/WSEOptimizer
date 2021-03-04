@@ -1,6 +1,6 @@
 from app.genetic.genes.logical.xor_gene import XorGene
-from tests.genetic.genes.logic.fake_false_gene import FakeFalseGene
-from tests.genetic.genes.logic.fake_true_gene import FakeTrueGene
+from tests.genetic.genes.fake_false_gene import FakeFalseGene
+from tests.genetic.genes.fake_true_gene import FakeTrueGene
 
 
 def test_condition_bothTrue_returnFalse():

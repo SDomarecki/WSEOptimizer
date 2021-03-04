@@ -81,6 +81,9 @@ class GeneFactory:
         self.logic_to_all = config.logic_to_all
         self.fundamental_to_all = config.fundamental_to_all
 
+    def create_n_random_genes(self, n: int) -> [Gene]:
+        return [self.create_random_gene() for _ in range(n)]
+
     def create_random_gene(self) -> Gene:
         if random.uniform(0.0, 1.0) <= self.logic_to_all:
             return self.create_logic_gene()

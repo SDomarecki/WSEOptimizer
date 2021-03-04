@@ -35,8 +35,8 @@ class BenchmarkAgent:
 
     @staticmethod
     def __get_target_ratio(benchmark, start_date, end_date) -> float:
-        start_value = get_closest_value(benchmark, start_date, "Close")
-        end_value = get_closest_value(benchmark, end_date, "Close")
+        start_value = get_closest_value(benchmark, start_date, "close")
+        end_value = get_closest_value(benchmark, end_date, "close")
         return end_value / start_value
 
     def __calculate_learning_benchmark_wallet(self, learning_database):
@@ -53,11 +53,11 @@ class BenchmarkAgent:
     def __calculate_benchmark_wallet(self, benchmark, start_date, end_date):
         start_cash = self.config.start_cash
         delta = datetime.timedelta(days=self.config.timedelta)
-        start_value = get_closest_value(benchmark, start_date, "Close")
+        start_value = get_closest_value(benchmark, start_date, "close")
         history = []
         day = start_date
         while day < end_date:
-            today_value = get_closest_value(benchmark, day, "Close")
+            today_value = get_closest_value(benchmark, day, "close")
             history.append(start_cash * today_value / start_value)
             day += delta
         return history

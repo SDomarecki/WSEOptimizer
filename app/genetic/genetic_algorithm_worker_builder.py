@@ -53,21 +53,19 @@ class GeneticAlgorithmWorkerBuilder:
         return BenchmarkAgent(self.config)
 
     def init_constant_length_agents(self) -> [Agent]:
-        return [
-            Agent(i, self.config.initial_length, self.gene_factory, self.config)
-            for i in range(self.config.initial_population)
-        ]
+        agents = []
+        for i in range(self.config.initial_population):
+            genome = self.gene_factory.create_n_random_genes(self.config.initial_length)
+            agents += Agent(i, genome, self.config)
+        return agents
 
     def init_non_constant_length_agents(self) -> [Agent]:
-        return [
-            Agent(
-                i,
-                random.randint(2, self.config.max_genes),
-                self.gene_factory,
-                self.config,
-            )
-            for i in range(self.config.initial_population)
-        ]
+        agents = []
+        for i in range(self.config.initial_population):
+            genome_length = random.randint(2, self.config.max_genes)
+            genome = self.gene_factory.create_n_random_genes(genome_length)
+            agents += Agent(i, genome, self.config)
+        return agents
 
     def init_selection_operator(self) -> SelectionOperator:
         method = self.config.selection_method
@@ -86,14 +84,12 @@ class GeneticAlgorithmWorkerBuilder:
                 self.config.initial_length,
                 to_create,
                 self.config.validations,
-                self.gene_factory,
                 self.config,
             )
         return NonConstant(
             self.config.max_genes,
             to_create,
             self.config.validations,
-            self.gene_factory,
             self.config,
         )
 

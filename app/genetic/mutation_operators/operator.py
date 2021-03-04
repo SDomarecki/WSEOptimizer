@@ -15,9 +15,9 @@ class Operator(ABC):
 
     def mutate(self, agents: [Agent]) -> [Agent]:
         for agent in agents:
-            agent.genes = [
+            agent.genome = [
                 self.mutate_one_gene(gene) if self.get_mutation_flag() else gene
-                for gene in agent.genes
+                for gene in agent.genome
             ]
         return agents
 

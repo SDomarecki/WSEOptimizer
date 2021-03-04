@@ -3,7 +3,6 @@ import random
 from app.config import Config
 from app.genetic.agent import Agent
 from app.genetic.crossover_operators.operator import Operator
-from app.genetic.genes.gene_factory import GeneFactory
 
 
 class NonConstant(Operator):
@@ -12,7 +11,6 @@ class NonConstant(Operator):
         max_genes: int,
         to_create: int,
         validations: [],
-        gene_factory: GeneFactory,
         config: Config,
     ):
         super().__init__()
@@ -20,7 +18,6 @@ class NonConstant(Operator):
         self.to_create = to_create
         self.validations = len(validations)
         self.config = config
-        self.gene_factory = gene_factory
 
     def crossover(self, agents: [Agent], last_agent_id: int) -> [Agent]:
         agent_id = last_agent_id
@@ -28,9 +25,6 @@ class NonConstant(Operator):
         for _ in range(self.to_create):
             parent1 = random.choice(agents)
             parent2 = random.choice(agents)
-
-            child1 = Agent(agent_id, 0, self.gene_factory, self.config)
-            child2 = Agent(agent_id + 1, 0, self.gene_factory, self.config)
 
             split1 = random.randint(1, len(parent1.genes) - 1)
 
@@ -41,8 +35,11 @@ class NonConstant(Operator):
 
             split2 = random.randint(min_for_split2, max_for_split2)
 
-            child1.genes = parent1.genes[:split1] + parent2.genes[split2:]
-            child2.genes = parent2.genes[:split2] + parent1.genes[split1:]
+            child1_genes = parent1.genes[:split1] + parent2.genes[split2:]
+            child2_genes = parent2.genes[:split2] + parent1.genes[split1:]
+
+            child1 = Agent(agent_id, child1_genes, self.config)
+            child2 = Agent(agent_id + 1, child2_genes, self.config)
 
             offspring.append(child1)
             offspring.append(child2)

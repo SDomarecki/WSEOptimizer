@@ -98,6 +98,6 @@ class Trader:
     def today_price(self, stock, day):
         lookup = convert_date_to_datetime(day)
         try:
-            return stock.technicals.at[lookup, "Close"]
+            return stock.technicals.at[lookup, "close"]
         except KeyError:
             return None

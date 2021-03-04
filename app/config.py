@@ -8,10 +8,10 @@ class Config:
         self.max_circulation = 0
         self.sectors = []
         self.companies = []
-        self.chunks = 0
-        self.timedelta = 0
-        self.iterations = 0
-        self.initial_population = 0
+        self.chunks = 1
+        self.timedelta = 1
+        self.iterations = 1
+        self.initial_population = 1
         self.start_date = None
         self.end_date = None
         self.validations = []

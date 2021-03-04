@@ -108,9 +108,9 @@ class GeneticAlgorithmWorker:
         self.agents.extend(mutated_agents)
 
     def calculate_agent_validation_performance(self, agent: Agent):
-        for idx, (start_date, end_date) in enumerate(self.config.validations):
+        for idx in range(len(self.config.validations)):
             fit = agent.calculate_testing_fitness(
-                self.testing_databases[idx].companies, idx, start_date, end_date
+                self.testing_databases[idx].companies, idx
             )
             print(f"[{agent.agent_id}] validation #{idx} - {fit}")
 
