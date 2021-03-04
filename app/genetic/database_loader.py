@@ -120,5 +120,5 @@ class DatabaseLoader:
             infer_datetime_format=True,
         )
         self.learning_database.benchmark = df
-        for idx, (start_date, end_date) in enumerate(self.config.validations):
+        for idx in range(len(self.config.validations)):
             self.testing_databases[idx].benchmark = df
