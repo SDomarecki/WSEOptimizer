@@ -17,39 +17,29 @@ Sum of clause values can be used to compare each stock to pick best ones to theo
 
 ## Usage
 
-#### 1. Stooq downloader
-To wget all of WSE stocks history a few days or VPN will be needed due to stooq.pl limit of daily downloads.
-Run:
-```bash
-$ python database_scripts\\stooq_downloader.py
-```
-to download 200 stock histories into database/stooq directory.
-Currently (2020-10-05) WSE main market lists 436 companies.
-
-#### 2. Fundamental database scrapping
-
-If all stock histories are ready, fundamental data can be scrapped from BiznesRadar.pl and mixed into preprocessed .csv database.
-To scrap:
-```bash
-$ python database_scripts\\database_preprocessor.py
-```
-It can be kinda slow due to all of the technical indicators computations.
-
-#### 3. Genetic algorithm
-Last part of application is genetic algorithm itself.
 All you have to do is ~~squish that cat~~ run:
 ```bash
-$ python genetic\\genetic_algorithm_worker.py
+$ python app\\main.py
 ```
 in root directory.
-Application as a result will generate at each epoch plot of best model performance comparing to benchmark.
+
+WSEO will automatically fetch needed data from stooq.pl and BiznesRadar.pl and cache it at database directory.
+
+The fetching will halt after downloading 200 stock histories due to stooq.pl limit of daily downloads.
+To reset this limitation use VPN or wait 24 hours.
+
+After downloading and preprocessing data main part of WSEO will perform genetic algorithm on data and choose best generated agents basing on fitness value.
+As a result WSEO will draw at each epoch plot of best model performance comparing to benchmark.
 Moreover at the end of execution WSEOptimizer will print plot of end performance of best model in each epoch.
 
-#### Config.json
+### Config.json
 List of all of the options:
 ```bash
 {
   "database": {
+    "fetch_mode": "auto", # auto - fetches if data is not present, 
+                          # refresh - downloads all data and replace if present, 
+                          # omit - skips this phase
     "min_circulation": 500000, #-1 == omitted, prevents from trading with penny stocks-like companies
     "max_circulation": -1, #-1 == omitted
     "sectors": [],
@@ -123,7 +113,7 @@ $ venv/Scripts/activate
 $ pip install -r requirements.txt
 
 # Run script
-$ python genetic\\genetic_algorithm_worker.py
+$ python app\\main.py
 ```
 
 Alternative way is to use bundled `PyCharm` configurations.
