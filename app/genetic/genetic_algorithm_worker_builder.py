@@ -56,7 +56,7 @@ class GeneticAlgorithmWorkerBuilder:
         agents = []
         for i in range(self.config.initial_population):
             genome = self.gene_factory.create_n_random_genes(self.config.initial_length)
-            agents += Agent(i, genome, self.config)
+            agents.append(Agent(i, genome, self.config))
         return agents
 
     def init_non_constant_length_agents(self) -> [Agent]:
@@ -83,13 +83,11 @@ class GeneticAlgorithmWorkerBuilder:
             return Constant(
                 self.config.initial_length,
                 to_create,
-                self.config.validations,
                 self.config,
             )
         return NonConstant(
             self.config.max_genes,
             to_create,
-            self.config.validations,
             self.config,
         )
 

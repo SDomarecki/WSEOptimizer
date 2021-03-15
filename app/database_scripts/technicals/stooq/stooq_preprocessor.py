@@ -7,10 +7,10 @@ from app.database_scripts.technicals.stooq.stooq_downloader import StooqDownload
 
 
 class StooqPreprocessor:
-    def __init__(self):
+    def __init__(self, database_path: str):
         stooq_base = "https://stooq.pl/q/d/l/?s="
         stooq_end = "&i=d"
-        self.cache_dir = "database/stooq"
+        self.cache_dir = f"{database_path}/stooq"
         self.stooq_downloader = StooqDownloader(stooq_base, stooq_end, self.cache_dir)
 
     def fetch_technicals(self, company: CompanyDetails) -> pd.DataFrame:

@@ -3,6 +3,7 @@ from datetime import datetime, date
 
 class Config:
     def __init__(self):
+        self.path_to_config = ""
         self.fetch_mode = ""
         self.min_circulation = 0
         self.max_circulation = 0

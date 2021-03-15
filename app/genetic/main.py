@@ -9,11 +9,12 @@ from app.genetic.reporting.reporter import Reporter
 
 
 def load_config(path: str) -> Config:
-    with open(path) as f:
+    with open(f"{path}/config.json") as f:
         dict_config = json.load(f)
 
     config = Config()
     config.fetch_from_dict(dict_config)
+    config.path_to_config = path
     return config
 
 
@@ -32,4 +33,4 @@ def run_genetic_algorithm(
 def save_results(worker: GeneticAlgorithmWorker, config: Config):
     filename = strftime("%Y-%m-%d %H-%M-%S", localtime())
     reporter = Reporter(worker, config)
-    reporter.save_results(f"../{filename}.json")
+    reporter.save_results(f"{config.path_to_config}/{filename}.json")

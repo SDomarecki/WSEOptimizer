@@ -13,7 +13,7 @@ from app.genetic.testing_database import TestingDatabase
 class DatabaseLoader:
     def __init__(self, path_to_database: str, config: Config):
         self.config = config
-        self.path = path_to_database
+        self.path = f"{path_to_database}/preprocessed"
 
         self.benchmark = None
 
@@ -81,7 +81,6 @@ class DatabaseLoader:
 
     def __filter_database(self, database: [], start_date, end_date) -> []:
         new_database = deepcopy(database)
-        # self.__filter_database_by_dates(new_database, start_date, end_date)
         new_database = self.__filter_database_by_circulation(new_database)
         return new_database
 

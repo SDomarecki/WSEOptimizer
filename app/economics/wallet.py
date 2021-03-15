@@ -28,7 +28,7 @@ class Wallet:
         total = self.cash
         for ticker in self.stocksHold.keys():
             company = self.find_company(database, ticker)
-            total += get_closest_value(company.technicals, date, "Close")
+            total += get_closest_value(company.technicals, date, "close")
         return round(total, 2)
 
     def get_end_total_value(self, database) -> float:

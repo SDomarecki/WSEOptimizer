@@ -24,7 +24,7 @@ class Plotter:
         )
         plt.plot_date(x, y, "-g", label="Total value")
         plt.legend(loc="upper left")
-        plt.savefig(f"../{str(generation)}.png", dpi=500)
+        plt.savefig(f"{self.config.path_to_config}/{str(generation)}.png", dpi=500)
         plt.close()
 
     def print_best_agents_learning_performance(self, best_scores, learning_targets):
@@ -33,7 +33,7 @@ class Plotter:
             learning_targets, color="r", linestyle="--", label="Target end value"
         )
         plt.legend(loc="upper left")
-        plt.savefig("../elite_perf_learning.png", dpi=500)
+        plt.savefig(f"{self.config.path_to_config}/elite_perf_learning.png", dpi=500)
         plt.close()
 
     def print_best_agents_testing_performance(self, best_scores, testing_targets):
@@ -46,5 +46,7 @@ class Plotter:
                 label="Target end value",
             )
             plt.legend(loc="upper left")
-            plt.savefig(f"../elite_perf_test_{str(idx)}.png", dpi=500)
+            plt.savefig(
+                f"{self.config.path_to_config}/elite_perf_test_{str(idx)}.png", dpi=500
+            )
             plt.close()

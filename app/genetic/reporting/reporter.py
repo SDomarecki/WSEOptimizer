@@ -15,8 +15,11 @@ class Reporter:
         self.save_to_file(result_string, save_path)
 
     def toJSON(self):
+        testing_targets = [
+            testing_db.benchmark_target for testing_db in self.worker.testing_databases
+        ]
         jsonable_self = GeneticAlgorithmWorkerJson(
-            self.worker.agents[:5], self.worker.targets[1:], self.config
+            self.worker.agents[:5], testing_targets, self.config
         )
         return json.dumps(jsonable_self.__dict__, default=str, indent=2)
 
