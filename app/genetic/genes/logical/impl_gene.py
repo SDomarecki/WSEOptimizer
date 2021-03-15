@@ -8,7 +8,7 @@ class ImplGene(Gene):
         self.rightGene = right_gene
 
     def condition(self, company, day):
-        # not(a and not b)
+        # not(a and not b) == not a or b
         left_cond = self.leftGene.condition(company, day)
         right_cond = self.rightGene.condition(company, day)
         return not left_cond or right_cond
