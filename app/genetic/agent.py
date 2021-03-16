@@ -74,7 +74,8 @@ class Agent:
         day += delta
         return self.shift_to_weekday(day)
 
-    def shift_to_weekday(self, day: datetime.date) -> datetime.date:
+    @staticmethod
+    def shift_to_weekday(day: datetime.date) -> datetime.date:
         if day.isoweekday() in [6, 7]:
             day += datetime.timedelta(days=8 - day.isoweekday())
         return day

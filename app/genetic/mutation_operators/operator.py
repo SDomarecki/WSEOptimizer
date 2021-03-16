@@ -23,4 +23,4 @@ class Operator(ABC):
 
     @abstractmethod
     def mutate_one_gene(self, gene: Gene) -> Gene:
-        pass
+        raise NotImplementedError

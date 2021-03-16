@@ -18,6 +18,7 @@ class Tournament(Operator):
         ]
         return selected
 
-    def select_one_aspirant(self, agents: [Agent], tournament_size: int) -> Agent:
+    @staticmethod
+    def select_one_aspirant(agents: [Agent], tournament_size: int) -> Agent:
         aspirants = random.sample(agents, tournament_size)
         return max(aspirants, key=lambda ag: ag.learning_fitness)

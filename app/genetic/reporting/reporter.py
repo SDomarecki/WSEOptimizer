@@ -23,6 +23,7 @@ class Reporter:
         )
         return json.dumps(jsonable_self.__dict__, default=str, indent=2)
 
-    def save_to_file(self, result: str, save_path: str):
+    @staticmethod
+    def save_to_file(result: str, save_path: str):
         with open(save_path, "w") as file:
             file.write(result)

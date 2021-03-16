@@ -8,7 +8,7 @@ class GeneticAlgorithmWorker:
 
         self.next_agent_id = 1
         self.learning_database = None
-        self.testing_databases = None
+        self.testing_databases: [] = None
         self.chunk_size = 0
 
         self.agents = []

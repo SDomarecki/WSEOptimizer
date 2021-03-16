@@ -37,8 +37,8 @@ class Plotter:
         plt.close()
 
     def print_best_agents_testing_performance(self, best_scores, testing_targets):
-        for idx in range(len(self.config.validations)):
-            plt.plot(best_scores[idx], label="Best agent end value")
+        for idx, score in enumerate(best_scores):
+            plt.plot(score, label="Best agent end value")
             plt.axhline(
                 testing_targets[idx],
                 color="r",

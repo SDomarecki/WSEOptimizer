@@ -27,8 +27,8 @@ class Gene(ABC):
 
     @abstractmethod
     def condition(self, company: Company, day: date) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def condition_to_string(self) -> str:
-        pass
+        raise NotImplementedError

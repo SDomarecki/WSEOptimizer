@@ -1,7 +1,6 @@
 import random
 
 from app.genetic.genes.fundamental.qq_change.gene_qq_change import GeneQQChange
-from app.genetic.genes.gene import Gene
 
 
 class PBVqq(GeneQQChange):

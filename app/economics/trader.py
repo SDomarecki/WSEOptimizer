@@ -95,7 +95,8 @@ class Trader:
             return self.testing_wallets[case].get_end_total_value(database)
         return self.testing_wallets[case].get_end_sharpe(database)
 
-    def today_price(self, stock, day):
+    @staticmethod
+    def today_price(stock, day):
         lookup = convert_date_to_datetime(day)
         try:
             return stock.technicals.at[lookup, "close"]

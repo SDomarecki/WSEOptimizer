@@ -31,11 +31,9 @@ class DatabaseLoader:
             database += [company] if company is not None else []
 
         self.learning_database = LearningDatabase()
-        self.learning_database.companies = self.__filter_database(
-            database, self.config.start_date, self.config.end_date
-        )
-        for (start_date, end_date) in self.config.validations:
-            companies = self.__filter_database(database, start_date, end_date)
+        self.learning_database.companies = self.__filter_database(database)
+        for _ in self.config.validations:
+            companies = self.__filter_database(database)
             testing_database = TestingDatabase()
             testing_database.companies = companies
             self.testing_databases.append(testing_database)
@@ -79,7 +77,7 @@ class DatabaseLoader:
             infer_datetime_format=True,
         )
 
-    def __filter_database(self, database: [], start_date, end_date) -> []:
+    def __filter_database(self, database: []) -> []:
         new_database = deepcopy(database)
         new_database = self.__filter_database_by_circulation(new_database)
         return new_database
@@ -119,5 +117,6 @@ class DatabaseLoader:
             infer_datetime_format=True,
         )
         self.learning_database.benchmark = df
-        for idx in range(len(self.config.validations)):
-            self.testing_databases[idx].benchmark = df
+
+        for db in self.testing_databases:
+            db.benchmark = df

@@ -8,9 +8,6 @@ if TYPE_CHECKING:
 
 
 class Operator(ABC):
-    def __init__(self):
-        pass
-
     @abstractmethod
     def crossover(self, agents: [Agent], last_agent_id: int) -> [Agent]:
-        pass
+        raise NotImplementedError
